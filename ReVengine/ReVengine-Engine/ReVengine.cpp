@@ -1,31 +1,44 @@
 ﻿#include "ReVengine.h"
-#include "soloud.h"
-#include <soloud_wav.h>
-#include <filesystem>
-#include "d3d11_1.h"
+#include "DirectX11/RenderWindow.h"
+#include "Windows.h"
+#include <iostream>
 
-void CmakeTestFunction()
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int nWinMode)
 {
-	std::cout << "Test has been testlled :pp" << std::endl;
+    // define the window class name
+    static const TCHAR szAppName[] = TEXT("MinimalWindowsApp");
+
+	initWindow(hInstance, nWinMode, szAppName);
+
+    static BOOL bRet;
+    static MSG  msg;
+
+    // enter the main message loop
+    while ((bRet = GetMessage(&msg, NULL, 0, 0)) != 0) // 0 = WM_QUIT
+    {
+        // check for error
+        if (-1 == bRet)
+        {
+            // handle the error and possibly exit
+
+            // for this app simply report error and exit
+            MessageBox(NULL, TEXT("Unable to Continue!"), szAppName, MB_OK | MB_ICONERROR);
+            return E_FAIL;
+        }
+        else
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+
+            mainLoop();
+        }
+    }
+
+    // the app is done, exit normally, return control to Windows
+    return (int)msg.wParam;
 }
 
-void EnginePlaySound()
+void mainLoop()
 {
-	SoLoud::Soloud gSoloud;
-	SoLoud::Wav gWave;
-
-	gSoloud.init();
-
-	std::cout << exists_test3("../resources/pew_pew.wav");
-
-	gWave.load("../resources/pew_pew.wav");
-
-	gSoloud.play(gWave);
-	//std::cout << exists_test3("../resources/pew_pew.wav");
-	//gSoloud.deinit();
-}
-
-inline bool exists_test3(const std::string& name) {
-	struct stat buffer;
-	return (stat(name.c_str(), &buffer) == 0);
+    std::cout << "I";
 }

@@ -3,10 +3,11 @@
 #include "RevEngine.h"
 #include "soloud.h"
 #include <soloud_wav.h>
+#include "DirectX11/RenderWindow.h"
 
 int main()
 {
-	CmakeTestFunction();
+	//CmakeTestFunction();
 
 	gSoloud.init();
 
@@ -14,7 +15,10 @@ int main()
 
 	//gSoloud.play(gWave);
 
-	//gSoloud.deinit();
+	while (gSoloud.getActiveVoiceCount() > 0) {
+	}
+
+	gSoloud.deinit();
 }
 
 void GameNamNam() {

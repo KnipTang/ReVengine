@@ -1,8 +1,9 @@
-﻿add_library(ReVengine-Engine "ReVengine.cpp") #No need to add header files
+﻿add_library(ReVengine-Engine "ReVengine.cpp" "DirectX11/RenderWindow.cpp") #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
 
-target_link_libraries(ReVengine-Engine PUBLIC soloud "${D3D11_LIBRARY}" "D3DX11_LIBRARY") #link soLoud to engine, name "soload" is the "target_name"
+#"${D3D11_LIBRARY}" "D3DX11_LIBRARY"
+target_link_libraries(ReVengine-Engine PUBLIC soloud dxgi d3d11) #link soLoud to engine, name "soload" is the "target_name"
 target_include_directories(ReVengine-Engine PUBLIC ${soloud_SOURCE_DIR}/include)
 
 #target_link_libraries(${PROJECT_NAME} PUBLIC dxgi d3d11)
