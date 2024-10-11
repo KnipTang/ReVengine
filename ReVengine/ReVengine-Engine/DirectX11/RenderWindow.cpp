@@ -1,77 +1,62 @@
 #include "RenderWindow.h"
+#include "ReVengine.h"
+#include "SDL.h"
+#include "d3d11.h"
 
-int initWindow(HINSTANCE hInstance, int nWinMode, static const TCHAR windowName[])
+#pragma comment(lib, "d3d11.lib")
+
+int SDL_main(int argc, char* argv[])
 {
-    // create an instance of the window class structure
-    WNDCLASSEX wc;
+    //The window we'll be rendering to
+    SDL_Window* window = NULL;
 
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.style = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc = WndProc;
-    wc.cbClsExtra = 0;
-    wc.cbWndExtra = 0;
-    wc.hInstance = hInstance;
-    wc.hIcon = (HICON)LoadImage(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-    wc.hIconSm = (HICON)LoadImage(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-    wc.hCursor = (HCURSOR)LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wc.lpszMenuName = NULL;
-    wc.lpszClassName = windowName;
+    //The surface contained by the window
+    SDL_Surface* screenSurface = NULL;
 
-    if (0 == RegisterClassEx(&wc))
+    //Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        MessageBox(NULL, TEXT("Can't Register the Window Class!"), windowName, MB_OK | MB_ICONERROR);
-        return E_FAIL;
+        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+    }
+    else
+    {
+        //Create window
+        window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 500, 500, SDL_WINDOW_SHOWN);
+        if (window == NULL)
+        {
+            printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+        }
+
+        //Get window surface
+        screenSurface = SDL_GetWindowSurface(window);
+
+        //Fill the surface white
+        SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+
+        //Update the surface
+        SDL_UpdateWindowSurface(window);
+
+        //Hack to get window to stay up
+        SDL_Event e;
+        bool quit = false;
+        while (quit == false)
+        {
+            while (SDL_PollEvent(&e))
+            {
+                if (e.type == SDL_QUIT)
+                    quit = true;
+            }
+
+            //Main Game Loop
+            mainLoop();
+        }
     }
 
-    // define the application title
-    static const TCHAR szAppTitle[] = TEXT("Win32 API Skeletal Application");
+    //Destroy window
+    SDL_DestroyWindow(window);
 
-    // create the window
-    HWND hwnd = CreateWindow(windowName, szAppTitle,
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        NULL, NULL, hInstance, NULL);
+    //Quit SDL subsystems
+    SDL_Quit();
 
-    // check if the window was created, exit if fail
-    if (NULL == hwnd)
-    {
-        MessageBox(NULL, TEXT("Unable to Create the Main Window!"), windowName, MB_OK | MB_ICONERROR);
-        return E_FAIL;
-    }
-
-    // show and update the window
-    ShowWindow(hwnd, nWinMode);
-    UpdateWindow(hwnd);
-}
-
-
-// processes the messages that Windows sends to the application ================
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    // choose which Windows messages you want to use
-    switch (message)
-    {
-    case WM_PAINT:
-        HDC         hdc;
-        PAINTSTRUCT ps;
-        hdc = BeginPaint(hwnd, &ps);
-
-        // draw some text centered in the client area
-        RECT rect;
-        GetClientRect(hwnd, &rect);
-        DrawText(hdc, TEXT("Hello, Windows!"), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-
-        EndPaint(hwnd, &ps);
-        return S_OK;
-
-    case WM_DESTROY:
-        // exit the application
-        PostQuitMessage(0);
-        return S_OK;
-    }
-
-    // let Windows process any unhandled messages
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    return 0;
 }
