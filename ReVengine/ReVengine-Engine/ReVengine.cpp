@@ -3,5 +3,5 @@
 
 void mainLoop()
 {
-    std::cout << "I\n";
+    //std::cout << "I\n";
 }
