@@ -1,6 +1,7 @@
 #include "d3d11.h"
 #include "SDL.h"
 #include <SDL_syswm.h>
+#include <string>
 class D3D11Creator
 {
 public:
@@ -20,6 +21,20 @@ private:
 	IDXGISwapChain* _swapChain = NULL;
 	ID3D11RenderTargetView* _renderTargetView = NULL;
 
-	ID3D11VertexShader* _vertexShader;
+	ID3D11Texture2D* framebuffer;
+
+	ID3D11VertexShader* _vertexShader = NULL;
+	ID3D11PixelShader* _pixelShader = NULL;
+	ID3D11InputLayout* input_layout_ptr = NULL;
+
+	ID3D11Buffer* vertex_buffer_ptr = NULL;
+	UINT vertex_stride = 3 * sizeof(float);
+	UINT vertex_offset = 0;
+	UINT vertex_count = 3;
+
+	HWND hwnd;
+
+	std::string vertexFile = "../DirectX11/shaders/shader.cso";
+	std::string pixelFile = "../DirectX11/shaders/shader_p.cso";
 };
 

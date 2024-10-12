@@ -39,7 +39,6 @@ int SDL_main(int argc, char* argv[])
 
         D3D11Creator* creatorGod = new D3D11Creator{};
         creatorGod->setupSwapChain(window);
-        creatorGod->compileShaders();
                         
         //Hack to get window to stay up
         SDL_Event e;
@@ -54,6 +53,7 @@ int SDL_main(int argc, char* argv[])
 
             //Main Game Loop
             mainLoop();
+            creatorGod->updateWindow();
         }
     }
 
