@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include "filesystem"
+#include "fstream"
 
 void displayCurrentFiles(std::string path)
 {
@@ -90,51 +91,17 @@ void D3D11Creator::setupSwapChain(SDL_Window* window)
 
 void D3D11Creator::compileShaders()
 {
-//	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-//#if defined( DEBUG ) || defined( _DEBUG )
-//	flags |= D3DCOMPILE_DEBUG; // add more debug output
-//#endif
-//	ID3DBlob* vs_blob_ptr = NULL, * ps_blob_ptr = NULL, * error_blob = NULL;
-//
-//	// COMPILE VERTEX SHADER
-//	HRESULT hr = D3DCompileFromFile(
-//		L"shader.hlsl",
-//		nullptr,
-//		D3D_COMPILE_STANDARD_FILE_INCLUDE,
-//		"vs_main",
-//		"vs_5_0",
-//		flags,
-//		0,
-//		&vs_blob_ptr,
-//		&error_blob);
-//	if (FAILED(hr)) {
-//		if (error_blob) {
-//			OutputDebugStringA((char*)error_blob->GetBufferPointer());
-//			error_blob->Release();
-//		}
-//		if (vs_blob_ptr) { vs_blob_ptr->Release(); }
-//		assert(false);
-//	}
-//
-//	// COMPILE PIXEL SHADER
-//	hr = D3DCompileFromFile(
-//		L"shader.hlsl",
-//		nullptr,
-//		D3D_COMPILE_STANDARD_FILE_INCLUDE,
-//		"ps_main",
-//		"ps_5_0",
-//		flags,
-//		0,
-//		&ps_blob_ptr,
-//		&error_blob);
-//	if (FAILED(hr)) {
-//		if (error_blob) {
-//			OutputDebugStringA((char*)error_blob->GetBufferPointer());
-//			error_blob->Release();
-//		}
-//		if (ps_blob_ptr) { ps_blob_ptr->Release(); }
-//		assert(false);
-//	}
+	std::string vertexFile = "../DirectX11/shaders/shader.cso";
+
+	std::ifstream inFile(vertexFile, std::ios_base::binary);
+	std::string vertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
+		std::istreambuf_iterator<char>());
+	inFile.close();
+
+	HRESULT result = _device->CreateVertexShader(
+		vertexBytecode.c_str(), vertexBytecode.size(),
+		nullptr, &_vertexShader);
+
 }
 
 void D3D11Creator::updateWindow()

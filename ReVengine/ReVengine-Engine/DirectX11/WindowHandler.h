@@ -19,5 +19,7 @@ private:
 	ID3D11DeviceContext* _deviceContext = NULL; //A device context contains the circumstance or setting in which a device is used. More specifically, a device context is used to set pipeline state and generate rendering commands using the resources owned by a device.
 	IDXGISwapChain* _swapChain = NULL;
 	ID3D11RenderTargetView* _renderTargetView = NULL;
+
+	ID3D11VertexShader* _vertexShader;
 };
 
