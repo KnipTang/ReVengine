@@ -55,13 +55,13 @@ endfunction()
 foreach(FILE ${SHADERS_DIR}/VertexShader.hlsl)
     get_filename_component(SHADER_NAME ${FILE} NAME_WE) # get shader name without extension
     
-    compile_shader(${FILE} ${SHADERS_OUT_DIR}/${SHADER_NAME}_v.cso vs_5_0 vs_main COMPILED_SHADER_FILES)
+    compile_shader(${FILE} ${SHADERS_OUT_DIR}/${SHADER_NAME}.cso vs_5_0 vs_main COMPILED_SHADER_FILES)
 endforeach()
 
 foreach(FILE ${SHADERS_DIR}/PixelShader.hlsl)
     get_filename_component(SHADER_NAME ${FILE} NAME_WE) # get shader name without extension
     
-    compile_shader(${FILE} ${SHADERS_OUT_DIR}/${SHADER_NAME}_p.cso ps_5_0 ps_main COMPILED_SHADER_FILES)
+    compile_shader(${FILE} ${SHADERS_OUT_DIR}/${SHADER_NAME}.cso ps_5_0 ps_main COMPILED_SHADER_FILES)
 endforeach()
 
 message("Adding CUSTOM TARGET on ${COMPILED_SHADER_FILES}")
