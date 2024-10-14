@@ -10,12 +10,6 @@
 
 #pragma comment(lib, "d3d11.lib")
 
-void displayCurrentFiles(std::string path)
-{
-	for (const auto& entry : std::filesystem::directory_iterator(path))
-		std::cout << entry.path() << std::endl;
-}
-
 D3D11Creator::D3D11Creator(SDL_Window* window)
 {
 	SDL_SysWMinfo wmInfo;
@@ -81,9 +75,6 @@ void D3D11Creator::setupDeviceAndSwap()
 
 	endFrame();
 
-
-	displayCurrentFiles("../DirectX11/shaders");
-
 	compileShaders();
 }
 
@@ -116,65 +107,98 @@ void D3D11Creator::compileShaders()
 	std::string vertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
 		std::istreambuf_iterator<char>());
 	inFile.close();
-
+	
 	HRESULT result = pDevice->CreateVertexShader(
 		vertexBytecode.c_str(), vertexBytecode.size(),
-		nullptr, &_vertexShader);
+		nullptr, &pVertexShader);
 	assert(SUCCEEDED(result));
 
-	inFile = std::ifstream{ pixelFile, std::ios_base::binary };
+	/*inFile = std::ifstream{ pixelFile, std::ios_base::binary };
 	std::string pixelBytecode = std::string(std::istreambuf_iterator<char>(inFile),
 		std::istreambuf_iterator<char>());
 	inFile.close();
 
 	result = pDevice->CreatePixelShader(
 		pixelBytecode.c_str(), pixelBytecode.size(),
-		nullptr, &_pixelShader);
+		nullptr, &_pixelShader);*/
 
-	D3D11_INPUT_ELEMENT_DESC inputElementDesc[] = {
-	  { 
-			"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	  /*
-	  { "COL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	  { "NOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	  { "TEX", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	  */
+	//D3D11_INPUT_ELEMENT_DESC inputElementDesc[] = {
+	//  { 
+	//		"POS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//  /*
+	//  { "COL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//  { "NOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//  { "TEX", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	//  */
+	//};
+	//result = pDevice->CreateInputLayout(
+	//	inputElementDesc,
+	//	ARRAYSIZE(inputElementDesc),
+	//	vertexBytecode.c_str(),
+	//	vertexBytecode.size(),
+	//	&input_layout_ptr);
+	//assert(SUCCEEDED(result));
+
+	//float vertex_data_array[] = {
+ //  0.0f,  0.5f,  0.0f, // point at top
+ //  0.5f, -0.5f,  0.0f, // point at bottom-right
+ // -0.5f, -0.5f,  0.0f, // point at bottom-left
+	//};
+
+
+	//{ /*** load mesh data into vertex buffer **/
+	//	D3D11_BUFFER_DESC vertex_buff_descr = {};
+	//	vertex_buff_descr.ByteWidth = sizeof(vertex_data_array);
+	//	vertex_buff_descr.Usage = D3D11_USAGE_DEFAULT;
+	//	vertex_buff_descr.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	//	D3D11_SUBRESOURCE_DATA sr_data = { 0 };
+	//	sr_data.pSysMem = vertex_data_array;
+	//	HRESULT hr = pDevice->CreateBuffer(
+	//		&vertex_buff_descr,
+	//		&sr_data,
+	//		&pVertexBuffer);
+	//	assert(SUCCEEDED(hr));
+	//}
+}
+
+void D3D11Creator::drawTriangle()
+{
+	const Vertex vertices[]
+	{
+		{ 0.0f, 0.5f },
+		{ 0.5f, -0.5f },
+		{ -0.5f, -0.5f },
 	};
-	result = pDevice->CreateInputLayout(
-		inputElementDesc,
-		ARRAYSIZE(inputElementDesc),
-		vertexBytecode.c_str(),
-		vertexBytecode.size(),
-		&input_layout_ptr);
+
+	D3D11_BUFFER_DESC vertexBuffer_DESC{ 0 };
+	vertexBuffer_DESC.BindFlags = D3D11_BIND_VERTEX_BUFFER; //Type of vertex buffer
+	vertexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
+	vertexBuffer_DESC.CPUAccessFlags = 0;
+	vertexBuffer_DESC.MiscFlags = 0;
+	vertexBuffer_DESC.ByteWidth = sizeof(vertices);
+	vertexBuffer_DESC.StructureByteStride = sizeof(Vertex);
+
+	//The data of the vertex
+	D3D11_SUBRESOURCE_DATA subResc_DATA{ 0 };
+	subResc_DATA.pSysMem = vertices;
+
+	HRESULT result = pDevice->CreateBuffer(&vertexBuffer_DESC, &subResc_DATA, &pVertexBuffer);
 	assert(SUCCEEDED(result));
 
-	float vertex_data_array[] = {
-   0.0f,  0.5f,  0.0f, // point at top
-   0.5f, -0.5f,  0.0f, // point at bottom-right
-  -0.5f, -0.5f,  0.0f, // point at bottom-left
-	};
+	//Vertex buffer is a buffer that holds the vertex data
+	pDeviceContext->IASetVertexBuffers(0,1, &pVertexBuffer, &vertexStride, &vertexOffset);
 
+	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
 
-	{ /*** load mesh data into vertex buffer **/
-		D3D11_BUFFER_DESC vertex_buff_descr = {};
-		vertex_buff_descr.ByteWidth = sizeof(vertex_data_array);
-		vertex_buff_descr.Usage = D3D11_USAGE_DEFAULT;
-		vertex_buff_descr.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		D3D11_SUBRESOURCE_DATA sr_data = { 0 };
-		sr_data.pSysMem = vertex_data_array;
-		HRESULT hr = pDevice->CreateBuffer(
-			&vertex_buff_descr,
-			&sr_data,
-			&vertex_buffer_ptr);
-		assert(SUCCEEDED(hr));
-	}
+	UINT vertexCount = std::size(vertices);
+	pDeviceContext->Draw(vertexCount, 0);
 }
 
 void D3D11Creator::updateWindow()
 {
-	float background_colour[4] = {
-	  0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
 	clearBuffer(background_colour);
+
+	drawTriangle();
 	/*
 	RECT winRect;
 	GetClientRect(hwnd, &winRect);

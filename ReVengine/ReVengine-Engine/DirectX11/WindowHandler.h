@@ -18,10 +18,17 @@ public:
 	void clearBuffer(float background_colour[4]); //Set background color and clear back buffer
 	void compileShaders();
 
+	void drawTriangle();
+
 	void cleanup();
 	void updateWindow();
 	void renderWindow();
 
+	struct Vertex
+	{
+		float x;
+		float y;
+	};
 
 private:
 	//The head of directX From device all the other achitecture gets created and linked to.
@@ -39,19 +46,25 @@ private:
 	//Holds both back and front chain. (front is what the user sees, back is what is being calculated before the user sees it)
 	wrl::ComPtr<ID3D11Texture2D> pFramebuffer;
 
-	wrl::ComPtr<ID3D11VertexShader> _vertexShader = NULL;
+	wrl::ComPtr<ID3D11Buffer> pVertexBuffer = NULL;
+
+	wrl::ComPtr<ID3D11VertexShader> pVertexShader = NULL;
 	wrl::ComPtr<ID3D11PixelShader> _pixelShader = NULL;
 	wrl::ComPtr<ID3D11InputLayout> input_layout_ptr = NULL;
 
-	wrl::ComPtr<ID3D11Buffer> vertex_buffer_ptr = NULL;
-	UINT vertex_stride = 3 * sizeof(float);
-	UINT vertex_offset = 0;
+	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
+	//3 floats for position (x, y, z) = 3 * 4 bytes = 12 bytes
+	//4 floats for color(r, g, b, a) = 4 * 4 bytes = 16 bytes
+	UINT vertexStride = (3 /*+ 4*/) * sizeof(float);
+	UINT vertexOffset = 0;
 	UINT vertex_count = 3;
 
 	//Windows window handle.
 	HWND hwnd;
 
-	std::string vertexFile = "../DirectX11/shaders/shader.cso";
-	std::string pixelFile = "../DirectX11/shaders/shader_p.cso";
+	std::string vertexFile = "../DirectX11/shaders/VertexShader_v.cso";
+	std::string pixelFile = "../DirectX11/shaders/PixelShader_p.cso";
+
+	float background_colour[4] = { 0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
 };
 

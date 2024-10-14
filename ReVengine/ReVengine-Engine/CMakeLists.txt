@@ -38,7 +38,7 @@ set(SHADERS_OUT_DIR "${CMAKE_BINARY_DIR}/DirectX11/shaders")
 # make shader output dir
 file(MAKE_DIRECTORY "${SHADERS_OUT_DIR}")
 
-function(compile_shader IN_FILE OUT_FILE PROFILE ENTRY COMPILED_SHADER_FILES)
+function(compile_shader IN_FILE OUT_FILE PROFILE ENTRY FILES_LIST)
     add_custom_command(
         OUTPUT ${OUT_FILE}
         COMMAND fxc.exe /T ${PROFILE} /E ${ENTRY} /Fo ${OUT_FILE} ${IN_FILE}
@@ -46,17 +46,22 @@ function(compile_shader IN_FILE OUT_FILE PROFILE ENTRY COMPILED_SHADER_FILES)
         VERBATIM
     )
      
-    list(APPEND COMPILED_SHADER_FILES ${OUT_FILE})
+    list(APPEND ${FILES_LIST} ${OUT_FILE})
 
-    set(${COMPILED_SHADER_FILES} "${${COMPILED_SHADER_FILES}}" PARENT_SCOPE)
+    set(${FILES_LIST} "${${FILES_LIST}}" PARENT_SCOPE)
 endfunction()
 
-foreach(FILE ${SHADERS_DIR}/shader.hlsl)
+#Compiling vertex shaders
+foreach(FILE ${SHADERS_DIR}/VertexShader.hlsl)
     get_filename_component(SHADER_NAME ${FILE} NAME_WE) # get shader name without extension
     
     compile_shader(${FILE} ${SHADERS_OUT_DIR}/${SHADER_NAME}_v.cso vs_5_0 vs_main COMPILED_SHADER_FILES)
-    compile_shader(${FILE} ${SHADERS_OUT_DIR}/${SHADER_NAME}_p.cso ps_5_0 ps_main COMPILED_SHADER_FILES)
+endforeach()
 
+foreach(FILE ${SHADERS_DIR}/PixelShader.hlsl)
+    get_filename_component(SHADER_NAME ${FILE} NAME_WE) # get shader name without extension
+    
+    compile_shader(${FILE} ${SHADERS_OUT_DIR}/${SHADER_NAME}_p.cso ps_5_0 ps_main COMPILED_SHADER_FILES)
 endforeach()
 
 message("Adding CUSTOM TARGET on ${COMPILED_SHADER_FILES}")
