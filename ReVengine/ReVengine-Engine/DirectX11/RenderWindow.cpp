@@ -4,8 +4,6 @@
 #include "d3d11.h"
 #include "DirectX11/WindowHandler.h"
 
-#pragma comment(lib, "d3d11.lib")
-
 int SDL_main(int argc, char* argv[])
 {
     //The window we'll be rendering to
@@ -37,8 +35,8 @@ int SDL_main(int argc, char* argv[])
         //Update the surface
         SDL_UpdateWindowSurface(window);
 
-        D3D11Creator* creatorGod = new D3D11Creator{};
-        creatorGod->setupSwapChain(window);
+        D3D11Creator* creatorGod = new D3D11Creator{ window };
+        creatorGod->setupDeviceAndSwap();
                         
         //Hack to get window to stay up
         SDL_Event e;

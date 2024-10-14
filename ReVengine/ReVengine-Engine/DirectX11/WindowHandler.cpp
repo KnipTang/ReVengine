@@ -8,49 +8,53 @@
 #include "filesystem"
 #include "fstream"
 
+#pragma comment(lib, "d3d11.lib")
+
 void displayCurrentFiles(std::string path)
 {
 	for (const auto& entry : std::filesystem::directory_iterator(path))
 		std::cout << entry.path() << std::endl;
 }
 
-D3D11Creator::D3D11Creator()
-{
-}
-
-D3D11Creator::~D3D11Creator()
-{
-}
-
-void D3D11Creator::createDevice()
-{
-	//HRESULT hr = D3D11CreateDevice();
-	//assert(SUCCEEDED(hr)); //Succeeded checks if the function worked and assert crashes the program if it didnt succeed
-	//_device.cre
-}
-
-void D3D11Creator::setupSwapChain(SDL_Window* window)
+D3D11Creator::D3D11Creator(SDL_Window* window)
 {
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(window, &wmInfo);
 	hwnd = wmInfo.info.win.window;
+}
 
+D3D11Creator::~D3D11Creator()
+{
+	
+	if (pDeviceContext != nullptr)
+		pDeviceContext->Release();
 
+	if (pSwapChain != nullptr)
+		pSwapChain->Release();
+}
 
+void D3D11Creator::setupDeviceAndSwap()
+{
+	//Configure the desc(options) for the swapchain pointer
 	DXGI_SWAP_CHAIN_DESC swapChainDESC = { 0 };
 	ZeroMemory(&swapChainDESC, sizeof(DXGI_SWAP_CHAIN_DESC));
 
+	swapChainDESC.BufferDesc.Width = 0;
+	swapChainDESC.BufferDesc.Height = 0; //Width and height unspecified
+	swapChainDESC.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	swapChainDESC.BufferDesc.RefreshRate.Numerator = 0;
 	swapChainDESC.BufferDesc.RefreshRate.Denominator = 1;
-	swapChainDESC.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	swapChainDESC.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	swapChainDESC.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDESC.SampleDesc.Count = 1;
-	swapChainDESC.SampleDesc.Quality = 0;
-	swapChainDESC.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDESC.BufferCount = 1;
-	swapChainDESC.OutputWindow = hwnd;
+	swapChainDESC.SampleDesc.Quality = 0; //Just means at this point no Anti Aliasing
+	swapChainDESC.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; //Use this buffer as render target
+	swapChainDESC.BufferCount = 1; //one back buffer and one front
+	swapChainDESC.OutputWindow = hwnd; //What window to output on
 	swapChainDESC.Windowed = true;
-
+	swapChainDESC.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDESC.Flags = 0;
 
 
 	D3D_FEATURE_LEVEL feature_level;
@@ -58,36 +62,52 @@ void D3D11Creator::setupSwapChain(SDL_Window* window)
 #if defined( DEBUG ) || defined( _DEBUG )
 	flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
+	//Creates swapchain, device and device context
 	HRESULT hr = D3D11CreateDeviceAndSwapChain(
-		NULL,
+		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
-		NULL,
+		nullptr,
 		flags,
-		NULL,
+		nullptr,
 		0,
 		D3D11_SDK_VERSION,
 		&swapChainDESC,
-		&_swapChain,
-		&_device,
+		&pSwapChain,
+		&pDevice,
 		&feature_level,
-		&_deviceContext);
-	assert(S_OK == hr && _swapChain && _device && _deviceContext);
+		&pDeviceContext);
+	assert(S_OK == hr && pSwapChain && pDevice && pDeviceContext);
 
 
+	endFrame();
 
-	hr = _swapChain->GetBuffer(
-		0,
-		__uuidof(ID3D11Texture2D),
-		(void**)&framebuffer);
-	assert(SUCCEEDED(hr));
-	hr = _device->CreateRenderTargetView(
-		framebuffer, 0, &_renderTargetView);
-	assert(SUCCEEDED(hr));
-	framebuffer->Release();
 
 	displayCurrentFiles("../DirectX11/shaders");
 
 	compileShaders();
+}
+
+void D3D11Creator::endFrame()
+{
+	HRESULT hr = pSwapChain->GetBuffer(
+		0,
+		__uuidof(ID3D11Texture2D),
+		(void**)&pFramebuffer);
+	assert(SUCCEEDED(hr));
+
+	hr = pDevice->CreateRenderTargetView(
+		pFramebuffer.Get(),
+		nullptr,
+		&pRenderTargetView);
+	assert(SUCCEEDED(hr));
+
+	pFramebuffer->Release();
+}
+
+void D3D11Creator::clearBuffer(float background_colour[4])
+{
+	pDeviceContext->ClearRenderTargetView(
+		pRenderTargetView.Get(), background_colour);
 }
 
 void D3D11Creator::compileShaders()
@@ -97,7 +117,7 @@ void D3D11Creator::compileShaders()
 		std::istreambuf_iterator<char>());
 	inFile.close();
 
-	HRESULT result = _device->CreateVertexShader(
+	HRESULT result = pDevice->CreateVertexShader(
 		vertexBytecode.c_str(), vertexBytecode.size(),
 		nullptr, &_vertexShader);
 	assert(SUCCEEDED(result));
@@ -107,7 +127,7 @@ void D3D11Creator::compileShaders()
 		std::istreambuf_iterator<char>());
 	inFile.close();
 
-	result = _device->CreatePixelShader(
+	result = pDevice->CreatePixelShader(
 		pixelBytecode.c_str(), pixelBytecode.size(),
 		nullptr, &_pixelShader);
 
@@ -120,7 +140,7 @@ void D3D11Creator::compileShaders()
 	  { "TEX", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	  */
 	};
-	result = _device->CreateInputLayout(
+	result = pDevice->CreateInputLayout(
 		inputElementDesc,
 		ARRAYSIZE(inputElementDesc),
 		vertexBytecode.c_str(),
@@ -142,7 +162,7 @@ void D3D11Creator::compileShaders()
 		vertex_buff_descr.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		D3D11_SUBRESOURCE_DATA sr_data = { 0 };
 		sr_data.pSysMem = vertex_data_array;
-		HRESULT hr = _device->CreateBuffer(
+		HRESULT hr = pDevice->CreateBuffer(
 			&vertex_buff_descr,
 			&sr_data,
 			&vertex_buffer_ptr);
@@ -152,12 +172,10 @@ void D3D11Creator::compileShaders()
 
 void D3D11Creator::updateWindow()
 {
-	/* clear the back buffer to cornflower blue for the new frame */
 	float background_colour[4] = {
 	  0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
-	_deviceContext->ClearRenderTargetView(
-		_renderTargetView, background_colour);
-
+	clearBuffer(background_colour);
+	/*
 	RECT winRect;
 	GetClientRect(hwnd, &winRect);
 	D3D11_VIEWPORT viewport = {
@@ -167,26 +185,26 @@ void D3D11Creator::updateWindow()
 	  (FLOAT)(winRect.bottom - winRect.top),
 	  0.0f,
 	  1.0f };
-	_deviceContext->RSSetViewports(1, &viewport);
+	pDeviceContext->RSSetViewports(1, &viewport);
 
-	_deviceContext->OMSetRenderTargets(1, &_renderTargetView, NULL);
+	pDeviceContext->OMSetRenderTargets(1, &pRenderTargetView, NULL);
 
-	_deviceContext->IASetPrimitiveTopology(
+	pDeviceContext->IASetPrimitiveTopology(
 		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	_deviceContext->IASetInputLayout(input_layout_ptr);
-	_deviceContext->IASetVertexBuffers(
+	pDeviceContext->IASetInputLayout(input_layout_ptr);
+	pDeviceContext->IASetVertexBuffers(
 		0,
 		1,
 		&vertex_buffer_ptr,
 		&vertex_stride,
 		&vertex_offset);
 
-	_deviceContext->VSSetShader(_vertexShader, NULL, 0);
-	_deviceContext->PSSetShader(_pixelShader, NULL, 0);
+	pDeviceContext->VSSetShader(_vertexShader, NULL, 0);
+	pDeviceContext->PSSetShader(_pixelShader, NULL, 0);
 
-	_deviceContext->Draw(vertex_count, 0);
+	pDeviceContext->Draw(vertex_count, 0);*/
 
-	_swapChain->Present(1, 0);
+	pSwapChain->Present(1, 0);
 }
 
 void D3D11Creator::renderWindow()
