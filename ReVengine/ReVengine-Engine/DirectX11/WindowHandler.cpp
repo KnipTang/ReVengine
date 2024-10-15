@@ -131,9 +131,9 @@ void D3D11Creator::drawTriangle()
 {
 	const Vertex vertices[]
 	{
-		{ 0.0f, 0.5f },		
-		{ 0.5f, -0.5f },
-		{ -0.5f, -0.5f },
+		{ 0.0f, 0.5f, 1.f, 0, 0 },		
+		{ 0.5f, -0.5f, 0.f, 1.f, 0 },
+		{ -0.5f, -0.5f, 0.f, 0, 1.0f},
 	};
 
 	D3D11_BUFFER_DESC vertexBuffer_DESC{ 0 };
@@ -151,6 +151,10 @@ void D3D11Creator::drawTriangle()
 	HRESULT result = pDevice->CreateBuffer(&vertexBuffer_DESC, &subResc_DATA, &pVertexBuffer);
 	assert(SUCCEEDED(result));
 
+	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
+	//3 floats for position (x, y) = 2 * 4 bytes = 8 bytes
+	//4 floats for color(r, g, b, a) = 3 * 4 bytes = 12 bytes
+	UINT vertexStride = (2 + 3) * sizeof(float);
 	//Vertex buffer is a buffer that holds the vertex data
 	pDeviceContext->IASetVertexBuffers(0,1, pVertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
 
@@ -179,6 +183,7 @@ void D3D11Creator::drawTriangle()
 	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), vertexBytecode.c_str(), vertexBytecode.size(), &inputLayer);
 

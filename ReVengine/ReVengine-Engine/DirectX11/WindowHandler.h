@@ -26,6 +26,11 @@ public:
 	{
 		float x;
 		float y;
+
+		float r;
+		float g;
+		float b;
+
 	};
 
 private:
@@ -54,10 +59,7 @@ private:
 	std::string vertexBytecode;
 	std::string pixelBytecode;
 
-	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
-	//3 floats for position (x, y) = 2 * 4 bytes = 8 bytes
-	//4 floats for color(r, g, b, a) = 4 * 4 bytes = 16 bytes
-	UINT vertexStride = (2 /*+ 4*/) * sizeof(float);
+
 	//OffSet between vertecies
 	UINT vertexOffset = 0;
 
