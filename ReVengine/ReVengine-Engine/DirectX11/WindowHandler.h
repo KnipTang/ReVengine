@@ -24,13 +24,17 @@ public:
 
 	struct Vertex
 	{
-		float x;
-		float y;
-
-		float r;
-		float g;
-		float b;
-
+		struct
+		{
+			float x;
+			float y;
+		} pos;
+		struct
+		{
+			float r;
+			float g;
+			float b;
+		} color;
 	};
 
 private:

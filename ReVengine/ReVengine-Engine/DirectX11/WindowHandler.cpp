@@ -131,9 +131,9 @@ void D3D11Creator::drawTriangle()
 {
 	const Vertex vertices[]
 	{
-		{ 0.0f, 0.5f, 1.f, 0, 0 },		
-		{ 0.5f, -0.5f, 0.f, 1.f, 0 },
-		{ -0.5f, -0.5f, 0.f, 0, 1.0f},
+		{ {0.0f, 0.5f}, {1.f, 0, 0} },
+		{ {0.5f, -0.5f}, {0.f, 1.f, 0} },
+		{ {-0.5f, -0.5f}, {0.f, 0, 1.0f} },
 	};
 
 	D3D11_BUFFER_DESC vertexBuffer_DESC{ 0 };
@@ -160,20 +160,32 @@ void D3D11Creator::drawTriangle()
 
 	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
 
+
+	const unsigned short indices[] =
+	{
+		0, 1, 2
+	};
+	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
+	D3D11_BUFFER_DESC indexBuffer_DESC;
+	indexBuffer_DESC.BindFlags = D3D11_BIND_INDEX_BUFFER; //Type of vertex buffer
+	indexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
+	indexBuffer_DESC.CPUAccessFlags = 0;
+	indexBuffer_DESC.MiscFlags = 0;
+	indexBuffer_DESC.ByteWidth = sizeof(indices);
+	indexBuffer_DESC.StructureByteStride = sizeof(unsigned short);
+
+	D3D11_SUBRESOURCE_DATA subRescIndex_DATA{ 0 };
+	subRescIndex_DATA.pSysMem = indices;
+
+	result = pDevice->CreateBuffer(&indexBuffer_DESC, &subRescIndex_DATA, &pIndexBuffer);
+	assert(SUCCEEDED(result));
+
+	pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+
 	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 
 	//specifies where the pixel shader has to the pixel target to
 	pDeviceContext->OMSetRenderTargets(1, pRenderTargetView.GetAddressOf(), nullptr);
-
-	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
-	D3D11_VIEWPORT viewPort;
-	viewPort.Width = width;
-	viewPort.Height = height;
-	viewPort.MinDepth = 0;
-	viewPort.MaxDepth = 1;
-	viewPort.TopLeftX = 0;
-	viewPort.TopLeftY = 0;
-	pDeviceContext->RSSetViewports(1, &viewPort);
 
 	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
 	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -189,8 +201,18 @@ void D3D11Creator::drawTriangle()
 
 	pDeviceContext->IASetInputLayout(inputLayer.Get());
 
-	UINT vertexCount = std::size(vertices);
-	pDeviceContext->Draw(vertexCount, 0);
+	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
+	D3D11_VIEWPORT viewPort;
+	viewPort.Width = width;
+	viewPort.Height = height;
+	viewPort.MinDepth = 0;
+	viewPort.MaxDepth = 1;
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
+
+	pDeviceContext->RSSetViewports(1, &viewPort);
+
+	pDeviceContext->DrawIndexed((UINT)std::size(indices), 0, 0);
 }
 
 void D3D11Creator::updateWindow()
