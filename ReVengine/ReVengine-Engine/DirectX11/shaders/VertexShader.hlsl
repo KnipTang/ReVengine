@@ -12,7 +12,7 @@ struct vs_output
 
 cbuffer CBuf
 {
-    row_major matrix transform;
+    matrix transform;
 };
 
 vs_output vs_main(vs_input input)

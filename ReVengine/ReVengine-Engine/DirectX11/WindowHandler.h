@@ -20,7 +20,7 @@ public:
 	void clearBuffer(float background_colour[4]); //Set background color and clear back buffer
 	void compileShaders();
 
-	void drawTriangle(float angle);
+	void drawTriangle(float angle, float x, float z);
 
 	void updateWindow();
 

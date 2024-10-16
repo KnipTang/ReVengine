@@ -130,7 +130,7 @@ void D3D11Creator::compileShaders()
 		nullptr, &pPixelShader);
 }
 
-void D3D11Creator::drawTriangle(float angle)
+void D3D11Creator::drawTriangle(float angle, float x, float z)
 {
 	const Vertex vertices[]
 	{
@@ -189,8 +189,12 @@ void D3D11Creator::drawTriangle(float angle)
 	const ConstantBuffer constantBuffer =
 	{
 		{
-			DirectX::XMMatrixRotationZ(angle) *
-			DirectX::XMMatrixScaling(3.f / 4.f,1.f,1.f)
+			//Transpose matrix because gpu reads other way around than cpu
+			DirectX::XMMatrixTranspose(
+				DirectX::XMMatrixRotationZ(angle) *
+				DirectX::XMMatrixScaling(3.f / 4.f,1.f,1.f) *
+				DirectX::XMMatrixTranslation(x, z, 1.f)
+			)
 		}
 	};
 	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
@@ -245,8 +249,17 @@ void D3D11Creator::updateWindow()
 
 	float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
 
+	float x_nda, y_nda;
+	int x, y;
+	SDL_GetMouseState( &x, &y);
+	std::cout << x << " " << y << "\n";
+
+	//screen to ndc space -> to [0-1]
+	x_nda = (float)x / (width/2) - 1.f;
+	y_nda = -(float)y / (height/2) + 1.f;
+
 	clearBuffer(background_colour);
-	drawTriangle(time);
+	drawTriangle(time, x_nda, y_nda);
 
 	pSwapChain->Present(1, 0);
 
