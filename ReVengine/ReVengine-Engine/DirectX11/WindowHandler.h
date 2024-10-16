@@ -30,6 +30,7 @@ public:
 		{
 			float x;
 			float y;
+			float z;
 		} pos;
 		struct
 		{

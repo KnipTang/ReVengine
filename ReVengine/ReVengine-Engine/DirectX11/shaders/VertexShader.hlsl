@@ -1,6 +1,6 @@
 struct vs_input
 {
-    float2 position : POSITION;
+    float3 position : POSITION;
     float3 color : COLOR;
 };
 
@@ -18,7 +18,7 @@ cbuffer CBuf
 vs_output vs_main(vs_input input)
 {
     vs_output output = (vs_output) 0;
-    output.position = mul(float4(input.position.x, input.position.y, 0, 1.0f), transform);
+    output.position = mul(float4(input.position.x, input.position.y, input.position.z, 1.0f), transform);
     output.color = input.color;
     return output;
 }

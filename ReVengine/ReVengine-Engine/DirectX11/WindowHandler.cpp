@@ -134,9 +134,14 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 {
 	const Vertex vertices[]
 	{
-		{ {0.0f, 0.5f}, {1.f, 0, 0} },
-		{ {0.5f, -0.5f}, {0.f, 1.f, 0} },
-		{ {-0.5f, -0.5f}, {0.f, 0, 1.0f} },
+		{ {-1.0f,  -1.f,  -1.0f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 1.f, -1.f,  -1.0f }, { 0.0f, 1.0f, 0.0f } }, 
+		{ {-1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } }, 
+		{ {1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {-1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {-1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
 	};
 
 	D3D11_BUFFER_DESC vertexBuffer_DESC{ 0 };
@@ -155,9 +160,7 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 	assert(SUCCEEDED(result));
 
 	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
-	//3 floats for position (x, y) = 2 * 4 bytes = 8 bytes
-	//4 floats for color(r, g, b, a) = 3 * 4 bytes = 12 bytes
-	UINT vertexStride = (2 + 3) * sizeof(float);
+	UINT vertexStride = sizeof(Vertex);
 	//Vertex buffer is a buffer that holds the vertex data
 	pDeviceContext->IASetVertexBuffers(0,1, pVertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
 
@@ -166,7 +169,12 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 
 	const unsigned short indices[] =
 	{
-		0, 1, 2
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4,
 	};
 	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
 	D3D11_BUFFER_DESC indexBuffer_DESC;
@@ -192,8 +200,9 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 			//Transpose matrix because gpu reads other way around than cpu
 			DirectX::XMMatrixTranspose(
 				DirectX::XMMatrixRotationZ(angle) *
-				DirectX::XMMatrixScaling(3.f / 4.f,1.f,1.f) *
-				DirectX::XMMatrixTranslation(x, z, 1.f)
+				DirectX::XMMatrixRotationX(angle) *
+				DirectX::XMMatrixTranslation(x, z, 4.f) *
+				DirectX::XMMatrixPerspectiveLH( 1.f, min(width, height) / max(width, height), 0.5f,10.f )
 			)
 		}
 	};
@@ -223,7 +232,7 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 	wrl::ComPtr<ID3D11InputLayout> inputLayer;
 	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
 	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), vertexBytecode.c_str(), vertexBytecode.size(), &inputLayer);
