@@ -3,6 +3,8 @@
 #include <SDL_syswm.h>
 #include <string>
 #include "wrl.h"
+#include "chrono"
+#include <DirectXMath.h>
 
 //Using comPtr's to manage windows objects in a smart way
 namespace wrl = Microsoft::WRL;
@@ -18,7 +20,7 @@ public:
 	void clearBuffer(float background_colour[4]); //Set background color and clear back buffer
 	void compileShaders();
 
-	void drawTriangle();
+	void drawTriangle(float angle);
 
 	void updateWindow();
 
@@ -35,6 +37,11 @@ public:
 			float g;
 			float b;
 		} color;
+	};
+
+	struct ConstantBuffer
+	{
+		DirectX::XMMATRIX transform;
 	};
 
 private:
@@ -76,5 +83,8 @@ private:
 	std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";
 
 	float background_colour[4] = { 0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
+
+	std::chrono::steady_clock::time_point last;
+
 };
 

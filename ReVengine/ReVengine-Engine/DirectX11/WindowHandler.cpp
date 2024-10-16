@@ -7,6 +7,7 @@
 #include <iostream>
 #include "filesystem"
 #include "fstream"
+#include "DirectXMath.h"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -19,6 +20,8 @@ D3D11Creator::D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight
 
 	width = windowWidth;
 	height = windowHeight;
+
+	last = std::chrono::steady_clock::now();
 }
 
 D3D11Creator::~D3D11Creator()
@@ -127,7 +130,7 @@ void D3D11Creator::compileShaders()
 		nullptr, &pPixelShader);
 }
 
-void D3D11Creator::drawTriangle()
+void D3D11Creator::drawTriangle(float angle)
 {
 	const Vertex vertices[]
 	{
@@ -182,6 +185,28 @@ void D3D11Creator::drawTriangle()
 
 	pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
+	//Set constantBuffer to pass to vertex shader for expl: translation
+	const ConstantBuffer constantBuffer =
+	{
+		{
+			DirectX::XMMatrixRotationZ(angle) *
+			DirectX::XMMatrixScaling(3.f / 4.f,1.f,1.f)
+		}
+	};
+	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+	D3D11_BUFFER_DESC constantBuffer_DESC;
+	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
+	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	constantBuffer_DESC.MiscFlags = 0u;
+	constantBuffer_DESC.ByteWidth = sizeof(constantBuffer);
+	constantBuffer_DESC.StructureByteStride = 0u;
+	D3D11_SUBRESOURCE_DATA csd = {};
+	csd.pSysMem = &constantBuffer;
+	pDevice->CreateBuffer(&constantBuffer_DESC, &csd, &pConstantBuffer);
+
+	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
+		
 	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 
 	//specifies where the pixel shader has to the pixel target to
@@ -217,8 +242,11 @@ void D3D11Creator::drawTriangle()
 
 void D3D11Creator::updateWindow()
 {
+
+	float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
+
 	clearBuffer(background_colour);
-	drawTriangle();
+	drawTriangle(time);
 
 	pSwapChain->Present(1, 0);
 
