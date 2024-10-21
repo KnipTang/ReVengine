@@ -1,4 +1,4 @@
-#include "DirectX11/WindowHandler.h"
+#include "Rendering/Direct3D11/WindowHandler.h"
 #include <cassert>
 #include "SDL.h"
 #include <SDL_syswm.h>

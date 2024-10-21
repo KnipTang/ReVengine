@@ -1,8 +1,9 @@
 ﻿add_library(ReVengine-Engine
     "ReVengine.cpp"
-    "DirectX11/RenderWindow.cpp"
-    "DirectX11/WindowHandler.h"
-    "DirectX11/WindowHandler.cpp") #No need to add header files
+    "Rendering/RenderWindow.cpp"
+    "Rendering/Direct3D11/WindowHandler.h"
+    "Rendering/Direct3D11/WindowHandler.cpp" 
+    "Sound/Rev_Sound.H") #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
 
@@ -20,7 +21,7 @@ target_include_directories(ReVengine-Engine PUBLIC
 
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-set(DIRECTX11_DIR "${CMAKE_CURRENT_SOURCE_DIR}/DirectX11")
+set(DIRECTX11_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Rendering")
 
 add_custom_target(copy_resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -33,7 +34,7 @@ add_custom_target(copy_resources ALL
 add_dependencies(ReVengine-Engine copy_resources)
 
 set(SHADERS_DIR "${DIRECTX11_DIR}/shaders")
-set(SHADERS_OUT_DIR "${CMAKE_BINARY_DIR}/DirectX11/shaders")
+set(SHADERS_OUT_DIR "${CMAKE_BINARY_DIR}/Rendering/shaders")
 
 # make shader output dir
 file(MAKE_DIRECTORY "${SHADERS_OUT_DIR}")

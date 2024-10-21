@@ -3,7 +3,7 @@
 #include "RevEngine.h"
 #include "soloud.h"
 #include <soloud_wav.h>
-#include "DirectX11/RenderWindow.h"
+#include "Rendering/RenderWindow.h"
 
 //int main()
 //{
