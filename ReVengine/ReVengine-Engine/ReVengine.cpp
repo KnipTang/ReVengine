@@ -1,7 +1,22 @@
 ﻿#include "ReVengine.h"
-#include <iostream>
 
-void mainLoop()
+using namespace Rev;
+
+ReVengine::ReVengine(int windowWidth, int windowHeight)
 {
-    //std::cout << "I\n";
+	pRenderWindow = std::make_unique<RenderWindow>(windowWidth, windowHeight);
+}
+
+ReVengine::~ReVengine()
+{
+}
+
+void ReVengine::Run(const std::function<void()>& GameRun)
+{
+	GameRun();
+
+	while (true)
+	{
+
+	}
 }

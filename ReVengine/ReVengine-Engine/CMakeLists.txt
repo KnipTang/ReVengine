@@ -3,7 +3,9 @@
     "Rendering/RenderWindow.cpp"
     "Rendering/Direct3D11/WindowHandler.h"
     "Rendering/Direct3D11/WindowHandler.cpp" 
-    "Sound/Rev_Sound.H") #No need to add header files
+    "Sound/Rev_Sound.H"
+    "Sound/SoLoud/Rev_SoLoud.H"
+) #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
 

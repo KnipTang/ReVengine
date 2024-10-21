@@ -4,19 +4,6 @@
 #include "d3d11.h"
 #include "Direct3D11/WindowHandler.h"
 #include <memory>
-//#include "WindowHandler.h"
-
-int SDL_main(int argc, char* argv[])
-{
-    int width = 700;
-    int height = 500;
-
-    std::unique_ptr<RenderWindow> windowOfReVenge = std::make_unique<RenderWindow>(width, height);
-
-    windowOfReVenge->InitWindow();
-
-    return 0;
-}
 
 
 
@@ -24,6 +11,8 @@ RenderWindow::RenderWindow(int windowWidth, int windowHeight)
 {
     width = windowWidth;
     height = windowHeight;
+
+    InitWindow();
 }
 
 RenderWindow::~RenderWindow()
@@ -81,7 +70,7 @@ int RenderWindow::LoopWindow()
         }
 
         //Main Game Loop
-        mainLoop();
+        //mainLoop();
         creatorGod->updateWindow();
     }
 

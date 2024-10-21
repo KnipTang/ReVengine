@@ -1,3 +1,5 @@
+#pragma once
+
 #include "d3d11.h"
 #include "SDL.h"
 #include <SDL_syswm.h>

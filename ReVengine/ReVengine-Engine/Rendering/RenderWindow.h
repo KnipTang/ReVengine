@@ -1,3 +1,5 @@
+#pragma once
+
 #include "SDL.h"
 class D3D11Creator;
 
