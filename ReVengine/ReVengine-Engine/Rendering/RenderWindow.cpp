@@ -5,14 +5,12 @@
 #include "Direct3D11/WindowHandler.h"
 #include <memory>
 
-
+using namespace RevDev;
 
 RenderWindow::RenderWindow(int windowWidth, int windowHeight)
 {
     width = windowWidth;
     height = windowHeight;
-
-    InitWindow();
 }
 
 RenderWindow::~RenderWindow()

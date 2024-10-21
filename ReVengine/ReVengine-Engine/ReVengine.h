@@ -15,6 +15,6 @@ namespace Rev
 		void Run(const std::function<void()>& GameRun);
 
 	private:
-		std::unique_ptr<RenderWindow> pRenderWindow;
+		std::unique_ptr<RevDev::RenderWindow> pRenderWindow;
 	};
 }

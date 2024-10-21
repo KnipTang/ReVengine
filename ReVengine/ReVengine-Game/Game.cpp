@@ -10,11 +10,6 @@ void Load()
 	std::cout << "t\n";
 }
 
-void PlaySound()
-{
-	
-}
-
 int main(int argc, char* argv[])
 {
 	int windowWidth = 700;

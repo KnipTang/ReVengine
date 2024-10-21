@@ -1,9 +1,12 @@
 #pragma once
 
-class Rev_SoLoud
+namespace RevDev
 {
-public:
+	class Rev_SoLoud
+	{
+	public:
 	
 
-private:
-};
+	private:
+	};
+}

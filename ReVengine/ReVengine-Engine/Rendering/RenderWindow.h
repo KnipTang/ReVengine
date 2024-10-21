@@ -1,23 +1,26 @@
 #pragma once
 
 #include "SDL.h"
-class D3D11Creator;
 
-class RenderWindow
+namespace RevDev
 {
-public:
-	RenderWindow(int windowWidth, int windowHeight);
-	~RenderWindow();
+	class D3D11Creator;
+	class RenderWindow
+	{
+	public:
+		RenderWindow(int windowWidth, int windowHeight);
+		~RenderWindow();
 
-	bool InitWindow();
+		bool InitWindow();
 
-private:
-	int LoopWindow();
-	int width;
-	int height;
+	private:
+		int LoopWindow();
+		int width;
+		int height;
 
-	D3D11Creator* creatorGod;
+		D3D11Creator* creatorGod;
 
-	//The window we'll be rendering to
-	SDL_Window* window = nullptr;
-};
+		//The window we'll be rendering to
+		SDL_Window* window = nullptr;
+	};
+}

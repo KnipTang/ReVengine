@@ -11,6 +11,8 @@
 
 #pragma comment(lib, "d3d11.lib")
 
+using namespace RevDev;
+
 D3D11Creator::D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight)
 {
 	SDL_SysWMinfo wmInfo;

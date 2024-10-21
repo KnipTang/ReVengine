@@ -12,6 +12,6 @@ namespace Rev
 		~Rev_Sound();
 	
 	private:
-		std::unique_ptr<Rev_SoLoud> pSoLoud;
+		std::unique_ptr<RevDev::Rev_SoLoud> pSoLoud;
 	};
 }
