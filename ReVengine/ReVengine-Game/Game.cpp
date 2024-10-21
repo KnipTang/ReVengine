@@ -1,13 +1,26 @@
 #include <SDL.h>
-#if _DEBUG
-#endif
 
 #include "ReVengine.h"
-#include <iostream>
+#include "Sound/Rev_Sound.H"
+
+#include "filesystem"
+#include "iostream"
+
+std::unique_ptr<Rev::ReVengine> gReVengine;
+
+void displayCurrentFiles(std::string path)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(path))
+		std::cout << entry.path() << std::endl;
+}
 
 void Load()
 {
-	std::cout << "t\n";
+	const std::string resourceFolder = "../game_resources";
+	const std::string soundFolder = "/sound";
+	const std::string sound_pewpew = "/pew_pew.wav";
+
+	gReVengine->pRevSound->PlaySound(resourceFolder + soundFolder + sound_pewpew);
 }
 
 int main(int argc, char* argv[])
@@ -15,10 +28,9 @@ int main(int argc, char* argv[])
 	int windowWidth = 700;
 	int windowHeight = 500;
 
-	std::unique_ptr<Rev::ReVengine> pReVengine;
-	pReVengine = std::make_unique<Rev::ReVengine>(windowWidth, windowHeight);
+	gReVengine = std::make_unique<Rev::ReVengine>(windowWidth, windowHeight);
 
-	pReVengine->Run(Load);
+	gReVengine->Run(Load);
 
 	return 0;
 }

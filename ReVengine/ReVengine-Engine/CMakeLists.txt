@@ -1,10 +1,9 @@
 ﻿add_library(ReVengine-Engine
     "ReVengine.cpp"
     "Rendering/RenderWindow.cpp"
-    "Rendering/Direct3D11/WindowHandler.h"
     "Rendering/Direct3D11/WindowHandler.cpp" 
-    "Sound/Rev_Sound.H"
-    "Sound/SoLoud/Rev_SoLoud.H"
+    "Sound/Rev_Sound.cpp"
+    "Sound/SoLoud/Rev_SoLoud.cpp"
 ) #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
@@ -23,17 +22,20 @@ target_include_directories(ReVengine-Engine PUBLIC
 
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-set(DIRECTX11_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Rendering")
 
-add_custom_target(copy_resources ALL
+add_custom_target(copy_engine_resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${RESOURCES_DIR}"
-        "${CMAKE_BINARY_DIR}/resources"
+        "${CMAKE_BINARY_DIR}/engine_resources"
     COMMENT "Copying resources to build directory"
 )
 
 # add this as a dependency to the engine
-add_dependencies(ReVengine-Engine copy_resources)
+add_dependencies(ReVengine-Engine copy_engine_resources)
+
+
+
+set(DIRECTX11_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Rendering")
 
 set(SHADERS_DIR "${DIRECTX11_DIR}/shaders")
 set(SHADERS_OUT_DIR "${CMAKE_BINARY_DIR}/Rendering/shaders")

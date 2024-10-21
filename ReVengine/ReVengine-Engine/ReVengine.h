@@ -6,6 +6,7 @@
 
 namespace Rev
 {
+	class Rev_Sound;
 	class ReVengine
 	{
 	public:
@@ -14,6 +15,8 @@ namespace Rev
 
 		void Run(const std::function<void()>& GameRun);
 
+		//Core systems
+		std::unique_ptr<Rev_Sound> pRevSound;
 	private:
 		std::unique_ptr<RevDev::RenderWindow> pRenderWindow;
 	};

@@ -4,7 +4,6 @@
 #include <SDL_syswm.h>
 #include "d3dcompiler.h"
 #include <string>
-#include <iostream>
 #include "filesystem"
 #include "fstream"
 #include "DirectXMath.h"
@@ -263,7 +262,6 @@ void D3D11Creator::updateWindow()
 	float x_nda, y_nda;
 	int x, y;
 	SDL_GetMouseState( &x, &y);
-	std::cout << x << " " << y << "\n";
 
 	//screen to ndc space -> to [0-1]
 	x_nda = (float)x / (width/2) - 1.f;
