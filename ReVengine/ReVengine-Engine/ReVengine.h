@@ -14,9 +14,6 @@ namespace Rev
 		~ReVengine();
 
 		void Run(const std::function<void()>& GameRun);
-
-		//Core systems
-		std::unique_ptr<Rev_Sound> pRevSound;
 	private:
 		std::unique_ptr<RevDev::RenderWindow> pRenderWindow;
 	};

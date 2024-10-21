@@ -6,10 +6,6 @@ using namespace Rev;
 ReVengine::ReVengine(int windowWidth, int windowHeight)
 {
 	pRenderWindow = std::make_unique<RevDev::RenderWindow>(windowWidth, windowHeight);
-
-
-	//Core systems
-	pRevSound = std::make_unique<Rev::Rev_Sound>();
 }
 
 ReVengine::~ReVengine()

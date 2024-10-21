@@ -1,5 +1,6 @@
 ﻿add_library(ReVengine-Engine
     "ReVengine.cpp"
+    "Rev_CoreSystems.cpp"
     "Rendering/RenderWindow.cpp"
     "Rendering/Direct3D11/WindowHandler.cpp" 
     "Sound/Rev_Sound.cpp"
