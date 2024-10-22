@@ -4,15 +4,13 @@
 #include "Rev_CoreSystems.h"
 #include "Sound/Rev_Sound.H"
 
-std::unique_ptr<Rev::Rev_CoreSystems> gRev_CoreSystems = std::make_unique<Rev::Rev_CoreSystems>();
-
 void Load()
 {
 	const std::string resourceFolder = "../game_resources";
 	const std::string soundFolder = "/sound";
 	const std::string sound_pewpew = "/pew_pew.wav";
 
-	gRev_CoreSystems->pRevSound->PlaySound(resourceFolder + soundFolder + sound_pewpew);
+	Rev::Rev_CoreSystems::pRevSound->PlaySound(resourceFolder + soundFolder + sound_pewpew);
 }
 
 int main(int argc, char* argv[])

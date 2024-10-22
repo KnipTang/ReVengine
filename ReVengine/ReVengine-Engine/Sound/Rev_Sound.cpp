@@ -1,5 +1,6 @@
 #include "Rev_Sound.H"
 #include <iostream>
+#include "SoLoud/Rev_SoLoud.h"
 
 using namespace Rev;
 

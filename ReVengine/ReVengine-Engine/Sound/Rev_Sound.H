@@ -1,8 +1,11 @@
 #pragma once
 
-#include "SoLoud/Rev_SoLoud.h"
 #include <memory>
 #include <string>
+
+namespace RevDev {
+	class Rev_SoLoud;
+}
 
 namespace Rev
 {

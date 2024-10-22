@@ -1,8 +1,11 @@
 ﻿#pragma once
 
-#include "functional";
-#include "Rendering/RenderWindow.h"
+#include <functional>;
 #include <memory>
+
+namespace RevDev {
+	class RenderWindow;
+}
 
 namespace Rev
 {

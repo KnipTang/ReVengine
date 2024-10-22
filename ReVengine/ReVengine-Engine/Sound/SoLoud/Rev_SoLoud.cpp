@@ -23,9 +23,4 @@ void Rev_SoLoud::PlaySound(const std::string source)
 	pRevDev_Wave->load(source.c_str());
 
 	pRevDev_Soloud->play(*pRevDev_Wave.get());
-
-	while (pRevDev_Soloud->getActiveVoiceCount() > 0) {
-	}
-
-	pRevDev_Soloud->deinit();
 }

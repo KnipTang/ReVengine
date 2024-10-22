@@ -7,10 +7,10 @@
 
 using namespace RevDev;
 
-RenderWindow::RenderWindow(int windowWidth, int windowHeight)
+RenderWindow::RenderWindow(int windowWidth, int windowHeight) : 
+    width{ windowWidth }, 
+    height{ windowHeight }
 {
-    width = windowWidth;
-    height = windowHeight;
 }
 
 RenderWindow::~RenderWindow()
@@ -40,10 +40,10 @@ bool RenderWindow::InitWindow() {
         screenSurface = SDL_GetWindowSurface(window);
 
         //Fill the surface white
-        SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+        //SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
 
         //Update the surface
-        SDL_UpdateWindowSurface(window);
+        //SDL_UpdateWindowSurface(window);
 
         creatorGod = new D3D11Creator{ window, width, height};
         creatorGod->setupDeviceAndSwap();

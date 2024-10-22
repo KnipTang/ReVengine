@@ -8,12 +8,12 @@ namespace Rev
 	class Rev_CoreSystems
 	{
 	public:
-		Rev_CoreSystems();
-		~Rev_CoreSystems();
+		Rev_CoreSystems() = delete;
+		~Rev_CoreSystems() = delete;
 
 
-		//Core systems
-		std::unique_ptr<Rev_Sound> pRevSound;
+		//Core systems //Static vars can't depend on each other because static party alcoholism problem(its a drunk driving issue)
+		static inline std::unique_ptr<Rev_Sound> pRevSound = std::make_unique<Rev_Sound>();
 	private:
 	};
 }
