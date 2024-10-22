@@ -5,6 +5,10 @@
 namespace Rev
 {
 	class Rev_Sound;
+}
+
+namespace Rev
+{
 	class Rev_CoreSystems
 	{
 	public:

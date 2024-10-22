@@ -4,7 +4,6 @@
 #include <string>
 
 namespace RevDev {
-	class Rev_SoLoud;
 	class Rev_SoundImpl;
 }
 

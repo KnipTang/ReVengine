@@ -3,13 +3,18 @@
 #include <functional>;
 #include <memory>
 
-namespace RevDev {
+namespace Rev
+{
+	class Rev_Sound;
+}
+
+namespace RevDev 
+{
 	class RenderWindow;
 }
 
 namespace Rev
 {
-	class Rev_Sound;
 	class ReVengine
 	{
 	public:

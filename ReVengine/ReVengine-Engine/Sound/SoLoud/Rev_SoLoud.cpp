@@ -1,7 +1,7 @@
+#include "Rev_SoLoud.h"
+
 #include <soloud.h>
 #include <soloud_wav.h>
-
-#include "Rev_SoLoud.h"
 
 using namespace RevDev;
 

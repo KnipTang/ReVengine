@@ -1,6 +1,5 @@
 #include "Rev_Sound.h"
 #include "Rev_SoundImpl.h"
-#include <iostream>
 
 using namespace Rev;
 
