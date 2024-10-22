@@ -18,6 +18,7 @@ RenderWindow::~RenderWindow()
 }
 
 bool RenderWindow::InitWindow() {
+
     //The surface contained by the window
     SDL_Surface* screenSurface = NULL;
 
@@ -30,14 +31,17 @@ bool RenderWindow::InitWindow() {
     else
     {
         //Create window
-        window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+        window = std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>>(
+            SDL_CreateWindow("WINDOW OF GODS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN),
+            SDL_DestroyWindow
+        );
         if (window == NULL)
         {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         }
 
         //Get window surface
-        screenSurface = SDL_GetWindowSurface(window);
+        screenSurface = SDL_GetWindowSurface(window.get());
 
         //Fill the surface white
         //SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
@@ -45,7 +49,7 @@ bool RenderWindow::InitWindow() {
         //Update the surface
         //SDL_UpdateWindowSurface(window);
 
-        creatorGod = new D3D11Creator{ window, width, height};
+        creatorGod = std::make_unique<D3D11Creator>(window.get(), width, height);
         creatorGod->setupDeviceAndSwap();
 
         LoopWindow();
@@ -73,7 +77,7 @@ int RenderWindow::LoopWindow()
     }
 
     //Destroy window
-    SDL_DestroyWindow(window);
+    SDL_DestroyWindow(window.get());
 
     //Quit SDL subsystems
     SDL_Quit();
