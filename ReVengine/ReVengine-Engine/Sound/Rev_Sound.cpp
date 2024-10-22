@@ -1,12 +1,13 @@
-#include "Rev_Sound.H"
+#include "Rev_Sound.h"
+#include "Rev_SoundImpl.h"
 #include <iostream>
-#include "SoLoud/Rev_SoLoud.h"
 
 using namespace Rev;
 
-Rev_Sound::Rev_Sound()
+Rev_Sound::Rev_Sound() :
+	pSoundImpl{ std::make_unique<RevDev::Rev_SoundImpl>() }
 {
-	pSoLoud = std::make_unique<RevDev::Rev_SoLoud>();
+
 }
 
 Rev_Sound::~Rev_Sound()
@@ -16,19 +17,6 @@ Rev_Sound::~Rev_Sound()
 
 bool Rev_Sound::PlaySound(const std::string source)
 {
-	if (!FileValid(source))
-	{
-		std::cerr << "source file not found";
-		return 0;
-	}
-	else
-		pSoLoud->PlaySound(source);
-
-	return 1;
+	return pSoundImpl->PlaySound(source);
 }
 
-bool Rev_Sound::FileValid(const std::string source)
-{
-	struct stat buffer;
-	return (stat(source.c_str(), &buffer) == 0);
-}

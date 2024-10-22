@@ -4,6 +4,7 @@
     "Rendering/RenderWindow.cpp"
     "Rendering/Direct3D11/WindowHandler.cpp" 
     "Sound/Rev_Sound.cpp"
+    "Sound/Rev_SoundImpl.cpp"
     "Sound/SoLoud/Rev_SoLoud.cpp"
 ) #No need to add header files
 

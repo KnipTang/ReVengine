@@ -5,6 +5,7 @@
 
 namespace RevDev {
 	class Rev_SoLoud;
+	class Rev_SoundImpl;
 }
 
 namespace Rev
@@ -18,8 +19,8 @@ namespace Rev
 		bool PlaySound(const std::string source);
 	
 	private:
-		bool FileValid(const std::string source);
 
-		std::unique_ptr<RevDev::Rev_SoLoud> pSoLoud;
+		//Point of pImpl is so you dont have to include the SoLoud in the header file, in the cpp file doesnt matter if you include it there
+		std::unique_ptr<RevDev::Rev_SoundImpl> pSoundImpl;
 	};
 }
