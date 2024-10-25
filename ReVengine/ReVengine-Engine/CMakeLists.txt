@@ -6,6 +6,8 @@
     "Sound/Rev_Sound.cpp"
     "Sound/Rev_SoundImpl.cpp"
     "Sound/SoLoud/Rev_SoLoud.cpp"
+    "GameObjects/GameObject.cpp"
+    "GameObjects/BaseComponent.cpp"
 ) #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
@@ -23,7 +25,7 @@ target_include_directories(ReVengine-Engine PUBLIC
 )
 
 
-set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
 
 add_custom_target(copy_engine_resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory

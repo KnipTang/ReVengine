@@ -3,6 +3,8 @@
 #include "ReVengine.h"
 #include "Rev_CoreSystems.h"
 #include "Sound/Rev_Sound.H"
+#include "GameObjects/GameObject.h"
+#include "GameObjects/BaseComponent.h"
 
 void Load()
 {
@@ -11,6 +13,10 @@ void Load()
 	const std::string sound_pewpew = "/pew_pew.wav";
 
 	Rev::Rev_CoreSystems::pRevSound->PlaySound(resourceFolder + soundFolder + sound_pewpew);
+
+	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
+
+	player->addComp<Rev::BaseComponent>();
 }
 
 int main(int argc, char* argv[])
