@@ -5,6 +5,7 @@
 #include "Sound/Rev_Sound.H"
 #include "GameObjects/GameObject.h"
 #include "GameObjects/BaseComponent.h"
+#include "GameObjects/Components/CompTest.h"
 
 void Load()
 {
@@ -16,7 +17,10 @@ void Load()
 
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 
-	player->addComp<Rev::BaseComponent>();
+	Rev::CompTest* cp = new Rev::CompTest{};
+	player->addComponent<Rev::CompTest>();
+
+	player->hasComponentType<Rev::CompTest>();
 }
 
 int main(int argc, char* argv[])

@@ -1,5 +1,7 @@
 #include "GameObject.h"
 #include "BaseComponent.h"
+#include <typeinfo>
+#include <string>
 
 using namespace Rev;
 
@@ -11,7 +13,7 @@ GameObject::~GameObject()
 {
 }
 
-void Rev::GameObject::update()
+void GameObject::update()
 {
 	for (auto& comp : m_Components)
 	{
