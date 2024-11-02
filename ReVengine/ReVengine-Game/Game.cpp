@@ -17,10 +17,12 @@ void Load()
 
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 
-	Rev::CompTest* cp = new Rev::CompTest{};
-	player->addComponent<Rev::CompTest>();
+	//Rev::CompTest* cp = new Rev::CompTest{ player.get()};
 
-	player->hasComponentType<Rev::CompTest>();
+	player->addComponent<Rev::CompTest>(player.get());
+	player->hasComponent<Rev::CompTest>();
+	player->removeComponent<Rev::CompTest>();
+	player->getComponent<Rev::CompTest>();
 }
 
 int main(int argc, char* argv[])

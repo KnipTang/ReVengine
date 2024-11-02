@@ -10,6 +10,9 @@ namespace Rev
 
 namespace Rev
 {
+	template <class T>
+	concept baseCompConcept = std::derived_from<T, BaseComponent>;
+
 	class GameObject
 	{
 	public:
@@ -18,22 +21,20 @@ namespace Rev
 
 		void update();
 
-		template <class T, typename... TArguments>
-		const BaseComponent* addComponent(const TArguments&... args)
+		template <baseCompConcept T, typename... TArguments>
+		const BaseComponent* addComponent(GameObject* gameObj, const TArguments&... args)
 		{
-			//Add to check if comp type is already in gameobject
-			if (hasComponentType<T>())
+			if (hasComponent<T>())
 				return nullptr;
 
-			std::unique_ptr<BaseComponent> comp = std::make_unique<T>(args...);
-			//hasComponentType(*comp.get());
+			std::unique_ptr<BaseComponent> comp = std::make_unique<T>(gameObj, args...);
 			m_Components.emplace_back(std::move(comp));
 
 			return m_Components.back().get();
 		}
 
-		template <class T>
-		const bool hasComponentType()
+		template <baseCompConcept T>
+		const bool hasComponent()
 		{
 			for (const auto& comp : m_Components)
 			{
@@ -44,7 +45,24 @@ namespace Rev
 			return false;
 		}
 
-		void removeComponent(std::unique_ptr<BaseComponent>&& component);
+		template <baseCompConcept T>
+		BaseComponent* getComponent()
+		{
+			for (auto& comp : m_Components)
+			{
+				if (dynamic_cast<T*>(comp.get()))
+					return comp.get();
+			}
+
+			return nullptr;
+		}
+
+		template <baseCompConcept T>
+		void removeComponent()
+		{
+			/*BaseComponent* comp = getComponent<T>();
+			m_Components.erase(std::remove(m_Components.begin(), m_Components.end(), *comp));*/
+		}
 	private:
 		std::vector<std::unique_ptr<BaseComponent>> m_Components;
 	};
