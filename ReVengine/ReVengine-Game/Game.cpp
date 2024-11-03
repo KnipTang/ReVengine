@@ -16,6 +16,9 @@ void Load()
 	Rev::Rev_CoreSystems::pRevSound->PlaySound(resourceFolder + soundFolder + sound_pewpew);
 
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
+	std::unique_ptr<Rev::GameObject> player1 = std::make_unique<Rev::GameObject>();
+
+	std::cout << player.get()->getID() << "\n" << player1.get()->getID();
 
 	//Rev::CompTest* cp = new Rev::CompTest{ player.get()};
 

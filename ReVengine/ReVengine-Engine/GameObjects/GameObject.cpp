@@ -5,7 +5,10 @@
 
 using namespace Rev;
 
-GameObject::GameObject()
+int GameObject::objIDCounter = 0;
+
+GameObject::GameObject() :
+	objID{objIDCounter++}
 {
 }
 

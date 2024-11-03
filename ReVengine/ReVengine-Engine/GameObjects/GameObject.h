@@ -63,7 +63,11 @@ namespace Rev
 			/*BaseComponent* comp = getComponent<T>();
 			m_Components.erase(std::remove(m_Components.begin(), m_Components.end(), *comp));*/
 		}
+
+		const int getID() { return objID; }
 	private:
 		std::vector<std::unique_ptr<BaseComponent>> m_Components;
+		static int objIDCounter;
+		int objID;
 	};
 }

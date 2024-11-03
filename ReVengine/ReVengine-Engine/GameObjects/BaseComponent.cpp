@@ -2,8 +2,7 @@
 
 using namespace Rev;
 
-BaseComponent::BaseComponent(GameObject* gameObj) :
-	m_GameObject{gameObj}
+BaseComponent::BaseComponent(GameObject* gameObj) : m_GameObject{gameObj}
 {
 
 }
