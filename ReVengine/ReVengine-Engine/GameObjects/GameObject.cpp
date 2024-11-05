@@ -23,3 +23,19 @@ void GameObject::update()
 		comp->update();
 	}
 }
+
+void GameObject::fixedUpdate()
+{
+	for (auto& comp : m_Components)
+	{
+		comp->fixedUpdate();
+	}
+}
+
+const void GameObject::render()
+{
+	for (auto& comp : m_Components)
+	{
+		comp->render();
+	}
+}

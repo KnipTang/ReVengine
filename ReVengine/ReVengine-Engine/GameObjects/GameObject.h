@@ -20,6 +20,8 @@ namespace Rev
 		~GameObject();
 
 		void update();
+		void fixedUpdate();
+		const void render();
 
 		template <baseCompConcept T, typename... TArguments>
 		const BaseComponent* addComponent(GameObject* gameObj, const TArguments&... args)
