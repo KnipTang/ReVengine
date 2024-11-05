@@ -21,7 +21,7 @@ namespace RevDev
 
 		void setupDeviceAndSwap();
 		void endFrame(); //Set backbuffer to pass to and create rendertargetview
-		void clearBuffer(float background_colour[4]); //Set background color and clear back buffer
+		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
 		void compileShaders();
 
 		void drawTriangle(float angle, float x, float z);
@@ -81,8 +81,8 @@ namespace RevDev
 
 		//Windows window handle.
 		HWND hwnd;
-		float width;
-		float height;
+		int width;
+		int height;
 
 		std::string vertexFile = "../DirectX11/shaders/VertexShader.cso";
 		std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";

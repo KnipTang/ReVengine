@@ -14,7 +14,7 @@ using namespace RevDev;
 
 D3D11Creator::D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight)
 {
-	SDL_SysWMinfo wmInfo;
+	SDL_SysWMinfo wmInfo{};
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(window, &wmInfo);
 	hwnd = wmInfo.info.win.window;
@@ -103,10 +103,10 @@ void D3D11Creator::endFrame()
 
 }
 
-void D3D11Creator::clearBuffer(float background_colour[4])
+void D3D11Creator::clearBuffer(float backgroundColour[4])
 {
 	pDeviceContext->ClearRenderTargetView(
-		pRenderTargetView.Get(), background_colour);
+		pRenderTargetView.Get(), backgroundColour);
 }
 
 void D3D11Creator::compileShaders()
@@ -178,7 +178,7 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 		0,1,4, 1,5,4,
 	};
 	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
-	D3D11_BUFFER_DESC indexBuffer_DESC;
+	D3D11_BUFFER_DESC indexBuffer_DESC{};
 	indexBuffer_DESC.BindFlags = D3D11_BIND_INDEX_BUFFER; //Type of vertex buffer
 	indexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
 	indexBuffer_DESC.CPUAccessFlags = 0;
@@ -203,12 +203,12 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 				DirectX::XMMatrixRotationZ(angle) *
 				DirectX::XMMatrixRotationX(angle) *
 				DirectX::XMMatrixTranslation(x, z, 4.f) *
-				DirectX::XMMatrixPerspectiveLH( 1.f, min(width, height) / max(width, height), 0.5f,10.f )
+				DirectX::XMMatrixPerspectiveLH( 1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f )
 			)
 		}
 	};
 	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
-	D3D11_BUFFER_DESC constantBuffer_DESC;
+	D3D11_BUFFER_DESC constantBuffer_DESC{};
 	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
 	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -241,9 +241,9 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 	pDeviceContext->IASetInputLayout(inputLayer.Get());
 
 	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
-	D3D11_VIEWPORT viewPort;
-	viewPort.Width = width;
-	viewPort.Height = height;
+	D3D11_VIEWPORT viewPort{};
+	viewPort.Width = float(width);
+	viewPort.Height = float(height);
 	viewPort.MinDepth = 0;
 	viewPort.MaxDepth = 1;
 	viewPort.TopLeftX = 0;
@@ -264,8 +264,8 @@ void D3D11Creator::updateWindow()
 	SDL_GetMouseState( &x, &y);
 
 	//screen to ndc space -> to [0-1]
-	x_nda = (float)x / (width/2) - 1.f;
-	y_nda = -(float)y / (height/2) + 1.f;
+	x_nda = (float)x / (width/2.f) - 1.f;
+	y_nda = -(float)y / (height/2.f) + 1.f;
 
 	clearBuffer(background_colour);
 	drawTriangle(time, x_nda, y_nda);

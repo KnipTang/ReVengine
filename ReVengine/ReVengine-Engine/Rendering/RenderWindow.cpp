@@ -55,7 +55,6 @@ bool RenderWindow::InitWindow() {
         LoopWindow();
         return true;
     }
-    return false;
 }
 
 int RenderWindow::LoopWindow()

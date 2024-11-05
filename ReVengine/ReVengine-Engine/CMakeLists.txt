@@ -9,6 +9,7 @@
     "GameObjects/GameObject.cpp"
     "GameObjects/BaseComponent.cpp"
     "GameObjects/Components/CompTest.cpp"
+    "GameObjects/Components/CompTransform.cpp"
 ) #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
@@ -24,6 +25,12 @@ target_link_libraries(ReVengine-Engine PUBLIC
 target_include_directories(ReVengine-Engine PUBLIC 
     ${soloud_SOURCE_DIR}/include
 )
+
+if(MSVC)
+  target_compile_options(ReVengine-Engine PRIVATE /W4 /WX)
+else()
+  target_compile_options(ReVengine-Engine PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
 
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")

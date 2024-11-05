@@ -6,6 +6,7 @@
 #include "GameObjects/GameObject.h"
 #include "GameObjects/BaseComponent.h"
 #include "GameObjects/Components/CompTest.h"
+#include "GameObjects/Components/CompTransform.h"
 
 void Load()
 {
@@ -22,6 +23,7 @@ void Load()
 
 	//Rev::CompTest* cp = new Rev::CompTest{ player.get()};
 
+	player->addComponent<Rev::CompTransform>(player.get());
 	player->addComponent<Rev::CompTest>(player.get());
 	player->hasComponent<Rev::CompTest>();
 	player->removeComponent<Rev::CompTest>();

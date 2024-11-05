@@ -1,12 +1,7 @@
 ﻿#pragma once
 
-#include <functional>;
+#include <functional>
 #include <memory>
-
-namespace Rev
-{
-	class Rev_Sound;
-}
 
 namespace RevDev 
 {
