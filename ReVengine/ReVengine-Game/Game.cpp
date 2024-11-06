@@ -7,6 +7,7 @@
 #include "GameObjects/BaseComponent.h"
 #include "GameObjects/Components/CompTest.h"
 #include "GameObjects/Components/CompTransform.h"
+#include "Scenes/Scene.h"
 
 void Load()
 {
@@ -19,15 +20,15 @@ void Load()
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	std::unique_ptr<Rev::GameObject> player1 = std::make_unique<Rev::GameObject>();
 
-	std::cout << player.get()->getID() << "\n" << player1.get()->getID();
-
-	//Rev::CompTest* cp = new Rev::CompTest{ player.get()};
-
 	player->addComponent<Rev::CompTransform>(player.get());
 	player->addComponent<Rev::CompTest>(player.get());
 	player->hasComponent<Rev::CompTest>();
 	player->removeComponent<Rev::CompTest>();
 	player->getComponent<Rev::CompTest>();
+
+	Rev::Scene* tempScene = new Rev::Scene{};
+	tempScene->addGameObject(std::move(player));
+	tempScene->update();
 }
 
 int main(int argc, char* argv[])

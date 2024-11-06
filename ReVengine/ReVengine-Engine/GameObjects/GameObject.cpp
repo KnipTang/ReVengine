@@ -1,7 +1,5 @@
 #include "GameObject.h"
 #include "BaseComponent.h"
-#include <typeinfo>
-#include <string>
 
 using namespace Rev;
 
