@@ -37,3 +37,13 @@ const void Scene::render()
 		obj->render();
 	}
 }
+
+const GameObject* Scene::addGameObject(std::unique_ptr<GameObject> gameObj)
+{
+	//if (hasGameObject<T>())  // NoNeed to check gameobejct can be duplicates
+	//	return nullptr;
+
+	m_GameObjects.emplace_back(std::move(gameObj));
+
+	return m_GameObjects.back().get();
+}

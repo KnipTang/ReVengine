@@ -27,12 +27,7 @@ D3D11Creator::D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight
 
 D3D11Creator::~D3D11Creator()
 {
-	
-	if (pDeviceContext != nullptr)
-		pDeviceContext->Release();
 
-	if (pSwapChain != nullptr)
-		pSwapChain->Release();
 }
 
 void D3D11Creator::setupDeviceAndSwap()
@@ -99,7 +94,7 @@ void D3D11Creator::endFrame()
 		&pRenderTargetView);
 	assert(SUCCEEDED(hr));
 
-	pFramebuffer->Release();
+	//pFramebuffer->Release();
 
 }
 

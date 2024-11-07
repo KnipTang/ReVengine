@@ -13,4 +13,5 @@ CompTransform::CompTransform(GameObject* gameObj, Vector3 position, Vector3 rota
 
 void CompTransform::update()
 {
+	printf("hi\n");
 }

@@ -15,6 +15,7 @@ RenderWindow::RenderWindow(int windowWidth, int windowHeight) :
 
 RenderWindow::~RenderWindow()
 {
+    creatorGod.reset();
 }
 
 bool RenderWindow::InitWindow() {
@@ -52,34 +53,31 @@ bool RenderWindow::InitWindow() {
         creatorGod = std::make_unique<D3D11Creator>(window.get(), width, height);
         creatorGod->setupDeviceAndSwap();
 
-        LoopWindow();
         return true;
     }
 }
 
-int RenderWindow::LoopWindow()
+bool RenderWindow::LoopWindow()
 {
     //Hack to get window to stay up
     SDL_Event e;
-    bool quit = false;
-    while (quit == false)
+
+    while (SDL_PollEvent(&e))
     {
-        while (SDL_PollEvent(&e))
-        {
-            if (e.type == SDL_QUIT)
-                quit = true;
-        }
+        if (e.type == SDL_QUIT)
+            return true;
 
-        //Main Game Loop
-        //mainLoop();
+    }    
         creatorGod->updateWindow();
-    }
 
+    return false;
+}
+
+void RevDev::RenderWindow::RipWindow()
+{
     //Destroy window
     SDL_DestroyWindow(window.get());
 
     //Quit SDL subsystems
     SDL_Quit();
-
-    return 0;
 }

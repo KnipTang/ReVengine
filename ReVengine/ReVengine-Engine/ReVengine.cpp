@@ -1,5 +1,6 @@
 ﻿#include "ReVengine.h"
 #include "Rendering/RenderWindow.h"
+#include "Scenes/SceneManager.h"
 
 using namespace Rev;
 
@@ -10,16 +11,24 @@ ReVengine::ReVengine(int windowWidth, int windowHeight)
 
 ReVengine::~ReVengine()
 {
+
 }
 
-void ReVengine::Run(const std::function<void()>& GameRun)
+void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRun)
 {
-	GameRun();
+	std::unique_ptr<SceneManager> sceneMan = std::move(GameRun());
 
 	pRenderWindow->InitWindow();
 
-	while (true)
+	bool quit = false;
+	while (quit == false)
 	{
+		sceneMan.get()->update();
+		sceneMan.get()->fixedUpdate();
+		sceneMan.get()->render();
 
+		quit = pRenderWindow->LoopWindow();
 	}
+
+	pRenderWindow->RipWindow();
 }

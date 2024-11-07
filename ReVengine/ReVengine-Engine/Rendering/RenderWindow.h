@@ -19,9 +19,11 @@ namespace RevDev
 		~RenderWindow();
 
 		bool InitWindow();
+		bool LoopWindow();
+
+		void RipWindow();
 
 	private:
-		int LoopWindow();
 		int width;
 		int height;
 

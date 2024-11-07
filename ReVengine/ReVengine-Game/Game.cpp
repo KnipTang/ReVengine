@@ -8,8 +8,9 @@
 #include "GameObjects/Components/CompTest.h"
 #include "GameObjects/Components/CompTransform.h"
 #include "Scenes/Scene.h"
+#include "Scenes/SceneManager.h"
 
-void Load()
+std::unique_ptr<Rev::SceneManager> Load()
 {
 	const std::string resourceFolder = "../game_resources";
 	const std::string soundFolder = "/sound";
@@ -26,9 +27,13 @@ void Load()
 	player->removeComponent<Rev::CompTest>();
 	player->getComponent<Rev::CompTest>();
 
-	Rev::Scene* tempScene = new Rev::Scene{};
+	std::unique_ptr<Rev::Scene> tempScene = std::make_unique<Rev::Scene>();
 	tempScene->addGameObject(std::move(player));
-	tempScene->update();
+
+	std::unique_ptr<Rev::SceneManager> tempSceneMan = std::make_unique<Rev::SceneManager>();
+	tempSceneMan->addScene(std::move(tempScene));
+
+	return std::move(tempSceneMan);
 }
 
 int main(int argc, char* argv[])
