@@ -95,13 +95,42 @@ void D3D11Creator::endFrame()
 	assert(SUCCEEDED(hr));
 
 	//pFramebuffer->Release();
+	//Z buffer
+	D3D11_DEPTH_STENCIL_DESC dsDesc{};
+	dsDesc.DepthEnable = TRUE;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
+	pDevice->CreateDepthStencilState(&dsDesc, &pDSState);
+	pDeviceContext->OMSetDepthStencilState(pDSState.Get(), 1);
 
+	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
+	D3D11_TEXTURE2D_DESC descDepth{};
+	descDepth.Width = 700;
+	descDepth.Height = 500;
+	descDepth.MipLevels = 1;
+	descDepth.ArraySize = 1;
+	descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+	descDepth.SampleDesc.Count = 1;
+	descDepth.SampleDesc.Quality = 0;
+	descDepth.Usage = D3D11_USAGE_DEFAULT;
+	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil);
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDepthStectilView = {};
+	descDepthStectilView.Format = DXGI_FORMAT_D32_FLOAT;
+	descDepthStectilView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDepthStectilView.Texture2D.MipSlice = 0u;
+	pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDepthStectilView, &pDepthStencilView);
+
+	// bind depth stensil view to OM
+	pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
 }
 
 void D3D11Creator::clearBuffer(float backgroundColour[4])
 {
-	pDeviceContext->ClearRenderTargetView(
-		pRenderTargetView.Get(), backgroundColour);
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
+	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);
 }
 
 void D3D11Creator::compileShaders()
@@ -197,7 +226,7 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 			DirectX::XMMatrixTranspose(
 				DirectX::XMMatrixRotationZ(angle) *
 				DirectX::XMMatrixRotationX(angle) *
-				DirectX::XMMatrixTranslation(x, z, 4.f) *
+				DirectX::XMMatrixTranslation(x, 0, z+4.f) *
 				DirectX::XMMatrixPerspectiveLH( 1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f )
 			)
 		}
@@ -218,8 +247,8 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 		
 	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 
-	//specifies where the pixel shader has to the pixel target to
-	pDeviceContext->OMSetRenderTargets(1, pRenderTargetView.GetAddressOf(), nullptr);
+	//specifies where the pixel shader has to the pixel target to// COmment out because you already set it for the z buffer depth
+	//pDeviceContext->OMSetRenderTargets(1, pRenderTargetView.GetAddressOf(), nullptr);
 
 	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
 	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -262,8 +291,12 @@ void D3D11Creator::updateWindow()
 	x_nda = (float)x / (width/2.f) - 1.f;
 	y_nda = -(float)y / (height/2.f) + 1.f;
 
+	/*float x_nda2 = (float)x / (width / 4.f) - 1.f;
+	float y_nda2 = -(float)y / (height / 4.f) + 1.f;*/
+
 	clearBuffer(background_colour);
 	drawTriangle(time, x_nda, y_nda);
+	drawTriangle(time, 0, 0);
 
 	pSwapChain->Present(1, 0);
 

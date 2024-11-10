@@ -10,6 +10,8 @@
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 
+#include <iostream>
+
 std::unique_ptr<Rev::SceneManager> Load()
 {
 	const std::string resourceFolder = "../game_resources";
@@ -21,7 +23,7 @@ std::unique_ptr<Rev::SceneManager> Load()
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	std::unique_ptr<Rev::GameObject> player1 = std::make_unique<Rev::GameObject>();
 
-	player->addComponent<Rev::CompTransform>(player.get());
+	player->addComponent<Rev::CompTransform>(player.get(), Vector3{5,8,2});
 	player->addComponent<Rev::CompTest>(player.get());
 	player->hasComponent<Rev::CompTest>();
 	player->removeComponent<Rev::CompTest>();

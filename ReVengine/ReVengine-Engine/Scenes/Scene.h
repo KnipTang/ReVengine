@@ -52,7 +52,8 @@ namespace Rev
 		template <gameObjectConcept T>
 		void removeGameObject()
 		{
-
+			std::unique_ptr<GameObject> object = std::make_unique<GameObject>(*getComponent<T>());
+			m_GameObjects.erase(std::remove(m_GameObjects.begin(), m_GameObjects.end() - 1, object));
 		}
 
 		const int getID() { return sceneID; }

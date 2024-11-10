@@ -1,4 +1,5 @@
 #include "CompTransform.h"
+#include <iostream>
 
 using namespace Rev;
 
@@ -13,5 +14,9 @@ CompTransform::CompTransform(GameObject* gameObj, Vector3 position, Vector3 rota
 
 void CompTransform::update()
 {
-	printf("hi\n");
+}
+
+void CompTransform::setPosition(Vector3 pos)
+{
+	m_Position = pos;
 }

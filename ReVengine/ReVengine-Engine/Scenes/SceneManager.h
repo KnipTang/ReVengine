@@ -40,7 +40,8 @@ namespace Rev
 		template <sceneConcept T>
 		void removeScene()
 		{
-
+			std::unique_ptr<Scene> scene = std::make_unique<Scene>(*getComponent<T>());
+			m_Scenes.erase(std::remove(m_Scenes.begin(), m_Scenes.end() - 1, scene));
 		}
 
 		const int getID() { return sceneManagerID; }

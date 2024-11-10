@@ -62,6 +62,8 @@ namespace RevDev
 		//Used to specifiy which pixel is being targeted atm
 		wrl::ComPtr<ID3D11RenderTargetView> pRenderTargetView = NULL;
 
+		wrl::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
+
 		//Holds both back and front chain. (front is what the user sees, back is what is being calculated before the user sees it)
 		wrl::ComPtr<ID3D11Texture2D> pFramebuffer;
 

@@ -62,8 +62,8 @@ namespace Rev
 		template <baseCompConcept T>
 		void removeComponent()
 		{
-			/*BaseComponent* comp = getComponent<T>();
-			m_Components.erase(std::remove(m_Components.begin(), m_Components.end(), *comp));*/
+			std::unique_ptr<BaseComponent> comp = std::make_unique<BaseComponent>(*getComponent<T>());
+			m_Components.erase(std::remove(m_Components.begin(), m_Components.end() - 1, comp));
 		}
 
 		const int getID() { return objID; }
