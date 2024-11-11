@@ -7,12 +7,13 @@
 #include "filesystem"
 #include "fstream"
 #include "DirectXMath.h"
+#include "Utils/Vertex.h"
 
 #pragma comment(lib, "d3d11.lib")
 
 using namespace RevDev;
 
-D3D11Creator::D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight)
+WindowHandler_D3D11::WindowHandler_D3D11(SDL_Window* window, int windowWidth, int windowHeight)
 {
 	SDL_SysWMinfo wmInfo{};
 	SDL_VERSION(&wmInfo.version);
@@ -25,12 +26,12 @@ D3D11Creator::D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight
 	last = std::chrono::steady_clock::now();
 }
 
-D3D11Creator::~D3D11Creator()
+WindowHandler_D3D11::~WindowHandler_D3D11()
 {
 
 }
 
-void RevDev::D3D11Creator::setupPipeline()
+void RevDev::WindowHandler_D3D11::setupPipeline()
 {
 	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
 	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -58,7 +59,7 @@ void RevDev::D3D11Creator::setupPipeline()
 	pDeviceContext->RSSetViewports(1, &viewPort);
 }
 
-void D3D11Creator::setupDeviceAndSwap()
+void WindowHandler_D3D11::setupDeviceAndSwap()
 {
 	//Configure the desc(options) for the swapchain pointer
 	DXGI_SWAP_CHAIN_DESC swapChainDESC = { 0 };
@@ -105,14 +106,38 @@ void D3D11Creator::setupDeviceAndSwap()
 
 	SetupRenderTargetAndStencelBuffer();
 
-	compileShaders();
+	std::string vertexFile = "../DirectX11/shaders/VertexShader.cso";
+	std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";
+	compileShaders(vertexFile, pixelFile);
 
-	setupShader();
+	const std::vector<Vertex> vertices
+	{
+		{ {-1.0f,  -1.f,  -1.0f }, { 1.0f, 0.0f, 0.0f } },
+		{ { 1.f, -1.f,  -1.0f }, { 0.0f, 1.0f, 0.0f } },
+		{ {-1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {-1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {-1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
+		{ {1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
+	};
+
+	vIndices =
+	{
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4,
+	};
+
+	setupShader(vertices, vIndices);
 
 	setupPipeline();
 }
 
-void D3D11Creator::SetupRenderTargetAndStencelBuffer()
+void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
 {
 	HRESULT hr = pSwapChain->GetBuffer(
 		0,
@@ -159,7 +184,7 @@ void D3D11Creator::SetupRenderTargetAndStencelBuffer()
 	pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
 }
 
-void D3D11Creator::compileShaders()
+void WindowHandler_D3D11::compileShaders(std::string vertexFile, std::string pixelFile)
 {
 	std::ifstream inFile(vertexFile, std::ios_base::binary);
 	vertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
@@ -171,6 +196,10 @@ void D3D11Creator::compileShaders()
 		nullptr, &pVertexShader);
 	assert(SUCCEEDED(result));
 
+	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
+
+
+
 	inFile = std::ifstream{ pixelFile, std::ios_base::binary };
 	pixelBytecode = std::string(std::istreambuf_iterator<char>(inFile),
 		std::istreambuf_iterator<char>());
@@ -179,22 +208,12 @@ void D3D11Creator::compileShaders()
 	result = pDevice->CreatePixelShader(
 		pixelBytecode.c_str(), pixelBytecode.size(),
 		nullptr, &pPixelShader);
+
+	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 }
 
-void RevDev::D3D11Creator::setupShader()
+void RevDev::WindowHandler_D3D11::setupShader(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
 {
-	const std::vector<Vertex> vertices
-	{
-		{ {-1.0f,  -1.f,  -1.0f }, { 1.0f, 0.0f, 0.0f } },
-		{ { 1.f, -1.f,  -1.0f }, { 0.0f, 1.0f, 0.0f } }, 
-		{ {-1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } }, 
-		{ {1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {-1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {-1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-	};
-
 	D3D11_BUFFER_DESC vertexBuffer_DESC{ 0 };
 	vertexBuffer_DESC.BindFlags = D3D11_BIND_VERTEX_BUFFER; //Type of vertex buffer
 	vertexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
@@ -215,18 +234,6 @@ void RevDev::D3D11Creator::setupShader()
 	//Vertex buffer is a buffer that holds the vertex data
 	pDeviceContext->IASetVertexBuffers(0,1, pVertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
 
-	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
-
-	indices =
-	{
-		0,2,1, 2,3,1,
-		1,3,5, 3,7,5,
-		2,6,3, 3,6,7,
-		4,5,7, 4,7,6,
-		0,4,2, 2,4,6,
-		0,1,4, 1,5,4,
-	};
-
 	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
 	D3D11_BUFFER_DESC indexBuffer_DESC{};
 	indexBuffer_DESC.BindFlags = D3D11_BIND_INDEX_BUFFER; //Type of vertex buffer
@@ -244,66 +251,72 @@ void RevDev::D3D11Creator::setupShader()
 
 	pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
+	D3D11_BUFFER_DESC constantBuffer_DESC{};
 	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
 	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	constantBuffer_DESC.MiscFlags = 0u;
-	constantBuffer_DESC.ByteWidth = sizeof(ConstantBuffer);
+	constantBuffer_DESC.ByteWidth = sizeof(DirectX::XMMATRIX);
 	constantBuffer_DESC.StructureByteStride = 0u;
-
-	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
+	pDevice->CreateBuffer(&constantBuffer_DESC, NULL, &pConstantBuffer);
 }
 
-void D3D11Creator::drawTriangle(float angle, float x, float z)
+void WindowHandler_D3D11::drawIt(DirectX::XMMATRIX &transform, UINT count)
 {
-	//Set constantBuffer to pass to vertex shader for expl: translation
-	const ConstantBuffer constantBuffer =
-	{
-		{
-			//Transpose matrix because gpu reads other way around than cpu
-			DirectX::XMMatrixTranspose
-			(
-				DirectX::XMMatrixRotationZ(angle) *
-				DirectX::XMMatrixRotationX(angle) *
-				DirectX::XMMatrixTranslation(x, 0, z+4.f) *
-				DirectX::XMMatrixPerspectiveLH( 1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f )
-			)
-		}
-	};
-	D3D11_SUBRESOURCE_DATA csd = {};
-	csd.pSysMem = &constantBuffer;
-	pDevice->CreateBuffer(&constantBuffer_DESC, &csd, &pConstantBuffer);
+	D3D11_MAPPED_SUBRESOURCE msr;
+	pDeviceContext->Map(pConstantBuffer.Get(), 0u,D3D11_MAP_WRITE_DISCARD, 0u,&msr);
+	memcpy(msr.pData, &transform, sizeof(DirectX::XMMATRIX));
+	pDeviceContext->Unmap(pConstantBuffer.Get(), 0u);
 
 	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
 
-	pDeviceContext->DrawIndexed((UINT)indices.size(), 0, 0);
+
+	pDeviceContext->DrawIndexed(count, 0, 0);
 }
 
-void D3D11Creator::updateWindow()
+void WindowHandler_D3D11::updateWindow()
 {
-
 	float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
 
 	float x_nda, y_nda;
 	int x, y;
-	SDL_GetMouseState( &x, &y);
+	SDL_GetMouseState(&x, &y);
 
 	//screen to ndc space -> to [0-1]
 	x_nda = (float)x / (width/2.f) - 1.f;
 	y_nda = -(float)y / (height/2.f) + 1.f;
 
-	/*float x_nda2 = (float)x / (width / 4.f) - 1.f;
-	float y_nda2 = -(float)y / (height / 4.f) + 1.f;*/
+	DirectX::XMMATRIX constantBuffer =
+	{
+		{
+			//Transpose matrix because gpu reads other way around than cpu
+			DirectX::XMMatrixTranspose
+			(
+				DirectX::XMMatrixRotationZ(time) *
+				DirectX::XMMatrixRotationX(time) *
+				DirectX::XMMatrixTranslation(x_nda, 0, y_nda + 4.f) *
+				DirectX::XMMatrixPerspectiveLH(1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f)
+			)
+		}
+	};
+	DirectX::XMMATRIX constantBuffer2 = 
+	{
+			DirectX::XMMatrixTranspose
+			(
+				DirectX::XMMatrixTranslation(0, 0, 5.f)*
+				DirectX::XMMatrixPerspectiveLH(1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f)
+			)
+	};
 
 	clearBuffer(background_colour);
-	drawTriangle(time, x_nda, y_nda);
-	drawTriangle(time, 0, 0);
+	drawIt(constantBuffer, UINT(vIndices.size()));
+	drawIt(constantBuffer2, UINT(vIndices.size()));
 
 	pSwapChain->Present(1, 0);
 
 }
 
-void D3D11Creator::clearBuffer(float backgroundColour[4])
+void WindowHandler_D3D11::clearBuffer(float backgroundColour[4])
 {
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
 	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);

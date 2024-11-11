@@ -19,10 +19,6 @@ RenderWindow::~RenderWindow()
 }
 
 bool RenderWindow::InitWindow() {
-
-    //The surface contained by the window
-    SDL_Surface* screenSurface = NULL;
-
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -41,25 +37,18 @@ bool RenderWindow::InitWindow() {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         }
 
-        //Get window surface
-        screenSurface = SDL_GetWindowSurface(window.get());
-
-        //Fill the surface white
-        //SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-
-        //Update the surface
-        //SDL_UpdateWindowSurface(window);
-
-        creatorGod = std::make_unique<D3D11Creator>(window.get(), width, height);
-        creatorGod->setupDeviceAndSwap();
+        {
+            creatorGod = std::make_unique<WindowHandler_D3D11>(window.get(), width, height);
+            creatorGod->setupDeviceAndSwap();
+        }
 
         return true;
     }
 }
 
-bool RenderWindow::LoopWindow()
+bool RenderWindow::UpdateWindow()
 {
-    //Hack to get window to stay up
+    //To get window to stay up
     SDL_Event e;
 
     while (SDL_PollEvent(&e))
@@ -68,7 +57,8 @@ bool RenderWindow::LoopWindow()
             return true;
 
     }    
-        creatorGod->updateWindow();
+    
+    creatorGod->updateWindow();
 
     return false;
 }

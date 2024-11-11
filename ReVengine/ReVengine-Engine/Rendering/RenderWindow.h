@@ -5,7 +5,7 @@
 
 namespace RevDev
 {
-	class D3D11Creator;
+	class WindowHandler_D3D11;
 }
 
 struct SDL_Window;
@@ -19,7 +19,7 @@ namespace RevDev
 		~RenderWindow();
 
 		bool InitWindow();
-		bool LoopWindow();
+		bool UpdateWindow();
 
 		void RipWindow();
 
@@ -27,7 +27,7 @@ namespace RevDev
 		int width;
 		int height;
 
-		std::unique_ptr<D3D11Creator> creatorGod;
+		std::unique_ptr<WindowHandler_D3D11> creatorGod;
 
 		//The window we'll be rendering to
 		std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>> window;

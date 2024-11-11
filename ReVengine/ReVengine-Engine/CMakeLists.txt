@@ -10,8 +10,10 @@
     "GameObjects/BaseComponent.cpp"
     "GameObjects/Components/CompTest.cpp"
     "GameObjects/Components/CompTransform.cpp"
+    "GameObjects/Components/CompRender.cpp"
     "Scenes/Scene.cpp"
-    "Scenes/SceneManager.cpp") #No need to add header files
+    "Scenes/SceneManager.cpp"
+) #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
 

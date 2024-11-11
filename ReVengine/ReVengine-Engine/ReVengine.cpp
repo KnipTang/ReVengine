@@ -27,7 +27,7 @@ void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRu
 		sceneMan.get()->fixedUpdate();
 		sceneMan.get()->render();
 
-		quit = pRenderWindow->LoopWindow();
+		quit = pRenderWindow->UpdateWindow();
 	}
 
 	pRenderWindow->RipWindow();

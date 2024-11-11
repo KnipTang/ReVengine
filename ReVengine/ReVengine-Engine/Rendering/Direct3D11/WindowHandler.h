@@ -11,48 +11,31 @@
 //Using comPtr's to manage windows objects in a smart way
 namespace wrl = Microsoft::WRL;
 
+struct Vertex;
+
 namespace RevDev
 {
-	class D3D11Creator
+	class WindowHandler_D3D11
 	{
 	public:
-		D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight);
-		~D3D11Creator();
+
+
+		WindowHandler_D3D11(SDL_Window* window, int windowWidth, int windowHeight);
+		~WindowHandler_D3D11();
 
 		void setupPipeline();
 
 		void setupDeviceAndSwap();
 		void SetupRenderTargetAndStencelBuffer(); //Set backbuffer to pass to and create rendertargetview
 
-		void compileShaders();
-		void setupShader();
+		void compileShaders(std::string vertexFile, std::string pixelFile);
+		void setupShader(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
 
 		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
 
-		void drawTriangle(float angle, float x, float z);
+		void drawIt(DirectX::XMMATRIX &transform, UINT count);
 
 		void updateWindow();
-
-		struct Vertex
-		{
-			struct
-			{
-				float x;
-				float y;
-				float z;
-			} pos;
-			struct
-			{
-				float r;
-				float g;
-				float b;
-			} color;
-		};
-
-		struct ConstantBuffer
-		{
-			DirectX::XMMATRIX transform;
-		};
 
 	private:
 		//The head of directX From device all the other achitecture gets created and linked to.
@@ -91,17 +74,12 @@ namespace RevDev
 		int width;
 		int height;
 
-		std::string vertexFile = "../DirectX11/shaders/VertexShader.cso";
-		std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";
-
 		float background_colour[4] = { 0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
 
 		std::chrono::steady_clock::time_point last;
 
-		std::vector<unsigned short> indices;
+		std::vector<unsigned short> vIndices;
 
 		wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
-		D3D11_BUFFER_DESC constantBuffer_DESC{};
-
 	};
 }
