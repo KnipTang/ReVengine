@@ -19,10 +19,15 @@ namespace RevDev
 		D3D11Creator(SDL_Window* window, int windowWidth, int windowHeight);
 		~D3D11Creator();
 
+		void setupPipeline();
+
 		void setupDeviceAndSwap();
-		void endFrame(); //Set backbuffer to pass to and create rendertargetview
-		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
+		void SetupRenderTargetAndStencelBuffer(); //Set backbuffer to pass to and create rendertargetview
+
 		void compileShaders();
+		void setupShader();
+
+		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
 
 		void drawTriangle(float angle, float x, float z);
 
@@ -92,6 +97,11 @@ namespace RevDev
 		float background_colour[4] = { 0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
 
 		std::chrono::steady_clock::time_point last;
+
+		std::vector<unsigned short> indices;
+
+		wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+		D3D11_BUFFER_DESC constantBuffer_DESC{};
 
 	};
 }

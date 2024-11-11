@@ -30,6 +30,34 @@ D3D11Creator::~D3D11Creator()
 
 }
 
+void RevDev::D3D11Creator::setupPipeline()
+{
+	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
+	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//Explain layout of vertices
+	wrl::ComPtr<ID3D11InputLayout> inputLayer;
+	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), vertexBytecode.c_str(), vertexBytecode.size(), &inputLayer);
+
+	pDeviceContext->IASetInputLayout(inputLayer.Get());
+
+	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
+	D3D11_VIEWPORT viewPort{};
+	viewPort.Width = float(width);
+	viewPort.Height = float(height);
+	viewPort.MinDepth = 0;
+	viewPort.MaxDepth = 1;
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
+
+	pDeviceContext->RSSetViewports(1, &viewPort);
+}
+
 void D3D11Creator::setupDeviceAndSwap()
 {
 	//Configure the desc(options) for the swapchain pointer
@@ -75,12 +103,16 @@ void D3D11Creator::setupDeviceAndSwap()
 	assert(S_OK == hr && pSwapChain && pDevice && pDeviceContext);
 
 
-	endFrame();
+	SetupRenderTargetAndStencelBuffer();
 
 	compileShaders();
+
+	setupShader();
+
+	setupPipeline();
 }
 
-void D3D11Creator::endFrame()
+void D3D11Creator::SetupRenderTargetAndStencelBuffer()
 {
 	HRESULT hr = pSwapChain->GetBuffer(
 		0,
@@ -127,12 +159,6 @@ void D3D11Creator::endFrame()
 	pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
 }
 
-void D3D11Creator::clearBuffer(float backgroundColour[4])
-{
-	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
-	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);
-}
-
 void D3D11Creator::compileShaders()
 {
 	std::ifstream inFile(vertexFile, std::ios_base::binary);
@@ -155,9 +181,9 @@ void D3D11Creator::compileShaders()
 		nullptr, &pPixelShader);
 }
 
-void D3D11Creator::drawTriangle(float angle, float x, float z)
+void RevDev::D3D11Creator::setupShader()
 {
-	const Vertex vertices[]
+	const std::vector<Vertex> vertices
 	{
 		{ {-1.0f,  -1.f,  -1.0f }, { 1.0f, 0.0f, 0.0f } },
 		{ { 1.f, -1.f,  -1.0f }, { 0.0f, 1.0f, 0.0f } }, 
@@ -174,12 +200,12 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 	vertexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
 	vertexBuffer_DESC.CPUAccessFlags = 0;
 	vertexBuffer_DESC.MiscFlags = 0;
-	vertexBuffer_DESC.ByteWidth = sizeof(vertices);
+	vertexBuffer_DESC.ByteWidth = UINT(vertices.size() * sizeof(Vertex));
 	vertexBuffer_DESC.StructureByteStride = sizeof(Vertex);
 
 	//The data of the vertex
 	D3D11_SUBRESOURCE_DATA subResc_DATA{ 0 };
-	subResc_DATA.pSysMem = vertices;
+	subResc_DATA.pSysMem = vertices.data();
 
 	HRESULT result = pDevice->CreateBuffer(&vertexBuffer_DESC, &subResc_DATA, &pVertexBuffer);
 	assert(SUCCEEDED(result));
@@ -191,8 +217,7 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 
 	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
 
-
-	const unsigned short indices[] =
+	indices =
 	{
 		0,2,1, 2,3,1,
 		1,3,5, 3,7,5,
@@ -201,29 +226,43 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 		0,4,2, 2,4,6,
 		0,1,4, 1,5,4,
 	};
+
 	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
 	D3D11_BUFFER_DESC indexBuffer_DESC{};
 	indexBuffer_DESC.BindFlags = D3D11_BIND_INDEX_BUFFER; //Type of vertex buffer
 	indexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
 	indexBuffer_DESC.CPUAccessFlags = 0;
 	indexBuffer_DESC.MiscFlags = 0;
-	indexBuffer_DESC.ByteWidth = sizeof(indices);
+	indexBuffer_DESC.ByteWidth = UINT(indices.size() * sizeof(unsigned short));
 	indexBuffer_DESC.StructureByteStride = sizeof(unsigned short);
 
 	D3D11_SUBRESOURCE_DATA subRescIndex_DATA{ 0 };
-	subRescIndex_DATA.pSysMem = indices;
+	subRescIndex_DATA.pSysMem = indices.data();
 
 	result = pDevice->CreateBuffer(&indexBuffer_DESC, &subRescIndex_DATA, &pIndexBuffer);
 	assert(SUCCEEDED(result));
 
 	pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
+	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
+	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	constantBuffer_DESC.MiscFlags = 0u;
+	constantBuffer_DESC.ByteWidth = sizeof(ConstantBuffer);
+	constantBuffer_DESC.StructureByteStride = 0u;
+
+	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
+}
+
+void D3D11Creator::drawTriangle(float angle, float x, float z)
+{
 	//Set constantBuffer to pass to vertex shader for expl: translation
 	const ConstantBuffer constantBuffer =
 	{
 		{
 			//Transpose matrix because gpu reads other way around than cpu
-			DirectX::XMMatrixTranspose(
+			DirectX::XMMatrixTranspose
+			(
 				DirectX::XMMatrixRotationZ(angle) *
 				DirectX::XMMatrixRotationX(angle) *
 				DirectX::XMMatrixTranslation(x, 0, z+4.f) *
@@ -231,51 +270,13 @@ void D3D11Creator::drawTriangle(float angle, float x, float z)
 			)
 		}
 	};
-	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
-	D3D11_BUFFER_DESC constantBuffer_DESC{};
-	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
-	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	constantBuffer_DESC.MiscFlags = 0u;
-	constantBuffer_DESC.ByteWidth = sizeof(constantBuffer);
-	constantBuffer_DESC.StructureByteStride = 0u;
 	D3D11_SUBRESOURCE_DATA csd = {};
 	csd.pSysMem = &constantBuffer;
 	pDevice->CreateBuffer(&constantBuffer_DESC, &csd, &pConstantBuffer);
 
 	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
-		
-	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 
-	//specifies where the pixel shader has to the pixel target to// COmment out because you already set it for the z buffer depth
-	//pDeviceContext->OMSetRenderTargets(1, pRenderTargetView.GetAddressOf(), nullptr);
-
-	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
-	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	//Explain layout of vertices
-	wrl::ComPtr<ID3D11InputLayout> inputLayer;
-	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), vertexBytecode.c_str(), vertexBytecode.size(), &inputLayer);
-
-	pDeviceContext->IASetInputLayout(inputLayer.Get());
-
-	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
-	D3D11_VIEWPORT viewPort{};
-	viewPort.Width = float(width);
-	viewPort.Height = float(height);
-	viewPort.MinDepth = 0;
-	viewPort.MaxDepth = 1;
-	viewPort.TopLeftX = 0;
-	viewPort.TopLeftY = 0;
-
-	pDeviceContext->RSSetViewports(1, &viewPort);
-
-	pDeviceContext->DrawIndexed((UINT)std::size(indices), 0, 0);
+	pDeviceContext->DrawIndexed((UINT)indices.size(), 0, 0);
 }
 
 void D3D11Creator::updateWindow()
@@ -300,4 +301,10 @@ void D3D11Creator::updateWindow()
 
 	pSwapChain->Present(1, 0);
 
+}
+
+void D3D11Creator::clearBuffer(float backgroundColour[4])
+{
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
+	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);
 }
