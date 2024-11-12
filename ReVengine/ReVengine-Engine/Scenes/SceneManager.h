@@ -26,12 +26,12 @@ namespace Rev
 		const Scene* addScene(std::unique_ptr<Scene> scene);
 
 		template <sceneConcept T>
-		Scene* getScene()
+		T* getScene()
 		{
 			for (auto& scene : m_Scenes)
 			{
-				if (dynamic_cast<T*>(scene.get()))
-					return scene.get();
+				if (auto derivedComp = dynamic_cast<T*>(scene.get()))
+					return derivedComp;
 			}
 
 			return nullptr;
@@ -40,8 +40,12 @@ namespace Rev
 		template <sceneConcept T>
 		void removeScene()
 		{
-			std::unique_ptr<Scene> scene = std::make_unique<Scene>(*getComponent<T>());
-			m_Scenes.erase(std::remove(m_Scenes.begin(), m_Scenes.end() - 1, scene));
+			m_Scenes.erase(
+				std::remove_if(m_Scenes.begin(), m_Scenes.end(),
+					[](const std::unique_ptr<Scene>& scene) {
+						return dynamic_cast<T*>(scene.get()) != nullptr;
+					}),
+				m_Scenes.end());
 		}
 
 		const int getID() { return sceneManagerID; }

@@ -1,12 +1,14 @@
 ﻿#include "ReVengine.h"
 #include "Rendering/RenderWindow.h"
 #include "Scenes/SceneManager.h"
+#include "Rev_CoreSystems.h"
 
 using namespace Rev;
 
 ReVengine::ReVengine(int windowWidth, int windowHeight)
 {
-	pRenderWindow = std::make_unique<RevDev::RenderWindow>(windowWidth, windowHeight);
+	width = windowWidth;
+	height = windowHeight;
 }
 
 ReVengine::~ReVengine()
@@ -18,7 +20,7 @@ void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRu
 {
 	std::unique_ptr<SceneManager> sceneMan = std::move(GameRun());
 
-	pRenderWindow->InitWindow();
+	Rev_CoreSystems::pRevRender->InitWindow(width, height);
 
 	bool quit = false;
 	while (quit == false)
@@ -27,8 +29,8 @@ void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRu
 		sceneMan.get()->fixedUpdate();
 		sceneMan.get()->render();
 
-		quit = pRenderWindow->UpdateWindow();
+		quit = Rev_CoreSystems::pRevRender->UpdateWindow();
 	}
 
-	pRenderWindow->RipWindow();
+	Rev_CoreSystems::pRevRender->RipWindow();
 }

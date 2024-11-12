@@ -15,17 +15,16 @@ namespace RevDev
 	class RenderWindow
 	{
 	public:
-		RenderWindow(int windowWidth, int windowHeight);
+		RenderWindow();
 		~RenderWindow();
 
-		bool InitWindow();
+		bool InitWindow(int windowWidth, int windowHeight);
+		void DrawWindow();
 		bool UpdateWindow();
 
 		void RipWindow();
 
 	private:
-		int width;
-		int height;
 
 		std::unique_ptr<WindowHandler_D3D11> creatorGod;
 

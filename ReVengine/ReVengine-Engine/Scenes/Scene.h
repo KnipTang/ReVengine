@@ -38,12 +38,12 @@ namespace Rev
 		}
 
 		template <gameObjectConcept T>
-		GameObject* getGameObject()
+		T* getGameObject()
 		{
 			for (auto& obj : m_GameObjects)
 			{
-				if (dynamic_cast<T*>(obj.get()))
-					return obj.get();
+				if (auto derivedComp = dynamic_cast<T*>(obj.get()))
+					return derivedComp;
 			}
 
 			return nullptr;
@@ -52,8 +52,12 @@ namespace Rev
 		template <gameObjectConcept T>
 		void removeGameObject()
 		{
-			std::unique_ptr<GameObject> object = std::make_unique<GameObject>(*getComponent<T>());
-			m_GameObjects.erase(std::remove(m_GameObjects.begin(), m_GameObjects.end() - 1, object));
+			m_GameObjects.erase(
+				std::remove_if(m_GameObjects.begin(), m_GameObjects.end(),
+					[](const std::unique_ptr<GameObject>& obj) {
+						return dynamic_cast<T*>(obj.get()) != nullptr;
+					}),
+				m_GameObjects.end());
 		}
 
 		const int getID() { return sceneID; }

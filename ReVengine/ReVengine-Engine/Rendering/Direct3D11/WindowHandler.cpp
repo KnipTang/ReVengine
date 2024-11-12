@@ -270,50 +270,39 @@ void WindowHandler_D3D11::drawIt(DirectX::XMMATRIX &transform, UINT count)
 
 	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
 
-
 	pDeviceContext->DrawIndexed(count, 0, 0);
+}
+
+
+
+void RevDev::WindowHandler_D3D11::drawWindow()
+{
+	DirectX::XMMATRIX constantBuffer =
+	{
+			DirectX::XMMatrixTranspose
+			(
+				DirectX::XMMatrixTranslation(0, 0, 5.f) *
+				DirectX::XMMatrixPerspectiveLH(1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f)
+			)
+	};
+
+	drawIt(constantBuffer, UINT(vIndices.size()));
 }
 
 void WindowHandler_D3D11::updateWindow()
 {
-	float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
+	//float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
 
-	float x_nda, y_nda;
-	int x, y;
-	SDL_GetMouseState(&x, &y);
+	//float x_nda, y_nda;
+	//int x, y;
+	//SDL_GetMouseState(&x, &y);
 
-	//screen to ndc space -> to [0-1]
-	x_nda = (float)x / (width/2.f) - 1.f;
-	y_nda = -(float)y / (height/2.f) + 1.f;
-
-	DirectX::XMMATRIX constantBuffer =
-	{
-		{
-			//Transpose matrix because gpu reads other way around than cpu
-			DirectX::XMMatrixTranspose
-			(
-				DirectX::XMMatrixRotationZ(time) *
-				DirectX::XMMatrixRotationX(time) *
-				DirectX::XMMatrixTranslation(x_nda, 0, y_nda + 4.f) *
-				DirectX::XMMatrixPerspectiveLH(1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f)
-			)
-		}
-	};
-	DirectX::XMMATRIX constantBuffer2 = 
-	{
-			DirectX::XMMatrixTranspose
-			(
-				DirectX::XMMatrixTranslation(0, 0, 5.f)*
-				DirectX::XMMatrixPerspectiveLH(1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f)
-			)
-	};
-
-	clearBuffer(background_colour);
-	drawIt(constantBuffer, UINT(vIndices.size()));
-	drawIt(constantBuffer2, UINT(vIndices.size()));
+	////screen to ndc space -> to [0-1]
+	//x_nda = (float)x / (width/2.f) - 1.f;
+	//y_nda = -(float)y / (height/2.f) + 1.f;
 
 	pSwapChain->Present(1, 0);
-
+	clearBuffer(background_colour);
 }
 
 void WindowHandler_D3D11::clearBuffer(float backgroundColour[4])

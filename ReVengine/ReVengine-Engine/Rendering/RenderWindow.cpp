@@ -7,9 +7,7 @@
 
 using namespace RevDev;
 
-RenderWindow::RenderWindow(int windowWidth, int windowHeight) : 
-    width{ windowWidth }, 
-    height{ windowHeight }
+RenderWindow::RenderWindow()
 {
 }
 
@@ -18,7 +16,7 @@ RenderWindow::~RenderWindow()
     creatorGod.reset();
 }
 
-bool RenderWindow::InitWindow() {
+bool RenderWindow::InitWindow(int windowWidth, int windowHeight) {
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -29,7 +27,7 @@ bool RenderWindow::InitWindow() {
     {
         //Create window
         window = std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>>(
-            SDL_CreateWindow("WINDOW OF GODS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN),
+            SDL_CreateWindow("WINDOW OF GODS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_SHOWN),
             SDL_DestroyWindow
         );
         if (window == NULL)
@@ -38,12 +36,17 @@ bool RenderWindow::InitWindow() {
         }
 
         {
-            creatorGod = std::make_unique<WindowHandler_D3D11>(window.get(), width, height);
+            creatorGod = std::make_unique<WindowHandler_D3D11>(window.get(), windowWidth, windowHeight);
             creatorGod->setupDeviceAndSwap();
         }
 
         return true;
     }
+}
+
+void RevDev::RenderWindow::DrawWindow()
+{
+    creatorGod->drawWindow();
 }
 
 bool RenderWindow::UpdateWindow()

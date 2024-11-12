@@ -35,6 +35,7 @@ namespace RevDev
 
 		void drawIt(DirectX::XMMATRIX &transform, UINT count);
 
+		void drawWindow();
 		void updateWindow();
 
 	private:

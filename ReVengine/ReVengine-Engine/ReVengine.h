@@ -24,5 +24,8 @@ namespace Rev
 		void Run(const std::function<std::unique_ptr<SceneManager>()>& GameRun);
 	private:
 		std::unique_ptr<RevDev::RenderWindow> pRenderWindow;
+
+		int width;
+		int height;
 	};
 }

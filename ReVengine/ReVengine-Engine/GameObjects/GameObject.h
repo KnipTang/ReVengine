@@ -48,12 +48,12 @@ namespace Rev
 		}
 
 		template <baseCompConcept T>
-		BaseComponent* getComponent()
+		T* getComponent()
 		{
 			for (auto& comp : m_Components)
 			{
-				if (dynamic_cast<T*>(comp.get()))
-					return comp.get();
+				if (auto derivedComp = dynamic_cast<T*>(comp.get()))
+					return derivedComp;
 			}
 
 			return nullptr;
@@ -62,8 +62,12 @@ namespace Rev
 		template <baseCompConcept T>
 		void removeComponent()
 		{
-			std::unique_ptr<BaseComponent> comp = std::make_unique<BaseComponent>(*getComponent<T>());
-			m_Components.erase(std::remove(m_Components.begin(), m_Components.end() - 1, comp));
+			m_Components.erase(
+				std::remove_if(m_Components.begin(), m_Components.end(),
+					[](const std::unique_ptr<BaseComponent>& comp) {
+						return dynamic_cast<T*>(comp.get()) != nullptr;
+					}),
+				m_Components.end());
 		}
 
 		const int getID() { return objID; }
