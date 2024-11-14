@@ -103,36 +103,11 @@ void WindowHandler_D3D11::setupDeviceAndSwap()
 		&pDeviceContext);
 	assert(S_OK == hr && pSwapChain && pDevice && pDeviceContext);
 
-
 	SetupRenderTargetAndStencelBuffer();
 
 	std::string vertexFile = "../DirectX11/shaders/VertexShader.cso";
 	std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";
 	compileShaders(vertexFile, pixelFile);
-
-	const std::vector<Vertex> vertices
-	{
-		{ {-1.0f,  -1.f,  -1.0f }, { 1.0f, 0.0f, 0.0f } },
-		{ { 1.f, -1.f,  -1.0f }, { 0.0f, 1.0f, 0.0f } },
-		{ {-1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {-1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {-1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-	};
-
-	vIndices =
-	{
-		0,2,1, 2,3,1,
-		1,3,5, 3,7,5,
-		2,6,3, 3,6,7,
-		4,5,7, 4,7,6,
-		0,4,2, 2,4,6,
-		0,1,4, 1,5,4,
-	};
-
-	setupShader(vertices, vIndices);
 
 	setupPipeline();
 }
@@ -226,15 +201,11 @@ void RevDev::WindowHandler_D3D11::setupShader(const std::vector<Vertex> vertices
 	D3D11_SUBRESOURCE_DATA subResc_DATA{ 0 };
 	subResc_DATA.pSysMem = vertices.data();
 
-	HRESULT result = pDevice->CreateBuffer(&vertexBuffer_DESC, &subResc_DATA, &pVertexBuffer);
+	pVertexBuffer.emplace_back(wrl::ComPtr<ID3D11Buffer>());
+
+	HRESULT result = pDevice->CreateBuffer(&vertexBuffer_DESC, &subResc_DATA, &pVertexBuffer.back());
 	assert(SUCCEEDED(result));
 
-	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
-	UINT vertexStride = sizeof(Vertex);
-	//Vertex buffer is a buffer that holds the vertex data
-	pDeviceContext->IASetVertexBuffers(0,1, pVertexBuffer.GetAddressOf(), &vertexStride, &vertexOffset);
-
-	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
 	D3D11_BUFFER_DESC indexBuffer_DESC{};
 	indexBuffer_DESC.BindFlags = D3D11_BIND_INDEX_BUFFER; //Type of vertex buffer
 	indexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
@@ -246,10 +217,19 @@ void RevDev::WindowHandler_D3D11::setupShader(const std::vector<Vertex> vertices
 	D3D11_SUBRESOURCE_DATA subRescIndex_DATA{ 0 };
 	subRescIndex_DATA.pSysMem = indices.data();
 
-	result = pDevice->CreateBuffer(&indexBuffer_DESC, &subRescIndex_DATA, &pIndexBuffer);
+	pIndexBuffer.emplace_back(wrl::ComPtr<ID3D11Buffer>());
+
+	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
+	UINT vertexStride = sizeof(Vertex);
+	//Vertex buffer is a buffer that holds the vertex data
+	pDeviceContext->IASetVertexBuffers(0, 1, pVertexBuffer.at(0).GetAddressOf(), &vertexStride, &vertexOffset);
+	pDeviceContext->IASetIndexBuffer(pIndexBuffer.at(0).Get(), DXGI_FORMAT_R16_UINT, 0);
+
+	result = pDevice->CreateBuffer(&indexBuffer_DESC, &subRescIndex_DATA, &pIndexBuffer.back());
 	assert(SUCCEEDED(result));
 
-	pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+	indiceCount = UINT(indices.size());
+
 
 	D3D11_BUFFER_DESC constantBuffer_DESC{};
 	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -261,8 +241,14 @@ void RevDev::WindowHandler_D3D11::setupShader(const std::vector<Vertex> vertices
 	pDevice->CreateBuffer(&constantBuffer_DESC, NULL, &pConstantBuffer);
 }
 
-void WindowHandler_D3D11::drawIt(DirectX::XMMATRIX &transform, UINT count)
+void WindowHandler_D3D11::drawIt(DirectX::XMMATRIX &transform, UINT index)
 {
+	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
+	UINT vertexStride = sizeof(Vertex);
+	//Vertex buffer is a buffer that holds the vertex data
+	pDeviceContext->IASetVertexBuffers(0, 1, pVertexBuffer.at(index).GetAddressOf(), &vertexStride, &vertexOffset);
+	pDeviceContext->IASetIndexBuffer(pIndexBuffer.at(index).Get(), DXGI_FORMAT_R16_UINT, 0);
+
 	D3D11_MAPPED_SUBRESOURCE msr;
 	pDeviceContext->Map(pConstantBuffer.Get(), 0u,D3D11_MAP_WRITE_DISCARD, 0u,&msr);
 	memcpy(msr.pData, &transform, sizeof(DirectX::XMMATRIX));
@@ -270,28 +256,34 @@ void WindowHandler_D3D11::drawIt(DirectX::XMMATRIX &transform, UINT count)
 
 	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
 
-	pDeviceContext->DrawIndexed(count, 0, 0);
+	pDeviceContext->DrawIndexed(indiceCount, 0, 0);
+
+	t++;
 }
 
 
 
 void RevDev::WindowHandler_D3D11::drawWindow()
 {
-	DirectX::XMMATRIX constantBuffer =
+	/*float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();*/
+	DirectX::XMMATRIX transformBuffer =
 	{
 			DirectX::XMMatrixTranspose
 			(
-				DirectX::XMMatrixTranslation(0, 0, 5.f) *
+				DirectX::XMMatrixRotationX(3.14f) *
+				//DirectX::XMMatrixTranslation(0, 0, 5.f) *
 				DirectX::XMMatrixPerspectiveLH(1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f)
 			)
 	};
 
-	drawIt(constantBuffer, UINT(vIndices.size()));
+
+		drawIt(transformBuffer, t);
+	
 }
 
 void WindowHandler_D3D11::updateWindow()
 {
-	//float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();
+
 
 	//float x_nda, y_nda;
 	//int x, y;
@@ -303,10 +295,43 @@ void WindowHandler_D3D11::updateWindow()
 
 	pSwapChain->Present(1, 0);
 	clearBuffer(background_colour);
+
 }
 
 void WindowHandler_D3D11::clearBuffer(float backgroundColour[4])
 {
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
 	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);
+	t = 0;
+}
+
+void WindowHandler_D3D11::sampleTexture()
+{
+	/*D3D11_TEXTURE2D_DESC ImageTextureDesc = {};
+
+	ImageTextureDesc.Width = ImageWidth;
+	ImageTextureDesc.Height = ImageHeight;
+	ImageTextureDesc.MipLevels = 1;
+	ImageTextureDesc.ArraySize = 1;
+	ImageTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	ImageTextureDesc.SampleDesc.Count = 1;
+	ImageTextureDesc.SampleDesc.Quality = 0;
+	ImageTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	ImageTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+	D3D11_SUBRESOURCE_DATA ImageSubresourceData = {};
+
+	ImageSubresourceData.pSysMem = ImageData;
+	ImageSubresourceData.SysMemPitch = ImagePitch;
+
+	ID3D11Texture2D* ImageTexture;
+
+	Result = Device->CreateTexture2D(&ImageTextureDesc,
+		&ImageSubresourceData,
+		&ImageTexture
+	);
+
+	assert(SUCCEEDED(Result));
+
+	free(ImageData);*/
 }

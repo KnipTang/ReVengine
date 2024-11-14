@@ -5,10 +5,11 @@
 
 using namespace Rev;
 
-ReVengine::ReVengine(int windowWidth, int windowHeight)
+ReVengine::ReVengine(int windowWidth, int windowHeight) :
+	width{ windowWidth },
+	height{ windowHeight }
 {
-	width = windowWidth;
-	height = windowHeight;
+	Rev_CoreSystems::pRevRender->InitWindow(width, height);
 }
 
 ReVengine::~ReVengine()
@@ -20,7 +21,6 @@ void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRu
 {
 	std::unique_ptr<SceneManager> sceneMan = std::move(GameRun());
 
-	Rev_CoreSystems::pRevRender->InitWindow(width, height);
 
 	bool quit = false;
 	while (quit == false)

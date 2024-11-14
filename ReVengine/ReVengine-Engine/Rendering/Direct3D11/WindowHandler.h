@@ -7,6 +7,7 @@
 #include "wrl.h"
 #include "chrono"
 #include <DirectXMath.h>
+#include <vector>
 
 //Using comPtr's to manage windows objects in a smart way
 namespace wrl = Microsoft::WRL;
@@ -33,11 +34,12 @@ namespace RevDev
 
 		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
 
-		void drawIt(DirectX::XMMATRIX &transform, UINT count);
+		void drawIt(DirectX::XMMATRIX &transform, UINT index);
 
 		void drawWindow();
 		void updateWindow();
 
+		void sampleTexture();
 	private:
 		//The head of directX From device all the other achitecture gets created and linked to.
 		wrl::ComPtr<ID3D11Device> pDevice = NULL; //A device is used to create resources and to enumerate the capabilities of a display adapter
@@ -57,7 +59,8 @@ namespace RevDev
 		wrl::ComPtr<ID3D11Texture2D> pFramebuffer;
 
 		//Buffer that holds the vertex information
-		wrl::ComPtr<ID3D11Buffer> pVertexBuffer = NULL;
+		std::vector<wrl::ComPtr<ID3D11Buffer>> pVertexBuffer;
+		std::vector<wrl::ComPtr<ID3D11Buffer>> pIndexBuffer;
 
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader = NULL;
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader = NULL;
@@ -79,8 +82,10 @@ namespace RevDev
 
 		std::chrono::steady_clock::time_point last;
 
-		std::vector<unsigned short> vIndices;
+		UINT indiceCount;
 
 		wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+
+		UINT t = 0;
 	};
 }

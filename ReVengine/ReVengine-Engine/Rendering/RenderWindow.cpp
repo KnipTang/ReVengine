@@ -4,6 +4,7 @@
 #include "d3d11.h"
 #include "Direct3D11/WindowHandler.h"
 #include <memory>
+#include "Utils/Vertex.h"
 
 using namespace RevDev;
 
@@ -64,6 +65,11 @@ bool RenderWindow::UpdateWindow()
     creatorGod->updateWindow();
 
     return false;
+}
+
+void RevDev::RenderWindow::SetupShader(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+{
+    creatorGod->setupShader(vertices, indices);
 }
 
 void RevDev::RenderWindow::RipWindow()

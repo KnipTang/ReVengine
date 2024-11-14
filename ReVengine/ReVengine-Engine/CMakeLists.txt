@@ -2,6 +2,7 @@
     "ReVengine.cpp"
     "Rev_CoreSystems.cpp"
     "Rendering/RenderWindow.cpp"
+    "Rendering/Texture.cpp"
     "Rendering/Direct3D11/WindowHandler.cpp" 
     "Sound/Rev_Sound.cpp"
     "Sound/Rev_SoundImpl.cpp"
@@ -27,6 +28,7 @@ target_link_libraries(ReVengine-Engine PUBLIC
 
 target_include_directories(ReVengine-Engine PUBLIC 
     ${soloud_SOURCE_DIR}/include
+    ${Stb_INCLUDE_DIR}
 )
 
 if(MSVC)

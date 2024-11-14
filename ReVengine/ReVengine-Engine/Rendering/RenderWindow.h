@@ -9,6 +9,7 @@ namespace RevDev
 }
 
 struct SDL_Window;
+struct Vertex;
 
 namespace RevDev
 {
@@ -22,8 +23,11 @@ namespace RevDev
 		void DrawWindow();
 		bool UpdateWindow();
 
+		void SetupShader(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
+
 		void RipWindow();
 
+		void LoadTexture();
 	private:
 
 		std::unique_ptr<WindowHandler_D3D11> creatorGod;

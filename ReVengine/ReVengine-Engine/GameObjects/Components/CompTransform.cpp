@@ -20,3 +20,8 @@ void CompTransform::setPosition(Vector3 pos)
 {
 	m_Position = pos;
 }
+
+Vector3 CompTransform::getPosition()
+{
+	return m_Position;
+}

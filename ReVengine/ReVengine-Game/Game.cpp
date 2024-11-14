@@ -26,40 +26,17 @@ std::unique_ptr<Rev::SceneManager> Load()
 
 	std::string vertexFile = "../DirectX11/shaders/VertexShader.cso";
 	std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";
+	
 
-	/*
-	const std::vector<Vertex> vertices
-	{
-		{ {-1.0f,  -1.f,  -1.0f }, { 1.0f, 0.0f, 0.0f } },
-		{ { 1.f, -1.f,  -1.0f }, { 0.0f, 1.0f, 0.0f } },
-		{ {-1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, 1.f,  -1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {-1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, -1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {-1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-		{ {1.0f, 1.f,  1.0f }, { 0.0f, 0.0f, 1.0f } },
-	};
 
-	std::vector<unsigned short> indices =
-	{
-		0,2,1, 2,3,1,
-		1,3,5, 3,7,5,
-		2,6,3, 3,6,7,
-		4,5,7, 4,7,6,
-		0,4,2, 2,4,6,
-		0,1,4, 1,5,4,
-	};
-	*/
-
-	player->addComponent<Rev::CompTransform>(player.get(), Vector3{5,8,2});
-	player->addComponent<Rev::CompTest>(player.get());
-	player->addComponent<Rev::CompRender>(player.get());
-	player->hasComponent<Rev::CompTest>();
-	player->removeComponent<Rev::CompTransform>();
-	Rev::CompTest* tt = player->getComponent<Rev::CompTest>();
+	player->addComponent<Rev::CompTransform>(player.get(), Vector3{-2,0,-5});
+	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), 1);
+	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 2,0,-5 });
+	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), 0);
 
 	std::unique_ptr<Rev::Scene> tempScene = std::make_unique<Rev::Scene>();
 	tempScene->addGameObject(std::move(player));
+	tempScene->addGameObject(std::move(player1));
 
 	std::unique_ptr<Rev::SceneManager> tempSceneMan = std::make_unique<Rev::SceneManager>();
 	tempSceneMan->addScene(std::move(tempScene));

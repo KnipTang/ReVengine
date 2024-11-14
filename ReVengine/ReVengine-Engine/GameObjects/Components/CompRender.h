@@ -6,14 +6,17 @@
 #include "Utils/Vertex.h"
 
 //struct Vertex;
+namespace Rev
+{
+	class CompTransform;
+}
 
 namespace Rev
 {
 	class CompRender : public BaseComponent
 	{
 	public:
-		CompRender(GameObject* gameObj);
-		CompRender(GameObject* gameObj, const std::vector<unsigned short> indices, const std::vector<Vertex> vertices);
+		CompRender(GameObject* gameObj, CompTransform* transform, float color, int width = 1, int height = 1);
 		~CompRender() {};
 
 		void SetupVertexShader(std::string vertexFile);
@@ -21,7 +24,14 @@ namespace Rev
 
 		const void render() override;
 	private:
-		const std::vector<unsigned short> m_Indices;
-		const std::vector<Vertex> m_Vertices;
+		CompTransform* m_Transform;
+
+		std::vector<Vertex> m_Vertices;
+
+		std::vector<unsigned short> m_Indices =
+		{
+			0,1,2,
+			2,1,3,
+		};
 	};
 }
