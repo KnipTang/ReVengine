@@ -6,6 +6,7 @@
 #include <memory>
 #include "Utils/Vertex.h"
 #include <algorithm>
+#include "Texture.h"
 #undef min
 #undef max
 
@@ -88,9 +89,9 @@ bool RenderWindow::UpdateWindow()
     return false;
 }
 
-uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
 {
-    return m_CreatorGod->AddMesh(vertices, indices);
+    return m_CreatorGod->AddMesh(vertices, indices, texture);
 }
 
 void RevDev::RenderWindow::RipWindow()

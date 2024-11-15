@@ -14,6 +14,11 @@
 namespace wrl = Microsoft::WRL;
 	struct Vertex;
 
+namespace Rev
+{
+	class Texture;
+}
+
 namespace RevDev
 {
 	class Mesh;
@@ -31,11 +36,12 @@ namespace RevDev
 
 		void Setup();
 
-		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
+		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture);
 
 		void DrawMesh(uint32_t index, const DirectX::XMMATRIX &transform = DirectX::XMMatrixIdentity());
 
 		void updateWindow();
+
 
 	private:
 		void setupPipeline();
@@ -45,6 +51,8 @@ namespace RevDev
 
 		void compileShaders(std::string vertexFile, std::string pixelFile);
 		void SetupShaderBuffers();
+
+		void SetupImageSampler();
 
 		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
 	private:

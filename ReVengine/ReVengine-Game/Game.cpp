@@ -10,9 +10,18 @@
 #include "GameObjects/Components/CompRender.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
-#include "Rendering/Mesh.h"
+#include "Rendering/Texture.h"
 
 #include <iostream>
+
+
+#include "filesystem"
+#include "iostream"
+void displayCurrentFiles(std::string path)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(path))
+		std::cout << entry.path() << std::endl;
+}
 
 std::unique_ptr<Rev::SceneManager> Load()
 {
@@ -25,10 +34,20 @@ std::unique_ptr<Rev::SceneManager> Load()
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	std::unique_ptr<Rev::GameObject> player1 = std::make_unique<Rev::GameObject>();
 
+	const std::string doomSprites = "/doomSprites";
+	const std::string doomEnemies = "/Enemies";
+	const std::string testDoomFile = "/bossb1.png";
+
+	displayCurrentFiles(resourceFolder + doomSprites + doomEnemies);
+
+	const std::string texturePath = resourceFolder + doomSprites + doomEnemies + testDoomFile;
+
+	std::unique_ptr<Rev::Texture> testTexture = std::make_unique<Rev::Texture>(texturePath);
+
 	player->addComponent<Rev::CompTransform>(player.get(), Vector3{-2,0,-5});
-	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), 1);
+	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), testTexture.get(), 1);
 	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 2,0,-5 });
-	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), 0);
+	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), testTexture.get(), 0);
 
 	std::unique_ptr<Rev::Scene> tempScene = std::make_unique<Rev::Scene>();
 	tempScene->addGameObject(std::move(player));

@@ -1,10 +1,11 @@
 #include "CompRender.h"
 #include "Rev_CoreSystems.h"
 #include "CompTransform.h"
+#include "Rendering/Texture.h"
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, float color, int windowWidth, int windowHeight) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, Texture* texture, float color, int windowWidth, int windowHeight) :
 	BaseComponent(gameObj),
 	m_Transform{ transform },
 	m_MeshId{}
@@ -29,7 +30,7 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, float colo
 		2,1,3,
 	};
 
-	m_MeshId = Rev_CoreSystems::pRevRender->AddMesh(m_Vertices, m_Indices);
+	m_MeshId = Rev_CoreSystems::pRevRender->AddMesh(m_Vertices, m_Indices, texture);
 }
 
 const void CompRender::render()

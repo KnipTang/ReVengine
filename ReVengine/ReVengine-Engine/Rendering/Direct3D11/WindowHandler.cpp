@@ -9,6 +9,7 @@
 #include "DirectXMath.h"
 #include "Utils/Vertex.h"
 #include "Rendering/Mesh.h"
+#include "Rendering/Texture.h"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -41,13 +42,18 @@ void RevDev::WindowHandler_D3D11::Setup()
 	SetupShaderBuffers();
 
 	setupPipeline();
+
+	SetupImageSampler();
 }
 
-uint32_t WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+uint32_t WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
 {
 	m_Meshes.emplace_back(std::make_unique<Mesh>(pDevice.Get()));
+
 	m_Meshes.back()->setupVertexBuffer(vertices);
 	m_Meshes.back()->setupIndexBuffer(indices);
+
+	m_Meshes.back()->SetupTexture(texture);
 
 	return m_Meshes.back()->GetID();
 }
@@ -240,4 +246,30 @@ void WindowHandler_D3D11::SetupShaderBuffers()
 	constantBuffer_DESC.ByteWidth = sizeof(DirectX::XMMATRIX);
 	constantBuffer_DESC.StructureByteStride = 0u;
 	pDevice->CreateBuffer(&constantBuffer_DESC, NULL, &pConstantBuffer);
+}
+
+void WindowHandler_D3D11::SetupImageSampler()
+{
+	D3D11_SAMPLER_DESC ImageSamplerDesc = {};
+
+	ImageSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	ImageSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ImageSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ImageSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ImageSamplerDesc.MipLODBias = 0.0f;
+	ImageSamplerDesc.MaxAnisotropy = 1;
+	ImageSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	ImageSamplerDesc.BorderColor[0] = 1.0f;
+	ImageSamplerDesc.BorderColor[1] = 1.0f;
+	ImageSamplerDesc.BorderColor[2] = 1.0f;
+	ImageSamplerDesc.BorderColor[3] = 1.0f;
+	ImageSamplerDesc.MinLOD = -FLT_MAX;
+	ImageSamplerDesc.MaxLOD = FLT_MAX;
+
+	ID3D11SamplerState* ImageSamplerState;
+
+	HRESULT result = pDevice->CreateSamplerState(&ImageSamplerDesc,
+		&ImageSamplerState);
+
+	assert(SUCCEEDED(result));
 }
