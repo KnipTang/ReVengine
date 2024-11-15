@@ -25,7 +25,7 @@ namespace RevDev
 		void setupVertexBuffer(const std::vector<Vertex> vertices);
 		void setupIndexBuffer(const std::vector<unsigned short> indices);
 
-		void SetupTexture(Rev::Texture* texture);
+		wrl::ComPtr<ID3D11ShaderResourceView> SetupTexture(Rev::Texture* texture);
 		//wrl::ComPtr<ID3D11Texture2D> GetImageTexture() { return m_ImageTexture; }
 
 		const uint32_t GetID() { return meshID; }
@@ -36,7 +36,7 @@ namespace RevDev
 	private:
 		[[nodiscard]]
 		wrl::ComPtr<ID3D11Texture2D> CreateTexture(Rev::Texture* texture);
-		void ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture);
+		wrl::ComPtr<ID3D11ShaderResourceView> ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture);
 
 	private:
 		ID3D11Device* m_Device;

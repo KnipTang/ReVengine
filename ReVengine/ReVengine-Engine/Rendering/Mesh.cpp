@@ -57,10 +57,10 @@ void Mesh::setupIndexBuffer(const std::vector<unsigned short> indices)
 	m_IndiceCount = UINT(indices.size());
 }
 
-void Mesh::SetupTexture(Rev::Texture* texture)
+wrl::ComPtr<ID3D11ShaderResourceView> Mesh::SetupTexture(Rev::Texture* texture)
 {
 	wrl::ComPtr<ID3D11Texture2D> imageTexture = CreateTexture(texture);
-	ShaderResourceView(imageTexture);
+	return ShaderResourceView(imageTexture);
 }
 
 wrl::ComPtr<ID3D11Texture2D> Mesh::CreateTexture(Rev::Texture* texture)
@@ -99,7 +99,7 @@ wrl::ComPtr<ID3D11Texture2D> Mesh::CreateTexture(Rev::Texture* texture)
 	return ImageTexture;
 }
 
-void Mesh::ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture)
+wrl::ComPtr<ID3D11ShaderResourceView> Mesh::ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture)
 {
 	ID3D11ShaderResourceView* ImageShaderResourceView;
 
@@ -108,4 +108,6 @@ void Mesh::ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture)
 		&ImageShaderResourceView
 	);
 	assert(SUCCEEDED(result));
+
+	return ImageShaderResourceView;
 }

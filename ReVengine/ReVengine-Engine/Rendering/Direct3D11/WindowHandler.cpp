@@ -53,7 +53,9 @@ uint32_t WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const 
 	m_Meshes.back()->setupVertexBuffer(vertices);
 	m_Meshes.back()->setupIndexBuffer(indices);
 
-	m_Meshes.back()->SetupTexture(texture);
+	wrl::ComPtr<ID3D11ShaderResourceView> testSRV = m_Meshes.back()->SetupTexture(texture);
+
+	pDeviceContext->PSSetShaderResources(0, 1, &testSRV);
 
 	return m_Meshes.back()->GetID();
 }
@@ -98,7 +100,7 @@ void WindowHandler_D3D11::setupPipeline()
 	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
 
@@ -272,4 +274,6 @@ void WindowHandler_D3D11::SetupImageSampler()
 		&ImageSamplerState);
 
 	assert(SUCCEEDED(result));
+
+	pDeviceContext->PSSetSamplers(0, 1, &ImageSamplerState);
 }
