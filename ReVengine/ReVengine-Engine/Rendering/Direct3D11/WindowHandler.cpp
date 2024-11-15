@@ -14,15 +14,17 @@
 
 using namespace RevDev;
 
-WindowHandler_D3D11::WindowHandler_D3D11(SDL_Window* m_Window, int windowWidth, int windowHeight)
+WindowHandler_D3D11::WindowHandler_D3D11(SDL_Window* window, int windowWidth, int windowHeight)
 {
 	SDL_SysWMinfo wmInfo{};
 	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(m_Window, &wmInfo);
-	hwnd = wmInfo.info.win.m_Window;
+	SDL_GetWindowWMInfo(window, &wmInfo);
+	hwnd = wmInfo.info.win.window;
 
 	m_WindowWidth = windowWidth;
 	m_WindowHeight = windowHeight;
+
+	m_VertexStride = sizeof(Vertex);
 }
 
 WindowHandler_D3D11::~WindowHandler_D3D11()
@@ -41,11 +43,13 @@ void RevDev::WindowHandler_D3D11::Setup()
 	setupPipeline();
 }
 
-void WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+uint32_t WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
 {
 	m_Meshes.emplace_back(std::make_unique<Mesh>(pDevice.Get()));
 	m_Meshes.back()->setupVertexBuffer(vertices);
 	m_Meshes.back()->setupIndexBuffer(indices);
+
+	return m_Meshes.back()->GetID();
 }
 
 void WindowHandler_D3D11::DrawMesh(uint32_t index, const DirectX::XMMATRIX &transform)

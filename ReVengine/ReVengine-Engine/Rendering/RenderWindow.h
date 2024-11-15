@@ -23,7 +23,7 @@ namespace RevDev
 		void DrawMesh(uint32_t meshId);
 		bool UpdateWindow();
 
-		void AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
+		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
 
 		void RipWindow();
 

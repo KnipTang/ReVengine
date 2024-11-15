@@ -5,10 +5,11 @@
 
 using namespace RevDev;
 
-int Mesh::meshIDCounter = 0;
+uint32_t Mesh::meshIDCounter = 0;
 
 Mesh::Mesh(ID3D11Device* pDevice) :
 	m_Device{pDevice},
+	m_IndiceCount{},
 	meshID{meshIDCounter++}
 {
 }

@@ -5,7 +5,7 @@
 #include <SDL_syswm.h>
 #include <string>
 #include "wrl.h"
-#include "chrono"
+#include <chrono>
 #include <DirectXMath.h>
 #include <vector>
 #include <memory>
@@ -26,12 +26,12 @@ namespace RevDev
 	public:
 
 
-		WindowHandler_D3D11(SDL_Window* m_Window, int windowWidth, int windowHeight);
+		WindowHandler_D3D11(SDL_Window* window, int windowWidth, int windowHeight);
 		~WindowHandler_D3D11();
 
 		void Setup();
 
-		void AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
+		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
 
 		void DrawMesh(uint32_t index, const DirectX::XMMATRIX &transform = DirectX::XMMatrixIdentity());
 
@@ -78,7 +78,7 @@ namespace RevDev
 		std::string m_PixelFile = "../DirectX11/shaders/PixelShader.cso";
 
 		//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
-		UINT m_VertexStride = sizeof(Vertex);
+		UINT m_VertexStride;
 		//OffSet between vertecies
 		UINT m_VertexOffset = 0;
 

@@ -88,9 +88,9 @@ bool RenderWindow::UpdateWindow()
     return false;
 }
 
-void RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
 {
-    m_CreatorGod->AddMesh(vertices, indices);
+    return m_CreatorGod->AddMesh(vertices, indices);
 }
 
 void RevDev::RenderWindow::RipWindow()
