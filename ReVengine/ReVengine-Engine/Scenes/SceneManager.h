@@ -48,7 +48,7 @@ namespace Rev
 				m_Scenes.end());
 		}
 
-		const int getID() { return sceneManagerID; }
+		const int GetID() { return sceneManagerID; }
 	private:
 		std::vector<std::unique_ptr<Scene>> m_Scenes;
 		static int sceneManagerIDCounter;

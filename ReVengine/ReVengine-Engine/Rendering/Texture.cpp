@@ -8,14 +8,11 @@ using namespace Rev;
 
 void Texture::LoadTexture(const char* path)
 {
-	int ImageWidth;
-	int ImageHeight;
-	int ImageChannels;
-	int ImageDesiredChannels = 4;
+	TextureData data;
 
 	m_ImageData = stbi_load(path,
-		&ImageWidth,
-		&ImageHeight,
-		&ImageChannels, ImageDesiredChannels);
+		&data.ImageWidth,
+		&data.ImageHeight,
+		&data.ImageChannels, data.ImageDesiredChannels);
 	assert(m_ImageData);
 }

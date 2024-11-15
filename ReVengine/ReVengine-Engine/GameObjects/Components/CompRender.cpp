@@ -4,7 +4,7 @@
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, float color, int width, int height) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, float color, int m_WindowWidth, int m_WindowHeight) :
 	BaseComponent(gameObj),
 	m_Transform{ transform }
 {
@@ -13,27 +13,25 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, float colo
 	m_Vertices =
 	{
 		//Bottom Left
-		{ { pos.x - width,  pos.y - height, pos.z }, { color, color, color } },
+		{ { pos.x - m_WindowWidth,  pos.y - m_WindowHeight, pos.z }, { color, color, color } },
 		//Bottom Right
-		{ { pos.x + width,  pos.y - height, pos.z }, { color, color, color } },
+		{ { pos.x + m_WindowWidth,  pos.y - m_WindowHeight, pos.z }, { color, color, color } },
 		//Top Left
-		{ { pos.x - width,  pos.y + height, pos.z }, { color, color, color } },
+		{ { pos.x - m_WindowWidth,  pos.y + m_WindowHeight, pos.z }, { color, color, color } },
 		//Top Right
-		{ { pos.x + width,  pos.y + height, pos.z }, { color, color, color } },
+		{ { pos.x + m_WindowWidth,  pos.y + m_WindowHeight, pos.z }, { color, color, color } },
 	};
 
-	Rev_CoreSystems::pRevRender->SetupShader(m_Vertices, m_Indices);
-}
+	m_Indices =
+	{
+		0,1,2,
+		2,1,3,
+	};
 
-void Rev::CompRender::SetupVertexShader(std::string vertexFile)
-{
-}
-
-void Rev::CompRender::SetupPixelShader(std::string pixelFile)
-{
+	Rev_CoreSystems::pRevRender->AddMesh(m_Vertices, m_Indices);
 }
 
 const void CompRender::render()
 {
-	Rev_CoreSystems::pRevRender->DrawWindow();
+	Rev_CoreSystems::pRevRender->DrawMesh();
 }

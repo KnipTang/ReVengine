@@ -10,6 +10,7 @@
 #include "GameObjects/Components/CompRender.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
+#include "Rendering/Mesh.h"
 
 #include <iostream>
 
@@ -23,11 +24,6 @@ std::unique_ptr<Rev::SceneManager> Load()
 
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	std::unique_ptr<Rev::GameObject> player1 = std::make_unique<Rev::GameObject>();
-
-	std::string vertexFile = "../DirectX11/shaders/VertexShader.cso";
-	std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";
-	
-
 
 	player->addComponent<Rev::CompTransform>(player.get(), Vector3{-2,0,-5});
 	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), 1);

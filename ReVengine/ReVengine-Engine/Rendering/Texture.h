@@ -5,6 +5,14 @@
 
 namespace Rev
 {
+	struct TextureData
+	{
+		int ImageWidth;
+		int ImageHeight;
+		int ImageChannels;
+		int ImageDesiredChannels = 4;
+	};
+
 	class Texture
 	{
 	public:

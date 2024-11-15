@@ -6,10 +6,10 @@
 using namespace Rev;
 
 ReVengine::ReVengine(int windowWidth, int windowHeight) :
-	width{ windowWidth },
-	height{ windowHeight }
+	m_WindowWidth{ windowWidth },
+	m_WindowHeight{ windowHeight }
 {
-	Rev_CoreSystems::pRevRender->InitWindow(width, height);
+	Rev_CoreSystems::pRevRender->InitWindow(m_WindowWidth, m_WindowHeight);
 }
 
 ReVengine::~ReVengine()

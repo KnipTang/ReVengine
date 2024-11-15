@@ -70,7 +70,7 @@ namespace Rev
 				m_Components.end());
 		}
 
-		const int getID() { return objID; }
+		const int GetID() { return objID; }
 	private:
 		std::vector<std::unique_ptr<BaseComponent>> m_Components;
 		static int objIDCounter;

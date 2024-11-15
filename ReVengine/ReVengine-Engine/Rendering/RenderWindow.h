@@ -20,19 +20,22 @@ namespace RevDev
 		~RenderWindow();
 
 		bool InitWindow(int windowWidth, int windowHeight);
-		void DrawWindow();
+		void DrawMesh(uint32_t meshId);
 		bool UpdateWindow();
 
-		void SetupShader(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
+		void AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
 
 		void RipWindow();
 
 		void LoadTexture();
 	private:
 
-		std::unique_ptr<WindowHandler_D3D11> creatorGod;
+		std::unique_ptr<WindowHandler_D3D11> m_CreatorGod;
 
 		//The window we'll be rendering to
-		std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>> window;
+		std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>> m_Window;
+
+		int m_WindowWidth;
+		int m_WindowHeight;
 	};
 }

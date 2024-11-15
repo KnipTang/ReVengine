@@ -8,22 +8,21 @@
 #include "fstream"
 #include "DirectXMath.h"
 #include "Utils/Vertex.h"
+#include "Rendering/Mesh.h"
 
 #pragma comment(lib, "d3d11.lib")
 
 using namespace RevDev;
 
-WindowHandler_D3D11::WindowHandler_D3D11(SDL_Window* window, int windowWidth, int windowHeight)
+WindowHandler_D3D11::WindowHandler_D3D11(SDL_Window* m_Window, int windowWidth, int windowHeight)
 {
 	SDL_SysWMinfo wmInfo{};
 	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(window, &wmInfo);
-	hwnd = wmInfo.info.win.window;
+	SDL_GetWindowWMInfo(m_Window, &wmInfo);
+	hwnd = wmInfo.info.win.m_Window;
 
-	width = windowWidth;
-	height = windowHeight;
-
-	last = std::chrono::steady_clock::now();
+	m_WindowWidth = windowWidth;
+	m_WindowHeight = windowHeight;
 }
 
 WindowHandler_D3D11::~WindowHandler_D3D11()
@@ -31,7 +30,55 @@ WindowHandler_D3D11::~WindowHandler_D3D11()
 
 }
 
-void RevDev::WindowHandler_D3D11::setupPipeline()
+void RevDev::WindowHandler_D3D11::Setup()
+{
+	setupDeviceAndSwap();
+	SetupRenderTargetAndStencelBuffer();
+
+	compileShaders(m_VertexFile, m_PixelFile);
+	SetupShaderBuffers();
+
+	setupPipeline();
+}
+
+void WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+{
+	m_Meshes.emplace_back(std::make_unique<Mesh>(pDevice.Get()));
+	m_Meshes.back()->setupVertexBuffer(vertices);
+	m_Meshes.back()->setupIndexBuffer(indices);
+}
+
+void WindowHandler_D3D11::DrawMesh(uint32_t index, const DirectX::XMMATRIX &transform)
+{
+	//Vertex buffer is a buffer that holds the vertex data
+	auto&& mesh = m_Meshes.at(index);
+	
+	pDeviceContext->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &m_VertexStride, &m_VertexOffset);
+	pDeviceContext->IASetIndexBuffer(mesh->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
+
+	D3D11_MAPPED_SUBRESOURCE msr;
+	pDeviceContext->Map(pConstantBuffer.Get(), 0u,D3D11_MAP_WRITE_DISCARD, 0u,&msr);
+	memcpy(msr.pData, &transform, sizeof(DirectX::XMMATRIX));
+	pDeviceContext->Unmap(pConstantBuffer.Get(), 0u);
+
+	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
+
+	pDeviceContext->DrawIndexed(mesh->GetIndiceCount(), 0, 0);
+}
+
+void WindowHandler_D3D11::updateWindow()
+{
+	pSwapChain->Present(1, 0);
+	clearBuffer(m_BackgroundColour);
+}
+
+void WindowHandler_D3D11::clearBuffer(float backgroundColour[4])
+{
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
+	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);
+}
+
+void WindowHandler_D3D11::setupPipeline()
 {
 	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
 	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -43,14 +90,14 @@ void RevDev::WindowHandler_D3D11::setupPipeline()
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), vertexBytecode.c_str(), vertexBytecode.size(), &inputLayer);
+	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
 
 	pDeviceContext->IASetInputLayout(inputLayer.Get());
 
 	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
 	D3D11_VIEWPORT viewPort{};
-	viewPort.Width = float(width);
-	viewPort.Height = float(height);
+	viewPort.Width = float(m_WindowWidth);
+	viewPort.Height = float(m_WindowHeight);
 	viewPort.MinDepth = 0;
 	viewPort.MaxDepth = 1;
 	viewPort.TopLeftX = 0;
@@ -102,14 +149,6 @@ void WindowHandler_D3D11::setupDeviceAndSwap()
 		&feature_level,
 		&pDeviceContext);
 	assert(S_OK == hr && pSwapChain && pDevice && pDeviceContext);
-
-	SetupRenderTargetAndStencelBuffer();
-
-	std::string vertexFile = "../DirectX11/shaders/VertexShader.cso";
-	std::string pixelFile = "../DirectX11/shaders/PixelShader.cso";
-	compileShaders(vertexFile, pixelFile);
-
-	setupPipeline();
 }
 
 void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
@@ -162,12 +201,12 @@ void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
 void WindowHandler_D3D11::compileShaders(std::string vertexFile, std::string pixelFile)
 {
 	std::ifstream inFile(vertexFile, std::ios_base::binary);
-	vertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
+	m_VertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
 		std::istreambuf_iterator<char>());
 	inFile.close();
 	
 	HRESULT result = pDevice->CreateVertexShader(
-		vertexBytecode.c_str(), vertexBytecode.size(),
+		m_VertexBytecode.c_str(), m_VertexBytecode.size(),
 		nullptr, &pVertexShader);
 	assert(SUCCEEDED(result));
 
@@ -176,61 +215,19 @@ void WindowHandler_D3D11::compileShaders(std::string vertexFile, std::string pix
 
 
 	inFile = std::ifstream{ pixelFile, std::ios_base::binary };
-	pixelBytecode = std::string(std::istreambuf_iterator<char>(inFile),
+	m_PixelBytecode = std::string(std::istreambuf_iterator<char>(inFile),
 		std::istreambuf_iterator<char>());
 	inFile.close();
 
 	result = pDevice->CreatePixelShader(
-		pixelBytecode.c_str(), pixelBytecode.size(),
+		m_PixelBytecode.c_str(), m_PixelBytecode.size(),
 		nullptr, &pPixelShader);
 
 	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 }
 
-void RevDev::WindowHandler_D3D11::setupShader(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+void WindowHandler_D3D11::SetupShaderBuffers()
 {
-	D3D11_BUFFER_DESC vertexBuffer_DESC{ 0 };
-	vertexBuffer_DESC.BindFlags = D3D11_BIND_VERTEX_BUFFER; //Type of vertex buffer
-	vertexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
-	vertexBuffer_DESC.CPUAccessFlags = 0;
-	vertexBuffer_DESC.MiscFlags = 0;
-	vertexBuffer_DESC.ByteWidth = UINT(vertices.size() * sizeof(Vertex));
-	vertexBuffer_DESC.StructureByteStride = sizeof(Vertex);
-
-	//The data of the vertex
-	D3D11_SUBRESOURCE_DATA subResc_DATA{ 0 };
-	subResc_DATA.pSysMem = vertices.data();
-
-	pVertexBuffer.emplace_back(wrl::ComPtr<ID3D11Buffer>());
-
-	HRESULT result = pDevice->CreateBuffer(&vertexBuffer_DESC, &subResc_DATA, &pVertexBuffer.back());
-	assert(SUCCEEDED(result));
-
-	D3D11_BUFFER_DESC indexBuffer_DESC{};
-	indexBuffer_DESC.BindFlags = D3D11_BIND_INDEX_BUFFER; //Type of vertex buffer
-	indexBuffer_DESC.Usage = D3D11_USAGE_DEFAULT; //How buffer communicates with gpu (if the gpu can also write back to the cpu or not)
-	indexBuffer_DESC.CPUAccessFlags = 0;
-	indexBuffer_DESC.MiscFlags = 0;
-	indexBuffer_DESC.ByteWidth = UINT(indices.size() * sizeof(unsigned short));
-	indexBuffer_DESC.StructureByteStride = sizeof(unsigned short);
-
-	D3D11_SUBRESOURCE_DATA subRescIndex_DATA{ 0 };
-	subRescIndex_DATA.pSysMem = indices.data();
-
-	pIndexBuffer.emplace_back(wrl::ComPtr<ID3D11Buffer>());
-
-	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
-	UINT vertexStride = sizeof(Vertex);
-	//Vertex buffer is a buffer that holds the vertex data
-	pDeviceContext->IASetVertexBuffers(0, 1, pVertexBuffer.at(0).GetAddressOf(), &vertexStride, &vertexOffset);
-	pDeviceContext->IASetIndexBuffer(pIndexBuffer.at(0).Get(), DXGI_FORMAT_R16_UINT, 0);
-
-	result = pDevice->CreateBuffer(&indexBuffer_DESC, &subRescIndex_DATA, &pIndexBuffer.back());
-	assert(SUCCEEDED(result));
-
-	indiceCount = UINT(indices.size());
-
-
 	D3D11_BUFFER_DESC constantBuffer_DESC{};
 	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
@@ -239,99 +236,4 @@ void RevDev::WindowHandler_D3D11::setupShader(const std::vector<Vertex> vertices
 	constantBuffer_DESC.ByteWidth = sizeof(DirectX::XMMATRIX);
 	constantBuffer_DESC.StructureByteStride = 0u;
 	pDevice->CreateBuffer(&constantBuffer_DESC, NULL, &pConstantBuffer);
-}
-
-void WindowHandler_D3D11::drawIt(DirectX::XMMATRIX &transform, UINT index)
-{
-	//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
-	UINT vertexStride = sizeof(Vertex);
-	//Vertex buffer is a buffer that holds the vertex data
-	pDeviceContext->IASetVertexBuffers(0, 1, pVertexBuffer.at(index).GetAddressOf(), &vertexStride, &vertexOffset);
-	pDeviceContext->IASetIndexBuffer(pIndexBuffer.at(index).Get(), DXGI_FORMAT_R16_UINT, 0);
-
-	D3D11_MAPPED_SUBRESOURCE msr;
-	pDeviceContext->Map(pConstantBuffer.Get(), 0u,D3D11_MAP_WRITE_DISCARD, 0u,&msr);
-	memcpy(msr.pData, &transform, sizeof(DirectX::XMMATRIX));
-	pDeviceContext->Unmap(pConstantBuffer.Get(), 0u);
-
-	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
-
-	pDeviceContext->DrawIndexed(indiceCount, 0, 0);
-
-	t++;
-}
-
-
-
-void RevDev::WindowHandler_D3D11::drawWindow()
-{
-	/*float time = std::chrono::duration<float>(std::chrono::steady_clock::now() - last).count();*/
-	DirectX::XMMATRIX transformBuffer =
-	{
-			DirectX::XMMatrixTranspose
-			(
-				DirectX::XMMatrixRotationX(3.14f) *
-				//DirectX::XMMatrixTranslation(0, 0, 5.f) *
-				DirectX::XMMatrixPerspectiveLH(1.f, min(float(width), float(height)) / max(float(width), float(height)), 0.5f,10.f)
-			)
-	};
-
-
-		drawIt(transformBuffer, t);
-	
-}
-
-void WindowHandler_D3D11::updateWindow()
-{
-
-
-	//float x_nda, y_nda;
-	//int x, y;
-	//SDL_GetMouseState(&x, &y);
-
-	////screen to ndc space -> to [0-1]
-	//x_nda = (float)x / (width/2.f) - 1.f;
-	//y_nda = -(float)y / (height/2.f) + 1.f;
-
-	pSwapChain->Present(1, 0);
-	clearBuffer(background_colour);
-
-}
-
-void WindowHandler_D3D11::clearBuffer(float backgroundColour[4])
-{
-	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
-	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);
-	t = 0;
-}
-
-void WindowHandler_D3D11::sampleTexture()
-{
-	/*D3D11_TEXTURE2D_DESC ImageTextureDesc = {};
-
-	ImageTextureDesc.Width = ImageWidth;
-	ImageTextureDesc.Height = ImageHeight;
-	ImageTextureDesc.MipLevels = 1;
-	ImageTextureDesc.ArraySize = 1;
-	ImageTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	ImageTextureDesc.SampleDesc.Count = 1;
-	ImageTextureDesc.SampleDesc.Quality = 0;
-	ImageTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	ImageTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-	D3D11_SUBRESOURCE_DATA ImageSubresourceData = {};
-
-	ImageSubresourceData.pSysMem = ImageData;
-	ImageSubresourceData.SysMemPitch = ImagePitch;
-
-	ID3D11Texture2D* ImageTexture;
-
-	Result = Device->CreateTexture2D(&ImageTextureDesc,
-		&ImageSubresourceData,
-		&ImageTexture
-	);
-
-	assert(SUCCEEDED(Result));
-
-	free(ImageData);*/
 }

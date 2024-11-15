@@ -60,7 +60,7 @@ namespace Rev
 				m_GameObjects.end());
 		}
 
-		const int getID() { return sceneID; }
+		const int GetID() { return sceneID; }
 	private:
 		std::vector<std::unique_ptr<GameObject>> m_GameObjects;
 		static int sceneIDCounter;

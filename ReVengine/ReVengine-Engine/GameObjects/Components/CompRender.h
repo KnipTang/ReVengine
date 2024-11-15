@@ -16,11 +16,8 @@ namespace Rev
 	class CompRender : public BaseComponent
 	{
 	public:
-		CompRender(GameObject* gameObj, CompTransform* transform, float color, int width = 1, int height = 1);
+		CompRender(GameObject* gameObj, CompTransform* transform, float color, int m_WindowWidth = 1, int m_WindowHeight = 1);
 		~CompRender() {};
-
-		void SetupVertexShader(std::string vertexFile);
-		void SetupPixelShader(std::string pixelFile);
 
 		const void render() override;
 	private:
@@ -28,10 +25,8 @@ namespace Rev
 
 		std::vector<Vertex> m_Vertices;
 
-		std::vector<unsigned short> m_Indices =
-		{
-			0,1,2,
-			2,1,3,
-		};
+		std::vector<unsigned short> m_Indices;
+
+		uint8_t m_MeshId;
 	};
 }

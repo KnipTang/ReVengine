@@ -5,6 +5,9 @@
 #include "Direct3D11/WindowHandler.h"
 #include <memory>
 #include "Utils/Vertex.h"
+#include <algorithm>
+#undef min
+#undef max
 
 using namespace RevDev;
 
@@ -14,7 +17,7 @@ RenderWindow::RenderWindow()
 
 RenderWindow::~RenderWindow()
 {
-    creatorGod.reset();
+    m_CreatorGod.reset();
 }
 
 bool RenderWindow::InitWindow(int windowWidth, int windowHeight) {
@@ -26,28 +29,46 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight) {
     }
     else
     {
+        m_WindowWidth = windowWidth;
+        m_WindowHeight = windowHeight;
+
         //Create window
-        window = std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>>(
-            SDL_CreateWindow("WINDOW OF GODS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_SHOWN),
+        m_Window = std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>>(
+            SDL_CreateWindow("WINDOW OF GODS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_WindowWidth, m_WindowHeight, SDL_WINDOW_SHOWN),
             SDL_DestroyWindow
         );
-        if (window == NULL)
+        if (m_Window == NULL)
         {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         }
 
         {
-            creatorGod = std::make_unique<WindowHandler_D3D11>(window.get(), windowWidth, windowHeight);
-            creatorGod->setupDeviceAndSwap();
+            m_CreatorGod = std::make_unique<WindowHandler_D3D11>(m_Window.get(), m_WindowWidth, m_WindowHeight);
+            m_CreatorGod->Setup();
         }
 
         return true;
     }
 }
 
-void RevDev::RenderWindow::DrawWindow()
+void RevDev::RenderWindow::DrawMesh(uint32_t meshId)
 {
-    creatorGod->drawWindow();
+    DirectX::XMMATRIX transformBuffer =
+    {
+            DirectX::XMMatrixTranspose
+            (
+                DirectX::XMMatrixRotationX(3.14f) *
+                //DirectX::XMMatrixTranslation(0, 0, 5.f) *
+                DirectX::XMMatrixPerspectiveLH(
+                    1.f, 
+                    std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
+                    0.5f,
+                    10.f
+                )
+            )
+    };
+
+    m_CreatorGod->DrawMesh(meshId, transformBuffer);
 }
 
 bool RenderWindow::UpdateWindow()
@@ -62,20 +83,20 @@ bool RenderWindow::UpdateWindow()
 
     }    
     
-    creatorGod->updateWindow();
+    m_CreatorGod->updateWindow();
 
     return false;
 }
 
-void RevDev::RenderWindow::SetupShader(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
+void RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
 {
-    creatorGod->setupShader(vertices, indices);
+    m_CreatorGod->AddMesh(vertices, indices);
 }
 
 void RevDev::RenderWindow::RipWindow()
 {
     //Destroy window
-    SDL_DestroyWindow(window.get());
+    SDL_DestroyWindow(m_Window.get());
 
     //Quit SDL subsystems
     SDL_Quit();

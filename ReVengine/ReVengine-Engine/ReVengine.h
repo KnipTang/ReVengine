@@ -25,7 +25,7 @@ namespace Rev
 	private:
 		std::unique_ptr<RevDev::RenderWindow> pRenderWindow;
 
-		int width;
-		int height;
+		int m_WindowWidth;
+		int m_WindowHeight;
 	};
 }
