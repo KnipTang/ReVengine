@@ -12,6 +12,5 @@ struct Vertex
 	{
 		float u;
 		float v;
-		float vo;
 	} uv;
 };

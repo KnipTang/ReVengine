@@ -8,9 +8,10 @@ using namespace RevDev;
 
 uint32_t Mesh::meshIDCounter = 0;
 
-Mesh::Mesh(ID3D11Device* pDevice) :
+Mesh::Mesh(ID3D11Device* pDevice, Rev::Texture* texture) :
 	m_Device{pDevice},
 	m_IndiceCount{},
+	m_Texture{ texture },
 	meshID{meshIDCounter++}
 {
 }
@@ -57,9 +58,9 @@ void Mesh::setupIndexBuffer(const std::vector<unsigned short> indices)
 	m_IndiceCount = UINT(indices.size());
 }
 
-wrl::ComPtr<ID3D11ShaderResourceView> Mesh::SetupTexture(Rev::Texture* texture)
+wrl::ComPtr<ID3D11ShaderResourceView> Mesh::SetupTexture()
 {
-	wrl::ComPtr<ID3D11Texture2D> imageTexture = CreateTexture(texture);
+	wrl::ComPtr<ID3D11Texture2D> imageTexture = CreateTexture(m_Texture);
 	return ShaderResourceView(imageTexture);
 }
 

@@ -34,15 +34,6 @@ WindowHandler_D3D11::~WindowHandler_D3D11()
 
 }
 
-#include "filesystem"
-#include "iostream"
-void displayCurrentFiles(std::string path)
-{
-	for (const auto& entry : std::filesystem::directory_iterator(path))
-		std::cout << entry.path() << std::endl;
-}
-
-
 void RevDev::WindowHandler_D3D11::Setup()
 {
 	setupDeviceAndSwap();
@@ -52,20 +43,18 @@ void RevDev::WindowHandler_D3D11::Setup()
 	SetupShaderBuffers();
 
 	setupPipeline();
-
-	SetupImageSampler();
 }
 
 uint32_t WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
 {
-	m_Meshes.emplace_back(std::make_unique<Mesh>(pDevice.Get()));
+	m_Meshes.emplace_back(std::make_unique<Mesh>(pDevice.Get(), texture));
 
 	m_Meshes.back()->setupVertexBuffer(vertices);
 	m_Meshes.back()->setupIndexBuffer(indices);
 
-	wrl::ComPtr<ID3D11ShaderResourceView> testSRV = m_Meshes.back()->SetupTexture(texture);
+	//wrl::ComPtr<ID3D11ShaderResourceView> testSRV = m_Meshes.back()->SetupTexture(texture);
 
-	pDeviceContext->PSSetShaderResources(0, 1, &testSRV);
+	//pDeviceContext->PSSetShaderResources(0, 1, &testSRV);
 
 	return m_Meshes.back()->GetID();
 }
@@ -84,6 +73,11 @@ void WindowHandler_D3D11::DrawMesh(uint32_t index, const DirectX::XMMATRIX &tran
 	pDeviceContext->Unmap(pConstantBuffer.Get(), 0u);
 
 	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
+
+	ID3D11ShaderResourceView* testSRV = m_Meshes.at(index)->SetupTexture().Get();
+
+	pDeviceContext->PSSetShaderResources(0, 1, &testSRV);
+	SetupImageSampler();
 
 	pDeviceContext->DrawIndexed(mesh->GetIndiceCount(), 0, 0);
 }
@@ -110,8 +104,8 @@ void WindowHandler_D3D11::setupPipeline()
 	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		//{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
 

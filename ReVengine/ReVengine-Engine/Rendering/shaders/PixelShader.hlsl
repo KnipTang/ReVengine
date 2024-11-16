@@ -1,11 +1,11 @@
-Texture2D Texture;
-SamplerState Sampler;
+Texture2D Texture : register(t0);
+SamplerState Sampler : register(s0);
 
 struct ps_input
 {
     float4 position : SV_POSITION;
-    //float2 uv: UV;
-    float3 color : COLOR;
+    float2 uv : UV;
+    //float3 color : COLOR;
 };
 
 struct ps_output
@@ -19,9 +19,9 @@ ps_output ps_main(ps_input input)
     
     float4 textureColor;
     
-    //textureColor = Texture.Sample(Sampler, input.uv);
+    textureColor = Texture.Sample(Sampler, input.uv);
     
-    //output.color = float4(textureColor);
-    output.color = float4(input.color, 1);
+    output.color = float4(textureColor);
+    //output.color = float4(input.color, 1);
     return output;
 }

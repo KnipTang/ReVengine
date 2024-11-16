@@ -31,12 +31,12 @@ std::unique_ptr<Rev::SceneManager> Load()
 
 	const std::string texturePath = resourceFolder + doomSprites + doomEnemies + testDoomFile;
 
-	std::unique_ptr<Rev::Texture> testTexture = std::make_unique<Rev::Texture>(texturePath);
+	Rev::Texture* testTexture = new Rev::Texture(texturePath);
 
 	player->addComponent<Rev::CompTransform>(player.get(), Vector3{-2,0,-5});
-	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), testTexture.get());
+	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), testTexture);
 	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 2,0,-5 });
-	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), testTexture.get());
+	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), testTexture);
 
 	std::unique_ptr<Rev::Scene> tempScene = std::make_unique<Rev::Scene>();
 	tempScene->addGameObject(std::move(player));

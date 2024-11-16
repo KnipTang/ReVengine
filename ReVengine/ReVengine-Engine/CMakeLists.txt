@@ -40,12 +40,16 @@ endif()
 
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
+set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Rendering/shaders")
 
 add_custom_target(copy_engine_resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${RESOURCES_DIR}"
-        "${CMAKE_BINARY_DIR}/engine_resources"
-    COMMENT "Copying resources to build directory"
+        "${CMAKE_BINARY_DIR}/engine_resources/Resources"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${SHADER_DIR}"
+        "${CMAKE_BINARY_DIR}/engine_resources/shaders"
+    COMMENT "Copying resources and shaders to build directory"
 )
 
 # add this as a dependency to the engine

@@ -3,6 +3,7 @@
 #include <vector>
 #include "wrl.h"
 #include "d3d11.h"
+#include <memory>
 #undef PlaySound
 
 namespace wrl = Microsoft::WRL;
@@ -19,13 +20,13 @@ namespace RevDev
 	class Mesh
 	{
 	public:
-		Mesh(ID3D11Device* pDevice);
+		Mesh(ID3D11Device* pDevice, Rev::Texture* texture);
 		~Mesh();
 
 		void setupVertexBuffer(const std::vector<Vertex> vertices);
 		void setupIndexBuffer(const std::vector<unsigned short> indices);
 
-		wrl::ComPtr<ID3D11ShaderResourceView> SetupTexture(Rev::Texture* texture);
+		wrl::ComPtr<ID3D11ShaderResourceView> SetupTexture();
 		//wrl::ComPtr<ID3D11Texture2D> GetImageTexture() { return m_ImageTexture; }
 
 		const uint32_t GetID() { return meshID; }
@@ -44,6 +45,8 @@ namespace RevDev
 		wrl::ComPtr<ID3D11Buffer> m_VertexBuffer;
 		wrl::ComPtr<ID3D11Buffer> m_IndexBuffer;
 		UINT m_IndiceCount;
+
+		Rev::Texture* m_Texture;
 
 		//wrl::ComPtr<ID3D11Texture2D> m_ImageTexture;
 

@@ -15,13 +15,13 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, Texture* t
 	m_Vertices =
 	{
 		//Bottom Left
-		{ { pos.x - windowWidth,  pos.y - windowHeight, pos.z }, { 0.f, 0.f, 0.f } },
+		{ { pos.x - windowWidth,  pos.y - windowHeight, pos.z }, { 0.f, 0.f } },
 		//Bottom Right
-		{ { pos.x + windowWidth,  pos.y - windowHeight, pos.z }, { 1.f, 0.f, 0.f } },
+		{ { pos.x + windowWidth,  pos.y - windowHeight, pos.z }, { 1.f, 0.f } },
 		//Top Left
-		{ { pos.x - windowWidth,  pos.y + windowHeight, pos.z }, { 0.f, 1.f, 1.f } },
+		{ { pos.x - windowWidth,  pos.y + windowHeight, pos.z }, { 0.f, 1.f } },
 		//Top Right
-		{ { pos.x + windowWidth,  pos.y + windowHeight, pos.z }, { 1.f, 1.f, 1.f } },
+		{ { pos.x + windowWidth,  pos.y + windowHeight, pos.z }, { 1.f, 1.f } },
 	};
 
 	m_Indices =
