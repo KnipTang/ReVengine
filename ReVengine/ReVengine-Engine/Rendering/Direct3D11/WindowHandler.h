@@ -50,6 +50,7 @@ namespace RevDev
 		void SetupRenderTargetAndStencelBuffer(); //Set backbuffer to pass to and create rendertargetview
 
 		void compileShaders(std::string vertexFile, std::string pixelFile);
+		HRESULT CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob);
 		void SetupShaderBuffers();
 
 		void SetupImageSampler();
@@ -80,10 +81,10 @@ namespace RevDev
 		wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
 
 		std::string m_VertexBytecode;
-		std::string m_PixelBytecode;
+		//std::string m_PixelBytecode;
 
-		std::string m_VertexFile = "../DirectX11/shaders/VertexShader.cso";
-		std::string m_PixelFile = "../DirectX11/shaders/PixelShader.cso";
+		std::string m_VertexFile = "../engine_resources/shaders/VertexShader.hlsl";
+		std::string m_PixelFile = "../engine_resources/shaders/PixelShader.hlsl";
 
 		//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
 		UINT m_VertexStride;

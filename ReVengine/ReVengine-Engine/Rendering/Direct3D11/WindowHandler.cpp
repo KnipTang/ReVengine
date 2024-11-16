@@ -2,7 +2,6 @@
 #include <cassert>
 #include "SDL.h"
 #include <SDL_syswm.h>
-#include "d3dcompiler.h"
 #include <string>
 #include "filesystem"
 #include "fstream"
@@ -10,8 +9,10 @@
 #include "Utils/Vertex.h"
 #include "Rendering/Mesh.h"
 #include "Rendering/Texture.h"
+#include <d3dcompiler.h>
 
-#pragma comment(lib, "d3d11.lib")
+//#pragma comment(lib, "d3d11.lib")
+//#pragma comment(lib, "d3dcompiler.lib")
 
 using namespace RevDev;
 
@@ -32,6 +33,15 @@ WindowHandler_D3D11::~WindowHandler_D3D11()
 {
 
 }
+
+#include "filesystem"
+#include "iostream"
+void displayCurrentFiles(std::string path)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(path))
+		std::cout << entry.path() << std::endl;
+}
+
 
 void RevDev::WindowHandler_D3D11::Setup()
 {
@@ -100,7 +110,8 @@ void WindowHandler_D3D11::setupPipeline()
 	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
 
@@ -210,32 +221,98 @@ void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
 	pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
 }
 
+HRESULT WindowHandler_D3D11::CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob)
+{
+	if (!srcFile || !entryPoint || !profile || !blob)
+		return E_INVALIDARG;
+
+	*blob = nullptr;
+
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if defined( DEBUG ) || defined( _DEBUG )
+	flags |= D3DCOMPILE_DEBUG;
+#endif
+
+	const D3D_SHADER_MACRO defines[] =
+	{
+		"EXAMPLE_DEFINE", "1",
+		NULL, NULL
+	};
+
+	ID3DBlob* shaderBlob = nullptr;
+	ID3DBlob* errorBlob = nullptr;
+	HRESULT hr = D3DCompileFromFile(srcFile, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		entryPoint, profile,
+		flags, 0, &shaderBlob, &errorBlob);
+	if (FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			errorBlob->Release();
+		}
+
+		if (shaderBlob)
+			shaderBlob->Release();
+
+		return hr;
+	}
+
+	*blob = shaderBlob;
+
+	return hr;
+}
+
 void WindowHandler_D3D11::compileShaders(std::string vertexFile, std::string pixelFile)
 {
-	std::ifstream inFile(vertexFile, std::ios_base::binary);
-	m_VertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
-		std::istreambuf_iterator<char>());
-	inFile.close();
-	
-	HRESULT result = pDevice->CreateVertexShader(
-		m_VertexBytecode.c_str(), m_VertexBytecode.size(),
-		nullptr, &pVertexShader);
-	assert(SUCCEEDED(result));
+	std::wstring wideVertexFile = std::wstring(vertexFile.begin(), vertexFile.end());
+	ID3DBlob* vsBlob = nullptr;
+	HRESULT hr = CompileShader(wideVertexFile.c_str(), "vs_main", "vs_5_0", &vsBlob);
+	if (FAILED(hr))
+	{
+		printf("Failed compiling vertex shader %08X\n", hr);
+	}
 
+	std::wstring widePixelFile = std::wstring(pixelFile.begin(), pixelFile.end());
+	ID3DBlob* psBlob = nullptr;
+	hr = CompileShader(widePixelFile.c_str(), "ps_main", "ps_5_0", &psBlob);
+	if (FAILED(hr))
+	{
+		printf("Failed compiling pixel shader %08X\n", hr);
+	}
+
+	//std::ifstream inFile(vertexFile, std::ios_base::binary);
+	//m_VertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
+	//	std::istreambuf_iterator<char>());
+	//inFile.close();
+	m_VertexBytecode.assign((char*)vsBlob->GetBufferPointer(), (char*)vsBlob->GetBufferPointer() + vsBlob->GetBufferSize());
+	
+	hr = pDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVertexShader);
+	if (FAILED(hr))
+	{
+		printf("Failed creating vertex shader %08X\n", hr);
+	}
 	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
 
-
-
-	inFile = std::ifstream{ pixelFile, std::ios_base::binary };
-	m_PixelBytecode = std::string(std::istreambuf_iterator<char>(inFile),
-		std::istreambuf_iterator<char>());
-	inFile.close();
-
-	result = pDevice->CreatePixelShader(
-		m_PixelBytecode.c_str(), m_PixelBytecode.size(),
-		nullptr, &pPixelShader);
+	hr = pDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPixelShader);
+	if (FAILED(hr))
+	{
+		printf("Failed creating pixel shader %08X\n", hr);
+	}
 
 	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
+
+	//inFile = std::ifstream{ pixelFile, std::ios_base::binary };
+	//m_PixelBytecode = std::string(std::istreambuf_iterator<char>(inFile),
+	//	std::istreambuf_iterator<char>());
+	//inFile.close();
+	//m_PixelBytecode.assign((char*)psBlob->GetBufferPointer(), (char*)psBlob->GetBufferPointer() + psBlob->GetBufferSize());
+
+
+	//result = pDevice->CreatePixelShader(
+	//	m_PixelBytecode.c_str(), m_PixelBytecode.size(),
+	//	nullptr, &pPixelShader);
+
 }
 
 void WindowHandler_D3D11::SetupShaderBuffers()

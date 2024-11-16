@@ -10,8 +10,8 @@ struct Vertex
 	} pos;
 	struct
 	{
-		float r;
-		float g;
-		float b;
-	} color;
+		float u;
+		float v;
+		float vo;
+	} uv;
 };

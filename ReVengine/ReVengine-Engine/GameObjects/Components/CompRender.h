@@ -17,7 +17,7 @@ namespace Rev
 	class CompRender : public BaseComponent
 	{
 	public:
-		CompRender(GameObject* gameObj, CompTransform* transform, Texture* texture, float color, int windowWidth = 1, int windowHeight = 1);
+		CompRender(GameObject* gameObj, CompTransform* transform, Texture* texture, int windowWidth = 1, int windowHeight = 1);
 		~CompRender() {};
 
 		const void render() override;

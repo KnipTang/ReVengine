@@ -23,7 +23,7 @@ target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) 
 #"${D3D11_LIBRARY}" "D3DX11_LIBRARY"
 target_link_libraries(ReVengine-Engine PUBLIC 
     soloud 
-    dxgi d3d11 
+    dxgi d3d11 d3dcompiler
     SDL2::SDL2 SDL2::SDL2main
 ) #link libs to engine, name "soload" is the "target_name"
 
@@ -62,9 +62,10 @@ set(SHADERS_OUT_DIR "${CMAKE_BINARY_DIR}/Rendering/shaders")
 file(MAKE_DIRECTORY "${SHADERS_OUT_DIR}")
 
 function(compile_shader IN_FILE OUT_FILE PROFILE ENTRY FILES_LIST)
+        set(DEBUG_FLAGS "/Zi /Od")
     add_custom_command(
         OUTPUT ${OUT_FILE}
-        COMMAND fxc.exe /T ${PROFILE} /E ${ENTRY} /Fo ${OUT_FILE} ${IN_FILE}
+        COMMAND fxc.exe /T ${PROFILE} /E ${ENTRY} /Fo ${OUT_FILE} /Zi /Od ${IN_FILE}
         DEPENDS ${IN_FILE}
         VERBATIM
     )
