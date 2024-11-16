@@ -9,9 +9,8 @@ TextureShader::TextureShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDevice
 	m_DeviceContext { pDeviceContext },
 	m_Texture{ texture }
 {
-	compileShaders(m_VertexFile, m_PixelFile);
-	SetupInputLayer();
-	SetupShaderBuffers();
+	LoadShaders(m_VertexFile, m_PixelFile);
+	InitShader();
 }
 
 TextureShader::~TextureShader()
@@ -19,7 +18,111 @@ TextureShader::~TextureShader()
 
 }
 
-void TextureShader::compileShaders(std::string vertexFile, std::string pixelFile)
+void TextureShader::InitShader()
+{
+	SetupInputLayer();
+	SetupShaderBuffers();
+	SetupImageSampler();
+	SetupTexture(m_Texture);
+	SetupShaderResourceView();
+}
+
+void TextureShader::SetShader()
+{
+	m_DeviceContext->PSSetShaderResources(0, 1, m_ImageShaderResourceView.GetAddressOf());
+	m_DeviceContext->PSSetSamplers(0, 1, m_ImageSamplerState.GetAddressOf());
+}
+
+void TextureShader::SetupInputLayer()
+{
+	//Explain layout of vertices
+	wrl::ComPtr<ID3D11InputLayout> inputLayer;
+	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	m_Device->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
+
+	m_DeviceContext->IASetInputLayout(inputLayer.Get());
+}
+void TextureShader::SetupShaderBuffers()
+{
+	D3D11_BUFFER_DESC constantBuffer_DESC{};
+	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
+	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	constantBuffer_DESC.MiscFlags = 0u;
+	constantBuffer_DESC.ByteWidth = sizeof(DirectX::XMMATRIX);
+	constantBuffer_DESC.StructureByteStride = 0u;
+	m_Device->CreateBuffer(&constantBuffer_DESC, NULL, &m_ConstantBuffer);
+}
+void TextureShader::SetupImageSampler()
+{
+	D3D11_SAMPLER_DESC ImageSamplerDesc = {};
+
+	ImageSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	ImageSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ImageSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ImageSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ImageSamplerDesc.MipLODBias = 0.0f;
+	ImageSamplerDesc.MaxAnisotropy = 1;
+	ImageSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	ImageSamplerDesc.BorderColor[0] = 1.0f;
+	ImageSamplerDesc.BorderColor[1] = 1.0f;
+	ImageSamplerDesc.BorderColor[2] = 1.0f;
+	ImageSamplerDesc.BorderColor[3] = 1.0f;
+	ImageSamplerDesc.MinLOD = -FLT_MAX;
+	ImageSamplerDesc.MaxLOD = FLT_MAX;
+
+	HRESULT result = m_Device->CreateSamplerState(&ImageSamplerDesc,
+		&m_ImageSamplerState);
+
+	assert(SUCCEEDED(result));
+}
+void TextureShader::SetupTexture(Rev::Texture* texture)
+{
+	auto&& data = texture->GetTextureDate();
+	auto&& imageData = texture->GetImageData();
+
+	int ImagePitch = data->ImageWidth * 4;
+
+	D3D11_TEXTURE2D_DESC ImageTextureDesc = {};
+
+	ImageTextureDesc.Width = (UINT)data->ImageWidth;
+	ImageTextureDesc.Height = (UINT)data->ImageHeight;
+	ImageTextureDesc.MipLevels = 1;
+	ImageTextureDesc.ArraySize = 1;
+	ImageTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	ImageTextureDesc.SampleDesc.Count = 1;
+	ImageTextureDesc.SampleDesc.Quality = 0;
+	ImageTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	ImageTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+	D3D11_SUBRESOURCE_DATA ImageSubresourceData = {};
+
+	ImageSubresourceData.pSysMem = imageData;
+	ImageSubresourceData.SysMemPitch = ImagePitch;
+
+	HRESULT result = m_Device->CreateTexture2D(&ImageTextureDesc,
+		&ImageSubresourceData,
+		&m_ImageTexture
+	);
+
+	assert(SUCCEEDED(result));
+}
+void TextureShader::SetupShaderResourceView()
+{
+	HRESULT result = m_Device->CreateShaderResourceView(m_ImageTexture.Get(),
+		nullptr,
+		&m_ImageShaderResourceView
+	);
+	assert(SUCCEEDED(result));
+}
+
+
+void TextureShader::LoadShaders(std::string vertexFile, std::string pixelFile)
 {
 	std::wstring wideVertexFile = std::wstring(vertexFile.begin(), vertexFile.end());
 	ID3DBlob* vsBlob = nullptr;
@@ -58,7 +161,6 @@ void TextureShader::compileShaders(std::string vertexFile, std::string pixelFile
 
 	m_DeviceContext->PSSetShader(m_PixelShader.Get(), 0, 0);
 }
-
 HRESULT TextureShader::CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob)
 {
 	if (!srcFile || !entryPoint || !profile || !blob)
@@ -99,114 +201,4 @@ HRESULT TextureShader::CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR 
 	*blob = shaderBlob;
 
 	return hr;
-}
-
-void TextureShader::SetupShaderBuffers()
-{
-	D3D11_BUFFER_DESC constantBuffer_DESC{};
-	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
-	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	constantBuffer_DESC.MiscFlags = 0u;
-	constantBuffer_DESC.ByteWidth = sizeof(DirectX::XMMATRIX);
-	constantBuffer_DESC.StructureByteStride = 0u;
-	m_Device->CreateBuffer(&constantBuffer_DESC, NULL, &pConstantBuffer);
-}
-
-void TextureShader::SetupImageSampler()
-{
-	D3D11_SAMPLER_DESC ImageSamplerDesc = {};
-
-	ImageSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	ImageSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.MipLODBias = 0.0f;
-	ImageSamplerDesc.MaxAnisotropy = 1;
-	ImageSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	ImageSamplerDesc.BorderColor[0] = 1.0f;
-	ImageSamplerDesc.BorderColor[1] = 1.0f;
-	ImageSamplerDesc.BorderColor[2] = 1.0f;
-	ImageSamplerDesc.BorderColor[3] = 1.0f;
-	ImageSamplerDesc.MinLOD = -FLT_MAX;
-	ImageSamplerDesc.MaxLOD = FLT_MAX;
-
-	ID3D11SamplerState* ImageSamplerState;
-
-	HRESULT result = m_Device->CreateSamplerState(&ImageSamplerDesc,
-		&ImageSamplerState);
-
-	assert(SUCCEEDED(result));
-
-	m_DeviceContext->PSSetSamplers(0, 1, &ImageSamplerState);
-}
-
-wrl::ComPtr<ID3D11ShaderResourceView> TextureShader::SetupTexture()
-{
-	wrl::ComPtr<ID3D11Texture2D> imageTexture = CreateTexture(m_Texture);
-	return ShaderResourceView(imageTexture);
-}
-
-wrl::ComPtr<ID3D11Texture2D> TextureShader::CreateTexture(Rev::Texture* texture)
-{
-	auto&& data = texture->GetTextureDate();
-	auto&& imageData = texture->GetImageData();
-
-	int ImagePitch = data->ImageWidth * 4;
-
-	D3D11_TEXTURE2D_DESC ImageTextureDesc = {};
-
-	ImageTextureDesc.Width = (UINT)data->ImageWidth;
-	ImageTextureDesc.Height = (UINT)data->ImageHeight;
-	ImageTextureDesc.MipLevels = 1;
-	ImageTextureDesc.ArraySize = 1;
-	ImageTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	ImageTextureDesc.SampleDesc.Count = 1;
-	ImageTextureDesc.SampleDesc.Quality = 0;
-	ImageTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	ImageTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-	D3D11_SUBRESOURCE_DATA ImageSubresourceData = {};
-
-	ImageSubresourceData.pSysMem = imageData;
-	ImageSubresourceData.SysMemPitch = ImagePitch;
-
-	wrl::ComPtr<ID3D11Texture2D> ImageTexture;
-
-	HRESULT result = m_Device->CreateTexture2D(&ImageTextureDesc,
-		&ImageSubresourceData,
-		&ImageTexture
-	);
-
-	assert(SUCCEEDED(result));
-
-	return ImageTexture;
-}
-
-wrl::ComPtr<ID3D11ShaderResourceView> TextureShader::ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture)
-{
-	ID3D11ShaderResourceView* ImageShaderResourceView;
-
-	HRESULT result = m_Device->CreateShaderResourceView(imageTexture.Get(),
-		nullptr,
-		&ImageShaderResourceView
-	);
-	assert(SUCCEEDED(result));
-
-	return ImageShaderResourceView;
-}
-
-void TextureShader::SetupInputLayer()
-{
-	//Explain layout of vertices
-	wrl::ComPtr<ID3D11InputLayout> inputLayer;
-	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	m_Device->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
-
-	m_DeviceContext->IASetInputLayout(inputLayer.Get());
 }

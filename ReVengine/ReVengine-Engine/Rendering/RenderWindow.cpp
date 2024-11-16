@@ -100,10 +100,7 @@ void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX& /*
 
     pDeviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
-
-    ID3D11ShaderResourceView* srv = textureShader->SetupTexture().Get();
-    pDeviceContext->PSSetShaderResources(0, 1, &srv);
-    textureShader->SetupImageSampler();
+    textureShader->SetShader();
 
     pDeviceContext->DrawIndexed(mesh->GetIndiceCount(), 0, 0);
 }

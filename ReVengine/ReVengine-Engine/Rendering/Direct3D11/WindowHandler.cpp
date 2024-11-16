@@ -12,9 +12,6 @@
 #include <d3dcompiler.h>
 #include "TextureShader.h"
 
-//#pragma comment(lib, "d3d11.lib")
-//#pragma comment(lib, "d3dcompiler.lib")
-
 using namespace RevDev;
 
 WindowHandler_D3D11::WindowHandler_D3D11(SDL_Window* window, int windowWidth, int windowHeight)

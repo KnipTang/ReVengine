@@ -18,22 +18,21 @@ namespace RevDev
 		TextureShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, Rev::Texture* texture);
 		~TextureShader();
 
-		void compileShaders(std::string vertexFile, std::string pixelFile);
+		void InitShader();
+		void SetShader(); //Every frame
+
+		std::string GetVertexByteCode() { return m_VertexBytecode; }
+		wrl::ComPtr<ID3D11Buffer> GetConstantBuffer() { return m_ConstantBuffer; }
+
+	private:
+		void SetupInputLayer();
+		void SetupTexture(Rev::Texture* texture);
+		void SetupShaderResourceView();
 		void SetupShaderBuffers();
 		void SetupImageSampler();
 
-		wrl::ComPtr<ID3D11ShaderResourceView> SetupTexture();
-
-		std::string GetVertexByteCode() { return m_VertexBytecode; }
-		wrl::ComPtr<ID3D11Buffer> GetConstantBuffer() { return pConstantBuffer; }
-
-	private:
-		[[nodiscard]]
-		wrl::ComPtr<ID3D11Texture2D> CreateTexture(Rev::Texture* texture);
-		wrl::ComPtr<ID3D11ShaderResourceView> ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture);
+		void LoadShaders(std::string vertexFile, std::string pixelFile);
 		HRESULT CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob);
-
-		void SetupInputLayer();
 
 	private:
 		ID3D11Device* m_Device;
@@ -49,6 +48,9 @@ namespace RevDev
 
 		std::string m_VertexBytecode;
 
-		wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+		wrl::ComPtr<ID3D11Buffer> m_ConstantBuffer;
+		wrl::ComPtr<ID3D11SamplerState> m_ImageSamplerState;
+		wrl::ComPtr<ID3D11Texture2D> m_ImageTexture;
+		wrl::ComPtr<ID3D11ShaderResourceView> m_ImageShaderResourceView;
 	};
 }
