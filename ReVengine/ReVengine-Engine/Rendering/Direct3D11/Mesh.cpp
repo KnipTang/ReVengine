@@ -2,16 +2,17 @@
 #include "d3d11.h"
 #include "Rendering/Direct3D11/WindowHandler.h"
 #include "Utils/Vertex.h"
-#include "Texture.h"
+#include "Rendering/Texture.h"
+#include "TextureShader.h"
 
 using namespace RevDev;
 
 uint32_t Mesh::meshIDCounter = 0;
 
-Mesh::Mesh(ID3D11Device* pDevice, Rev::Texture* texture) :
+Mesh::Mesh(ID3D11Device* pDevice, TextureShader* textureShader) :
 	m_Device{pDevice},
 	m_IndiceCount{},
-	m_Texture{ texture },
+	m_TextureShader{ textureShader },
 	meshID{meshIDCounter++}
 {
 }
@@ -56,59 +57,4 @@ void Mesh::setupIndexBuffer(const std::vector<unsigned short> indices)
 	assert(SUCCEEDED(result));
 
 	m_IndiceCount = UINT(indices.size());
-}
-
-wrl::ComPtr<ID3D11ShaderResourceView> Mesh::SetupTexture()
-{
-	wrl::ComPtr<ID3D11Texture2D> imageTexture = CreateTexture(m_Texture);
-	return ShaderResourceView(imageTexture);
-}
-
-wrl::ComPtr<ID3D11Texture2D> Mesh::CreateTexture(Rev::Texture* texture)
-{
-	auto&& data = texture->GetTextureDate();
-	auto&& imageData = texture->GetImageData();
-
-	int ImagePitch = data->ImageWidth * 4;
-
-	D3D11_TEXTURE2D_DESC ImageTextureDesc = {};
-
-	ImageTextureDesc.Width = (UINT)data->ImageWidth;
-	ImageTextureDesc.Height = (UINT)data->ImageHeight;
-	ImageTextureDesc.MipLevels = 1;
-	ImageTextureDesc.ArraySize = 1;
-	ImageTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	ImageTextureDesc.SampleDesc.Count = 1;
-	ImageTextureDesc.SampleDesc.Quality = 0;
-	ImageTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	ImageTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-	D3D11_SUBRESOURCE_DATA ImageSubresourceData = {};
-
-	ImageSubresourceData.pSysMem = imageData;
-	ImageSubresourceData.SysMemPitch = ImagePitch;
-
-	wrl::ComPtr<ID3D11Texture2D> ImageTexture;
-
-	HRESULT result = m_Device->CreateTexture2D(&ImageTextureDesc,
-		&ImageSubresourceData,
-		&ImageTexture
-	);
-
-	assert(SUCCEEDED(result));
-
-	return ImageTexture;
-}
-
-wrl::ComPtr<ID3D11ShaderResourceView> Mesh::ShaderResourceView(wrl::ComPtr<ID3D11Texture2D> imageTexture)
-{
-	ID3D11ShaderResourceView* ImageShaderResourceView;
-
-	HRESULT result = m_Device->CreateShaderResourceView(imageTexture.Get(),
-		nullptr,
-		&ImageShaderResourceView
-	);
-	assert(SUCCEEDED(result));
-
-	return ImageShaderResourceView;
 }

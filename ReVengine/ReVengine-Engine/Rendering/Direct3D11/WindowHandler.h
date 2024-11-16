@@ -12,48 +12,27 @@
 
 //Using comPtr's to manage windows objects in a smart way
 namespace wrl = Microsoft::WRL;
-	struct Vertex;
-
-namespace Rev
-{
-	class Texture;
-}
-
-namespace RevDev
-{
-	class Mesh;
-}
 
 namespace RevDev
 {
 	class WindowHandler_D3D11
 	{
 	public:
-
-
 		WindowHandler_D3D11(SDL_Window* window, int windowWidth, int windowHeight);
 		~WindowHandler_D3D11();
 
 		void Setup();
 
-		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture);
-
-		void DrawMesh(uint32_t index, const DirectX::XMMATRIX &transform = DirectX::XMMatrixIdentity());
-
 		void updateWindow();
 
+		ID3D11Device* GetDevice() { return pDevice.Get(); }
+		ID3D11DeviceContext* GetDeviceContext() { return pDeviceContext.Get(); }
 
 	private:
 		void setupPipeline();
 
 		void setupDeviceAndSwap();
 		void SetupRenderTargetAndStencelBuffer(); //Set backbuffer to pass to and create rendertargetview
-
-		void compileShaders(std::string vertexFile, std::string pixelFile);
-		HRESULT CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob);
-		void SetupShaderBuffers();
-
-		void SetupImageSampler();
 
 		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
 	private:
@@ -69,27 +48,11 @@ namespace RevDev
 		//Used to specifiy which pixel is being targeted atm
 		wrl::ComPtr<ID3D11RenderTargetView> pRenderTargetView = NULL;
 
+		//For Z-Buffering
 		wrl::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
 
 		//Holds both back and front chain. (front is what the user sees, back is what is being calculated before the user sees it)
 		wrl::ComPtr<ID3D11Texture2D> pFramebuffer;
-
-		wrl::ComPtr<ID3D11VertexShader> pVertexShader = NULL;
-		wrl::ComPtr<ID3D11PixelShader> pPixelShader = NULL;
-		wrl::ComPtr<ID3D11InputLayout> pInputLayout = NULL;
-
-		wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
-
-		std::string m_VertexBytecode;
-		//std::string m_PixelBytecode;
-
-		std::string m_VertexFile = "../engine_resources/shaders/VertexShader.hlsl";
-		std::string m_PixelFile = "../engine_resources/shaders/PixelShader.hlsl";
-
-		//The size of each vertex in mem, this way the gpu knows how many bytes there are in each vertex
-		UINT m_VertexStride;
-		//OffSet between vertecies
-		UINT m_VertexOffset = 0;
 
 		//Windows window handle.
 		HWND hwnd;
@@ -97,7 +60,5 @@ namespace RevDev
 		int m_WindowHeight;
 
 		float m_BackgroundColour[4] = { 0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
-
-		std::vector<std::unique_ptr<Mesh>> m_Meshes;
 	};
 }

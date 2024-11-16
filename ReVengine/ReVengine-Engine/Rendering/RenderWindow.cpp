@@ -7,6 +7,9 @@
 #include "Utils/Vertex.h"
 #include <algorithm>
 #include "Texture.h"
+#include "Rendering/Direct3D11/Mesh.h"
+#include "Rendering/Direct3D11/TextureShader.h"
+
 #undef min
 #undef max
 
@@ -14,6 +17,7 @@ using namespace RevDev;
 
 RenderWindow::RenderWindow()
 {
+    m_VertexStride = sizeof(Vertex);
 }
 
 RenderWindow::~RenderWindow()
@@ -52,24 +56,56 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight) {
     }
 }
 
-void RevDev::RenderWindow::DrawMesh(uint32_t meshId)
+uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
 {
-    DirectX::XMMATRIX transformBuffer =
-    {
-            DirectX::XMMatrixTranspose
-            (
-                DirectX::XMMatrixRotationX(3.14f) *
-                //DirectX::XMMatrixTranslation(0, 0, 5.f) *
-                DirectX::XMMatrixPerspectiveLH(
-                    1.f, 
-                    std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
-                    0.5f,
-                    10.f
-                )
-            )
-    };
+    TextureShader* textureShader = new TextureShader{ m_CreatorGod->GetDevice(), m_CreatorGod->GetDeviceContext(), texture };
 
-    m_CreatorGod->DrawMesh(meshId, transformBuffer);
+    m_Meshes.emplace_back(std::make_unique<Mesh>(m_CreatorGod->GetDevice(), textureShader));
+
+    m_Meshes.back()->setupVertexBuffer(vertices);
+    m_Meshes.back()->setupIndexBuffer(indices);
+
+    return m_Meshes.back()->GetID();
+}
+
+void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX& /*transform*/)
+{
+    DirectX::XMMATRIX transform2 =
+        DirectX::XMMatrixTranspose
+        (
+            DirectX::XMMatrixRotationX(3.14f) *
+            //DirectX::XMMatrixTranslation(0, 0, 5.f) *
+            DirectX::XMMatrixPerspectiveLH(
+                1.f,
+                std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
+                0.5f,
+                10.f
+            )
+        );
+
+    ID3D11DeviceContext* pDeviceContext = m_CreatorGod->GetDeviceContext();
+
+    //Vertex buffer is a buffer that holds the vertex data
+    auto&& mesh = m_Meshes.at(meshId);
+    auto&& textureShader = mesh->GetTextureShader();
+    wrl::ComPtr<ID3D11Buffer> constantBuffer = textureShader->GetConstantBuffer();
+
+    pDeviceContext->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &m_VertexStride, &m_VertexOffset);
+    pDeviceContext->IASetIndexBuffer(mesh->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
+
+    D3D11_MAPPED_SUBRESOURCE msr;
+    pDeviceContext->Map(constantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr);
+    memcpy(msr.pData, &transform2, sizeof(DirectX::XMMATRIX));
+    pDeviceContext->Unmap(constantBuffer.Get(), 0u);
+
+    pDeviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+
+
+    ID3D11ShaderResourceView* srv = textureShader->SetupTexture().Get();
+    pDeviceContext->PSSetShaderResources(0, 1, &srv);
+    textureShader->SetupImageSampler();
+
+    pDeviceContext->DrawIndexed(mesh->GetIndiceCount(), 0, 0);
 }
 
 bool RenderWindow::UpdateWindow()
@@ -87,11 +123,6 @@ bool RenderWindow::UpdateWindow()
     m_CreatorGod->updateWindow();
 
     return false;
-}
-
-uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
-{
-    return m_CreatorGod->AddMesh(vertices, indices, texture);
 }
 
 void RevDev::RenderWindow::RipWindow()

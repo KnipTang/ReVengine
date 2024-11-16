@@ -7,9 +7,10 @@
 #include "fstream"
 #include "DirectXMath.h"
 #include "Utils/Vertex.h"
-#include "Rendering/Mesh.h"
+#include "Rendering/Direct3D11/Mesh.h"
 #include "Rendering/Texture.h"
 #include <d3dcompiler.h>
+#include "TextureShader.h"
 
 //#pragma comment(lib, "d3d11.lib")
 //#pragma comment(lib, "d3dcompiler.lib")
@@ -25,8 +26,6 @@ WindowHandler_D3D11::WindowHandler_D3D11(SDL_Window* window, int windowWidth, in
 
 	m_WindowWidth = windowWidth;
 	m_WindowHeight = windowHeight;
-
-	m_VertexStride = sizeof(Vertex);
 }
 
 WindowHandler_D3D11::~WindowHandler_D3D11()
@@ -39,47 +38,7 @@ void RevDev::WindowHandler_D3D11::Setup()
 	setupDeviceAndSwap();
 	SetupRenderTargetAndStencelBuffer();
 
-	compileShaders(m_VertexFile, m_PixelFile);
-	SetupShaderBuffers();
-
 	setupPipeline();
-}
-
-uint32_t WindowHandler_D3D11::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
-{
-	m_Meshes.emplace_back(std::make_unique<Mesh>(pDevice.Get(), texture));
-
-	m_Meshes.back()->setupVertexBuffer(vertices);
-	m_Meshes.back()->setupIndexBuffer(indices);
-
-	//wrl::ComPtr<ID3D11ShaderResourceView> testSRV = m_Meshes.back()->SetupTexture(texture);
-
-	//pDeviceContext->PSSetShaderResources(0, 1, &testSRV);
-
-	return m_Meshes.back()->GetID();
-}
-
-void WindowHandler_D3D11::DrawMesh(uint32_t index, const DirectX::XMMATRIX &transform)
-{
-	//Vertex buffer is a buffer that holds the vertex data
-	auto&& mesh = m_Meshes.at(index);
-	
-	pDeviceContext->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &m_VertexStride, &m_VertexOffset);
-	pDeviceContext->IASetIndexBuffer(mesh->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
-
-	D3D11_MAPPED_SUBRESOURCE msr;
-	pDeviceContext->Map(pConstantBuffer.Get(), 0u,D3D11_MAP_WRITE_DISCARD, 0u,&msr);
-	memcpy(msr.pData, &transform, sizeof(DirectX::XMMATRIX));
-	pDeviceContext->Unmap(pConstantBuffer.Get(), 0u);
-
-	pDeviceContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
-
-	ID3D11ShaderResourceView* testSRV = m_Meshes.at(index)->SetupTexture().Get();
-
-	pDeviceContext->PSSetShaderResources(0, 1, &testSRV);
-	SetupImageSampler();
-
-	pDeviceContext->DrawIndexed(mesh->GetIndiceCount(), 0, 0);
 }
 
 void WindowHandler_D3D11::updateWindow()
@@ -98,18 +57,6 @@ void WindowHandler_D3D11::setupPipeline()
 {
 	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
 	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	//Explain layout of vertices
-	wrl::ComPtr<ID3D11InputLayout> inputLayer;
-	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		//{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	pDevice->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
-
-	pDeviceContext->IASetInputLayout(inputLayer.Get());
 
 	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
 	D3D11_VIEWPORT viewPort{};
@@ -213,138 +160,4 @@ void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
 
 	// bind depth stensil view to OM
 	pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
-}
-
-HRESULT WindowHandler_D3D11::CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob)
-{
-	if (!srcFile || !entryPoint || !profile || !blob)
-		return E_INVALIDARG;
-
-	*blob = nullptr;
-
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined( DEBUG ) || defined( _DEBUG )
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-
-	const D3D_SHADER_MACRO defines[] =
-	{
-		"EXAMPLE_DEFINE", "1",
-		NULL, NULL
-	};
-
-	ID3DBlob* shaderBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-	HRESULT hr = D3DCompileFromFile(srcFile, defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		entryPoint, profile,
-		flags, 0, &shaderBlob, &errorBlob);
-	if (FAILED(hr))
-	{
-		if (errorBlob)
-		{
-			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			errorBlob->Release();
-		}
-
-		if (shaderBlob)
-			shaderBlob->Release();
-
-		return hr;
-	}
-
-	*blob = shaderBlob;
-
-	return hr;
-}
-
-void WindowHandler_D3D11::compileShaders(std::string vertexFile, std::string pixelFile)
-{
-	std::wstring wideVertexFile = std::wstring(vertexFile.begin(), vertexFile.end());
-	ID3DBlob* vsBlob = nullptr;
-	HRESULT hr = CompileShader(wideVertexFile.c_str(), "vs_main", "vs_5_0", &vsBlob);
-	if (FAILED(hr))
-	{
-		printf("Failed compiling vertex shader %08X\n", hr);
-	}
-
-	std::wstring widePixelFile = std::wstring(pixelFile.begin(), pixelFile.end());
-	ID3DBlob* psBlob = nullptr;
-	hr = CompileShader(widePixelFile.c_str(), "ps_main", "ps_5_0", &psBlob);
-	if (FAILED(hr))
-	{
-		printf("Failed compiling pixel shader %08X\n", hr);
-	}
-
-	//std::ifstream inFile(vertexFile, std::ios_base::binary);
-	//m_VertexBytecode = std::string(std::istreambuf_iterator<char>(inFile),
-	//	std::istreambuf_iterator<char>());
-	//inFile.close();
-	m_VertexBytecode.assign((char*)vsBlob->GetBufferPointer(), (char*)vsBlob->GetBufferPointer() + vsBlob->GetBufferSize());
-	
-	hr = pDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &pVertexShader);
-	if (FAILED(hr))
-	{
-		printf("Failed creating vertex shader %08X\n", hr);
-	}
-	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
-
-	hr = pDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &pPixelShader);
-	if (FAILED(hr))
-	{
-		printf("Failed creating pixel shader %08X\n", hr);
-	}
-
-	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
-
-	//inFile = std::ifstream{ pixelFile, std::ios_base::binary };
-	//m_PixelBytecode = std::string(std::istreambuf_iterator<char>(inFile),
-	//	std::istreambuf_iterator<char>());
-	//inFile.close();
-	//m_PixelBytecode.assign((char*)psBlob->GetBufferPointer(), (char*)psBlob->GetBufferPointer() + psBlob->GetBufferSize());
-
-
-	//result = pDevice->CreatePixelShader(
-	//	m_PixelBytecode.c_str(), m_PixelBytecode.size(),
-	//	nullptr, &pPixelShader);
-
-}
-
-void WindowHandler_D3D11::SetupShaderBuffers()
-{
-	D3D11_BUFFER_DESC constantBuffer_DESC{};
-	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
-	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	constantBuffer_DESC.MiscFlags = 0u;
-	constantBuffer_DESC.ByteWidth = sizeof(DirectX::XMMATRIX);
-	constantBuffer_DESC.StructureByteStride = 0u;
-	pDevice->CreateBuffer(&constantBuffer_DESC, NULL, &pConstantBuffer);
-}
-
-void WindowHandler_D3D11::SetupImageSampler()
-{
-	D3D11_SAMPLER_DESC ImageSamplerDesc = {};
-
-	ImageSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	ImageSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.MipLODBias = 0.0f;
-	ImageSamplerDesc.MaxAnisotropy = 1;
-	ImageSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	ImageSamplerDesc.BorderColor[0] = 1.0f;
-	ImageSamplerDesc.BorderColor[1] = 1.0f;
-	ImageSamplerDesc.BorderColor[2] = 1.0f;
-	ImageSamplerDesc.BorderColor[3] = 1.0f;
-	ImageSamplerDesc.MinLOD = -FLT_MAX;
-	ImageSamplerDesc.MaxLOD = FLT_MAX;
-
-	ID3D11SamplerState* ImageSamplerState;
-
-	HRESULT result = pDevice->CreateSamplerState(&ImageSamplerDesc,
-		&ImageSamplerState);
-
-	assert(SUCCEEDED(result));
-
-	pDeviceContext->PSSetSamplers(0, 1, &ImageSamplerState);
 }

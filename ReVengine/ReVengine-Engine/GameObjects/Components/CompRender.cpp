@@ -11,7 +11,7 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, Texture* t
 	m_MeshId{}
 {
 	Vector3 pos = m_Transform->getPosition();
-
+	[[maybe_unused]] int width =texture->GetTextureDate()->ImageWidth;
 	m_Vertices =
 	{
 		//Bottom Left
