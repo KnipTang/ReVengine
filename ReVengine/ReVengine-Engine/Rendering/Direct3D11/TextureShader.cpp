@@ -33,6 +33,7 @@ void TextureShader::SetShader()
 	m_DeviceContext->PSSetSamplers(0, 1, m_ImageSamplerState.GetAddressOf());
 }
 
+
 void TextureShader::SetupInputLayer()
 {
 	//Explain layout of vertices
@@ -120,7 +121,6 @@ void TextureShader::SetupShaderResourceView()
 	);
 	assert(SUCCEEDED(result));
 }
-
 
 void TextureShader::LoadShaders(std::string vertexFile, std::string pixelFile)
 {

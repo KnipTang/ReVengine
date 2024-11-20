@@ -9,6 +9,7 @@
 #include "Texture.h"
 #include "Rendering/Direct3D11/Mesh.h"
 #include "Rendering/Direct3D11/TextureShader.h"
+#include <Rev_CoreSystems.h>
 
 #undef min
 #undef max
@@ -112,8 +113,16 @@ bool RenderWindow::UpdateWindow()
 
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_QUIT)
-            return true;
+        switch (e.type)
+        {
+        case SDL_KEYDOWN:
+            Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(e.key.keysym.scancode);
+            break;
+
+        case SDL_QUIT:
+                return true;
+            break;
+        }
 
     }    
     
