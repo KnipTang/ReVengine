@@ -61,6 +61,6 @@ namespace RevDev
 		int m_WindowWidth;
 		int m_WindowHeight;
 
-		float m_BackgroundColour[4] = { 0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 1.0f };
+		float m_BackgroundColour[4] = { 0x64 / 255.0f, 0x95 / 255.0f, 0xED / 255.0f, 0.0f };
 	};
 }

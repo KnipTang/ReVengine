@@ -55,6 +55,26 @@ void WindowHandler_D3D11::setupPipeline()
 {
 	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
 	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	D3D11_BLEND_DESC blendDesc = {};
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	wrl::ComPtr<ID3D11BlendState> blendState;
+	pDevice->CreateBlendState(&blendDesc, blendState.GetAddressOf());
+
+	float blendColor[4];
+	blendColor[0] = 0.0f;
+	blendColor[1] = 0.0f;
+	blendColor[2] = 0.0f;
+	blendColor[3] = 0.0f;
+	pDeviceContext->OMSetBlendState(blendState.Get(), blendColor, 0xffffffff);
 	
 	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
 	D3D11_VIEWPORT viewPort{};
@@ -135,7 +155,7 @@ void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
 	pDevice->CreateDepthStencilState(&dsDesc, &pDSState);
-	pDeviceContext->OMSetDepthStencilState(pDSState.Get(), 1);
+	pDeviceContext->OMSetDepthStencilState(pDSState.Get(), 0);
 
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
 	D3D11_TEXTURE2D_DESC descDepth{};
