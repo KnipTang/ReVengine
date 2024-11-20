@@ -34,6 +34,7 @@ void RevDev::WindowHandler_D3D11::Setup()
 {
 	setupDeviceAndSwap();
 	SetupRenderTargetAndStencelBuffer();
+	SetupRasterizerState();
 
 	setupPipeline();
 }
@@ -54,7 +55,7 @@ void WindowHandler_D3D11::setupPipeline()
 {
 	//Set type of rendering (point, line (strip), triangle (strip),.... Strip -> 0,1,2,3,4... Non-Strip = (0 - 1), (1 - 2), (5 - 0),...
 	pDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	
 	//Config viewport -> pixelshader target (renderTarget) From ndc to render view
 	D3D11_VIEWPORT viewPort{};
 	viewPort.Width = float(m_WindowWidth);
@@ -157,4 +158,18 @@ void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
 
 	// bind depth stensil view to OM
 	pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), pDepthStencilView.Get());
+}
+
+void WindowHandler_D3D11::SetupRasterizerState()
+{
+	D3D11_RASTERIZER_DESC rasterizerDesc = {};
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.FrontCounterClockwise = TRUE;
+	rasterizerDesc.DepthClipEnable = TRUE;
+
+	wrl::ComPtr<ID3D11RasterizerState> rasterizerState;
+	pDevice->CreateRasterizerState(&rasterizerDesc, &rasterizerState);
+
+	pDeviceContext->RSSetState(rasterizerState.Get());
 }

@@ -31,8 +31,10 @@ namespace RevDev
 	private:
 		void setupPipeline();
 
+
 		void setupDeviceAndSwap();
 		void SetupRenderTargetAndStencelBuffer(); //Set backbuffer to pass to and create rendertargetview
+		void SetupRasterizerState();
 
 		void clearBuffer(float backgroundColour[4]); //Set background color and clear back buffer
 	private:

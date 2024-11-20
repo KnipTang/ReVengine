@@ -12,6 +12,14 @@ namespace Rev {
 
 namespace RevDev
 {
+	struct MatrixBufferType
+	{
+		DirectX::XMMATRIX world;
+		DirectX::XMMATRIX view;
+		DirectX::XMMATRIX projection;
+		DirectX::XMMATRIX transform;
+	};
+
 	class TextureShader
 	{
 	public:
@@ -22,7 +30,7 @@ namespace RevDev
 		void SetShader(); //Every frame
 
 		std::string GetVertexByteCode() { return m_VertexBytecode; }
-		wrl::ComPtr<ID3D11Buffer> GetConstantBuffer() { return m_ConstantBuffer; }
+		wrl::ComPtr<ID3D11Buffer> GetMatrixBuffer() { return m_MatrixBuffer; }
 
 	private:
 		void SetupInputLayer();
@@ -48,7 +56,8 @@ namespace RevDev
 
 		std::string m_VertexBytecode;
 
-		wrl::ComPtr<ID3D11Buffer> m_ConstantBuffer;
+		wrl::ComPtr<ID3D11Buffer> m_MatrixBuffer;
+
 		wrl::ComPtr<ID3D11SamplerState> m_ImageSamplerState;
 		wrl::ComPtr<ID3D11Texture2D> m_ImageTexture;
 		wrl::ComPtr<ID3D11ShaderResourceView> m_ImageShaderResourceView;

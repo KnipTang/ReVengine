@@ -5,11 +5,11 @@
 
 using namespace Rev;
 
-ReVengine::ReVengine(int windowWidth, int windowHeight) :
+ReVengine::ReVengine(int windowWidth, int windowHeight, float nearZ, float farZ) :
 	m_WindowWidth{ windowWidth },
 	m_WindowHeight{ windowHeight }
 {
-	Rev_CoreSystems::pRevRender->InitWindow(m_WindowWidth, m_WindowHeight);
+	Rev_CoreSystems::pRevRender->InitWindow(m_WindowWidth, m_WindowHeight, nearZ, farZ);
 }
 
 ReVengine::~ReVengine()

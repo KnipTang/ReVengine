@@ -50,14 +50,14 @@ void TextureShader::SetupInputLayer()
 }
 void TextureShader::SetupShaderBuffers()
 {
-	D3D11_BUFFER_DESC constantBuffer_DESC{};
-	constantBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	constantBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
-	constantBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	constantBuffer_DESC.MiscFlags = 0u;
-	constantBuffer_DESC.ByteWidth = sizeof(DirectX::XMMATRIX);
-	constantBuffer_DESC.StructureByteStride = 0u;
-	m_Device->CreateBuffer(&constantBuffer_DESC, NULL, &m_ConstantBuffer);
+	D3D11_BUFFER_DESC matrixBuffer_DESC{};
+	matrixBuffer_DESC.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBuffer_DESC.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBuffer_DESC.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBuffer_DESC.MiscFlags = 0;
+	matrixBuffer_DESC.ByteWidth = sizeof(MatrixBufferType);
+	matrixBuffer_DESC.StructureByteStride = 0;
+	m_Device->CreateBuffer(&matrixBuffer_DESC, NULL, &m_MatrixBuffer);
 }
 void TextureShader::SetupImageSampler()
 {

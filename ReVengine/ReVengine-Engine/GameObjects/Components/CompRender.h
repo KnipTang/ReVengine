@@ -17,7 +17,7 @@ namespace Rev
 	class CompRender : public BaseComponent
 	{
 	public:
-		CompRender(GameObject* gameObj, CompTransform* transform, Texture* texture, int windowWidth = 1, int windowHeight = 1);
+		CompRender(GameObject* gameObj, CompTransform* transform, Texture* texture, int width = 1, int height = 1);
 		~CompRender() {};
 
 		const void render() override;
@@ -25,7 +25,6 @@ namespace Rev
 		CompTransform* m_Transform;
 
 		std::vector<Vertex> m_Vertices;
-
 		std::vector<unsigned short> m_Indices;
 
 		uint32_t m_MeshId;

@@ -18,8 +18,7 @@ const std::string doomEnemies = "/Enemies";
 
 void testFunction()
 {
-	const std::string SoundPew = "/sound/pew_pew.wav";
-	Rev::Rev_CoreSystems::pRevSound->PlaySound(resourceFolder + SoundPew);
+	
 }
 
 std::unique_ptr<Rev::Scene> Scene1()
@@ -38,12 +37,12 @@ std::unique_ptr<Rev::Scene> Scene1()
 	const std::string texturePath = testDoomFile;
 	Rev::Texture* testTexture = new Rev::Texture(texturePath);
 
-	player->addComponent<Rev::CompTransform>(player.get(), Vector3{ -2,0,-5 });
+	player->addComponent<Rev::CompTransform>(player.get(), Vector3{ 2,1, 5 });
 	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), testTexture);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	inputComp->BindAction(SDL_SCANCODE_E, testFunction);
 
-	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 2,0,-5 });
+	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 2,0, -5 });
 	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), testTexture);
 
 

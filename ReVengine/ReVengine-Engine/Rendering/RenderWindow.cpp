@@ -26,7 +26,7 @@ RenderWindow::~RenderWindow()
     m_CreatorGod.reset();
 }
 
-bool RenderWindow::InitWindow(int windowWidth, int windowHeight) {
+bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, float farZ) {
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -37,6 +37,12 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight) {
     {
         m_WindowWidth = windowWidth;
         m_WindowHeight = windowHeight;
+
+        float fieldOfView = (float)DirectX::XM_PI / 4.0f;
+        float screenAspect = (float)m_WindowWidth / (float)m_WindowHeight;
+
+        m_ProjectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, nearZ, farZ);
+        m_WorldMatrix = DirectX::XMMatrixIdentity();
 
         //Create window
         m_Window = std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>>(
@@ -80,26 +86,42 @@ void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX& /*
                 1.f,
                 std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
                 0.5f,
-                10.f
+                1000.f
             )
         );
+
+    DirectX::XMMATRIX tempProj = DirectX::XMMatrixPerspectiveLH(
+        1.f,
+        std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
+        0.5f,
+        1000.f
+    );
+
+    DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(m_WorldMatrix);
+    DirectX::XMMATRIX transView = DirectX::XMMatrixTranspose(m_Camera->GetViewMatrix());
+    DirectX::XMMATRIX transProj = DirectX::XMMatrixTranspose(tempProj);
 
     ID3D11DeviceContext* pDeviceContext = m_CreatorGod->GetDeviceContext();
 
     //Vertex buffer is a buffer that holds the vertex data
     auto&& mesh = m_Meshes.at(meshId);
     auto&& textureShader = mesh->GetTextureShader();
-    wrl::ComPtr<ID3D11Buffer> constantBuffer = textureShader->GetConstantBuffer();
+    wrl::ComPtr<ID3D11Buffer> matrixBuffer = textureShader->GetMatrixBuffer();
 
     pDeviceContext->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &m_VertexStride, &m_VertexOffset);
     pDeviceContext->IASetIndexBuffer(mesh->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
 
     D3D11_MAPPED_SUBRESOURCE msr;
-    pDeviceContext->Map(constantBuffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr);
-    memcpy(msr.pData, &transform2, sizeof(DirectX::XMMATRIX));
-    pDeviceContext->Unmap(constantBuffer.Get(), 0u);
+    pDeviceContext->Map(matrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+    MatrixBufferType* data = (MatrixBufferType*)msr.pData;
+    data->world = transWorld;
+    data->view = transView;
+    data->projection = transProj;
+    data->transform = transform2;
+   // memcpy(msr.pData, data, sizeof(DirectX::XMMATRIX));
+    pDeviceContext->Unmap(matrixBuffer.Get(), 0);
 
-    pDeviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+    pDeviceContext->VSSetConstantBuffers(0, 1, matrixBuffer.GetAddressOf());
 
     textureShader->SetShader();
 
@@ -125,7 +147,7 @@ bool RenderWindow::UpdateWindow()
         }
 
     }    
-    
+    m_Camera->Update();
     m_CreatorGod->updateWindow();
 
     return false;

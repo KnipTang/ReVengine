@@ -3,6 +3,7 @@
 #include <memory>
 #include <functional>
 #include <DirectXMath.h>
+#include "Camera/Camera.h"
 
 namespace Rev
 {
@@ -26,7 +27,7 @@ namespace RevDev
 		RenderWindow();
 		~RenderWindow();
 
-		bool InitWindow(int windowWidth, int windowHeight);
+		bool InitWindow(int windowWidth, int windowHeight, float nearZ, float farZ);
 
 		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture);
 		void DrawMesh(uint32_t meshId, const DirectX::XMMATRIX& transform = DirectX::XMMatrixIdentity());
@@ -36,6 +37,9 @@ namespace RevDev
 		void RipWindow();
 
 		void LoadTexture();
+
+		DirectX::XMMATRIX getProjectionMatrix();
+		DirectX::XMMATRIX getWorldMatrix();
 	private:
 
 		std::unique_ptr<WindowHandler_D3D11> m_CreatorGod;
@@ -52,5 +56,10 @@ namespace RevDev
 
 		int m_WindowWidth;
 		int m_WindowHeight;
+
+		DirectX::XMMATRIX m_ProjectionMatrix;
+		DirectX::XMMATRIX m_WorldMatrix;
+
+		Camera* m_Camera = new Camera;
 	};
 }
