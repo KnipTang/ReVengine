@@ -31,6 +31,4 @@ void InputManager::HandleMouseRelativeMotion(int x, int y)
 {
 	m_MouseRelativeMotion->x = x;
 	m_MouseRelativeMotion->y = y;
-
-	printf("Relative Mouse Movement: dx=%d, dy=%d\n", x, y);
 }

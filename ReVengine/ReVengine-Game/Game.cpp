@@ -56,6 +56,13 @@ std::unique_ptr<Rev::Scene> Scene1()
 	inputComp->BindAction(SDL_SCANCODE_L, [cameraComp, cameraDir]() { cameraComp->AddYawInput(cameraDir); });
 	inputComp->BindAction(SDL_SCANCODE_J, [cameraComp, cameraDir]() { cameraComp->AddYawInput(-cameraDir); });
 
+	//float movSpeed = 5;
+	inputComp->BindAction(SDL_SCANCODE_Z, [transformComp]() { transformComp->MoveForward(1); });
+	inputComp->BindAction(SDL_SCANCODE_S, [transformComp]() { transformComp->MoveForward(-1); });
+	inputComp->BindAction(SDL_SCANCODE_D, [transformComp]() { transformComp->MoveRight(1); });
+	inputComp->BindAction(SDL_SCANCODE_Q, [transformComp]() { transformComp->MoveRight(-1); });
+
+
 	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 0, 0, 5 });
 	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), cameraComp, testTexture);
 

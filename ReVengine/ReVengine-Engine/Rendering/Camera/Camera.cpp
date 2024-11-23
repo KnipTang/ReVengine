@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include "Utils/Vector3.h"
+#include "Utils/ReV_Mat.h"
 
 using namespace RevDev;
 
@@ -20,9 +21,9 @@ void Camera::Update()
 	DirectX::XMVECTOR vecPosition = DirectX::XMLoadFloat3(&m_Position);
 	DirectX::XMVECTOR lookAt = DirectX::XMVectorSet(0.0, 0.0, 1.0f, 1.0f);
 
-	float pitch = m_Rotation.x * 0.0174532f;
-	float yaw = m_Rotation.y * 0.0174532f;
-	float roll = m_Rotation.z * 0.0174532f;
+	float pitch = m_Rotation.x * RevMat::DEG_TO_RAD_F;
+	float yaw = m_Rotation.y * RevMat::DEG_TO_RAD_F;
+	float roll = m_Rotation.z * RevMat::DEG_TO_RAD_F;
 
 	DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 

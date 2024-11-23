@@ -2,7 +2,6 @@
 #include "Rendering/Camera/Camera.h"
 #include <Utils/MousePos.h>
 #include <Rev_CoreSystems.h>
-#include "GameSettings.h"
 
 using namespace Rev;
 
@@ -19,9 +18,6 @@ void Rev::CompCamera::update()
 	m_Camera->Update();
 
 	MouseRelativeMotion delta = Rev::Rev_CoreSystems::pInputManager->GetMouseRelativeMotion();
-	
-	//int deltaX = delta.x - (GameSettings::windowWidth / 2);
-	//int deltaY = delta.y - (GameSettings::windowHeight / 2);
 	
 	Turn((float)delta.x, (float)delta.y);
 }

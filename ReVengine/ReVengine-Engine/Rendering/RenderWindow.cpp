@@ -150,7 +150,6 @@ bool RenderWindow::UpdateWindow()
                 return true;
             break;
         }
-
     }    
 
     int xRel, yRel;

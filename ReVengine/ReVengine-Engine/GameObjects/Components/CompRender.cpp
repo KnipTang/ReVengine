@@ -12,7 +12,7 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 	m_CameraComp{ camera },
 	m_MeshId{}
 {
-	Vector3 pos = m_TransformComp->getPosition();
+	Vector3 pos = m_TransformComp->GetPosition();
 	m_Vertices =
 	{
 		//Bottom Left
