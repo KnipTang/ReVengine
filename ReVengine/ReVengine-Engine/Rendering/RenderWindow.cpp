@@ -49,10 +49,15 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, fl
             SDL_CreateWindow("WINDOW OF GODS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_WindowWidth, m_WindowHeight, SDL_WINDOW_SHOWN),
             SDL_DestroyWindow
         );
+
         if (m_Window == NULL)
         {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         }
+
+        //SDL_WarpMouseInWindow(m_Window.get(), m_WindowWidth / 2, m_WindowHeight / 2);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+        //SDL_ShowCursor(SDL_ENABLE);
 
         {
             m_CreatorGod = std::make_unique<WindowHandler_D3D11>(m_Window.get(), m_WindowWidth, m_WindowHeight);
@@ -147,6 +152,11 @@ bool RenderWindow::UpdateWindow()
         }
 
     }    
+
+    int xRel, yRel;
+    SDL_GetRelativeMouseState(&xRel, &yRel);
+    Rev::Rev_CoreSystems::pInputManager->HandleMouseRelativeMotion(xRel, yRel);
+
     m_CreatorGod->updateWindow();
 
     return false;

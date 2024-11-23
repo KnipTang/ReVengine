@@ -10,6 +10,7 @@
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Rendering/Texture.h"
+#include "GameSettings.h"
 
 #include <SDL_scancode.h>
 #include <iostream>
@@ -48,14 +49,12 @@ std::unique_ptr<Rev::Scene> Scene1()
 		testTexture
 	);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
-	int a = 1;
-	inputComp->BindAction(SDL_SCANCODE_E, testFunction);
-	inputComp->BindAction(SDL_SCANCODE_I, [cameraComp, a]() { cameraComp->AddPitchInput(a); });
-	inputComp->BindAction(SDL_SCANCODE_K, [cameraComp, a]() { cameraComp->AddPitchInput(-a); });
-	inputComp->BindAction(SDL_SCANCODE_L, [cameraComp, a]() { cameraComp->AddYawInput(a); });
-	inputComp->BindAction(SDL_SCANCODE_J, [cameraComp, a]() { cameraComp->AddYawInput(-a); });
 
-
+	float cameraDir = 1;
+	inputComp->BindAction(SDL_SCANCODE_I, [cameraComp, cameraDir]() { cameraComp->AddPitchInput(cameraDir); });
+	inputComp->BindAction(SDL_SCANCODE_K, [cameraComp, cameraDir]() { cameraComp->AddPitchInput(-cameraDir); });
+	inputComp->BindAction(SDL_SCANCODE_L, [cameraComp, cameraDir]() { cameraComp->AddYawInput(cameraDir); });
+	inputComp->BindAction(SDL_SCANCODE_J, [cameraComp, cameraDir]() { cameraComp->AddYawInput(-cameraDir); });
 
 	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 0, 0, 5 });
 	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), cameraComp, testTexture);
@@ -82,11 +81,8 @@ std::unique_ptr<Rev::SceneManager> Load()
 
 int main(int argc, char* argv[])
 {
-	int windowWidth = 700;
-	int windowHeight = 500;
-
 	std::unique_ptr<Rev::ReVengine> pReVengine;
-	pReVengine = std::make_unique<Rev::ReVengine>(windowWidth, windowHeight);
+	pReVengine = std::make_unique<Rev::ReVengine>(GameSettings::windowWidth, GameSettings::windowHeight);
 
 	pReVengine->Run(Load);
 

@@ -32,17 +32,14 @@ void Camera::Update()
 	lookAt = DirectX::XMVectorAdd(vecPosition, lookAt);
 
 	m_ViewMatrix = DirectX::XMMatrixLookAtLH(vecPosition, lookAt, up);
-
-	//m_ViewMatrix = DirectX::XMMatrixIdentity();
-	//m_ViewMatrix = DirectX::XMMatrixMultiply(m_ViewMatrix, DirectX::XMMatrixTranslation(0.0f, 0.0f, 10.0f));
 }
 
-void Camera::AddYawInput(float input)
+void Camera::AddPitchInput(float input)
 {
 	m_Rotation.x += input;
 }
 
-void Camera::AddPitchInput(float input)
+void Camera::AddYawInput(float input)
 {
 	m_Rotation.y += input;
 }

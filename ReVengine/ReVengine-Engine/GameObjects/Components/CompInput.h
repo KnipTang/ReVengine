@@ -19,5 +19,7 @@ namespace Rev
 	private:
 		using ActionMap = std::unordered_multimap<SDL_Scancode, std::function<void()>>;
 		ActionMap m_Actions;
+
+
 	};
 }

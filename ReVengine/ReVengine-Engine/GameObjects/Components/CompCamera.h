@@ -18,11 +18,15 @@ namespace Rev
 
 		void update() override;
 
+		void Turn(float x, float y);
+
 		void AddYawInput(float input);
 		void AddPitchInput(float input);
 
 		RevDev::Camera* GetCamera() const { return m_Camera.get(); }
 	private:
 		std::unique_ptr<RevDev::Camera> m_Camera;
+
+		float m_LookSensitivity;
 	};
 }

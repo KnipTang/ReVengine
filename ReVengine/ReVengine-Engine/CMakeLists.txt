@@ -21,8 +21,7 @@
     "Input/InputManager.cpp"
 ) #No need to add header files
 
-target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
-
+target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/GameSettings) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
 
 #"${D3D11_LIBRARY}" "D3DX11_LIBRARY"
 target_link_libraries(ReVengine-Engine PUBLIC 

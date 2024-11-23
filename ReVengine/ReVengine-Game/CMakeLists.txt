@@ -11,5 +11,14 @@ add_custom_target(copy_game_resources ALL
     COMMENT "Copying resources to build directory"
 )
 
-# add this as a dependency to the game
-add_dependencies(ReVengine-Game copy_game_resources)
+set(GAME_SETTINGS_FILE "${CMAKE_CURRENT_SOURCE_DIR}/GameSettings.h")
+
+add_custom_command(TARGET ReVengine-Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${GAME_SETTINGS_FILE}"
+        "${CMAKE_BINARY_DIR}/GameSettings/GameSettings.h"
+    COMMENT "Copying MyHeader.h to the build directory"
+)
+set_property(GLOBAL PROPERTY EXCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/GameSettings")
+
+add_dependencies(ReVengine-Game copy_game_resources) #Adds this as a dependency to the game
