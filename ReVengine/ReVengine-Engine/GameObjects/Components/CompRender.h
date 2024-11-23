@@ -9,6 +9,7 @@
 namespace Rev
 {
 	class CompTransform;
+	class CompCamera;
 	class Texture;
 }
 
@@ -17,12 +18,13 @@ namespace Rev
 	class CompRender : public BaseComponent
 	{
 	public:
-		CompRender(GameObject* gameObj, CompTransform* transform, Texture* texture, int width = 1, int height = 1);
+		CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, Texture* texture, int width = 1, int height = 1);
 		~CompRender() {};
 
 		const void render() override;
 	private:
-		CompTransform* m_Transform;
+		CompTransform* m_TransformComp;
+		CompCamera* m_CameraComp;
 
 		std::vector<Vertex> m_Vertices;
 		std::vector<unsigned short> m_Indices;

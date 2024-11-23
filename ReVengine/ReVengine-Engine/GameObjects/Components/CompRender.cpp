@@ -1,16 +1,18 @@
 #include "CompRender.h"
 #include "Rev_CoreSystems.h"
 #include "CompTransform.h"
+#include "CompCamera.h"
 #include "Rendering/Texture.h"
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, Texture* texture, int width, int height) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, Texture* texture, int width, int height) :
 	BaseComponent(gameObj),
-	m_Transform{ transform },
+	m_TransformComp{ transform },
+	m_CameraComp{ camera },
 	m_MeshId{}
 {
-	Vector3 pos = m_Transform->getPosition();
+	Vector3 pos = m_TransformComp->getPosition();
 	m_Vertices =
 	{
 		//Bottom Left
@@ -34,5 +36,5 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, Texture* t
 
 const void CompRender::render()
 {
-	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId);
+	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId, m_CameraComp->GetCamera()->GetViewMatrix());
 }

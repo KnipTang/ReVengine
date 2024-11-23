@@ -24,12 +24,12 @@ namespace Rev
 		const void render();
 
 		template <baseCompConcept T, typename... TArguments>
-		T* addComponent(GameObject* gameObj, const TArguments&... args)
+		T* addComponent(GameObject* gameObj, TArguments&&... args)
 		{
 			if (hasComponent<T>())
 				return nullptr;
 
-			std::unique_ptr<T> comp = std::make_unique<T>(gameObj, args...);
+			std::unique_ptr<T> comp = std::make_unique<T>(gameObj, std::forward<TArguments>(args)...);
 			m_Components.emplace_back(std::move(comp));
 
 			return dynamic_cast<T*>(m_Components.back().get());

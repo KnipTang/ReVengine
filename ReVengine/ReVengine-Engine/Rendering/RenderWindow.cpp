@@ -75,7 +75,7 @@ uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const
     return m_Meshes.back()->GetID();
 }
 
-void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX& /*transform*/)
+void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX viewMatrix)
 {
     DirectX::XMMATRIX transform2 =
         DirectX::XMMatrixTranspose
@@ -98,7 +98,7 @@ void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX& /*
     );
 
     DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(m_WorldMatrix);
-    DirectX::XMMATRIX transView = DirectX::XMMatrixTranspose(m_Camera->GetViewMatrix());
+    DirectX::XMMATRIX transView = DirectX::XMMatrixTranspose(viewMatrix);
     DirectX::XMMATRIX transProj = DirectX::XMMatrixTranspose(tempProj);
 
     ID3D11DeviceContext* pDeviceContext = m_CreatorGod->GetDeviceContext();
@@ -147,7 +147,6 @@ bool RenderWindow::UpdateWindow()
         }
 
     }    
-    m_Camera->Update();
     m_CreatorGod->updateWindow();
 
     return false;

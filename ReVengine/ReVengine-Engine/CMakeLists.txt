@@ -6,19 +6,19 @@
     "Rendering/Direct3D11/Mesh.cpp"
     "Rendering/Direct3D11/TextureShader.cpp" 
     "Rendering/Direct3D11/WindowHandler.cpp" 
+    "Rendering/Camera/Camera.cpp"
     "Sound/Rev_Sound.cpp"
     "Sound/Rev_SoundImpl.cpp"
     "Sound/SoLoud/Rev_SoLoud.cpp"
     "GameObjects/GameObject.cpp"
     "GameObjects/BaseComponent.cpp"
-    "GameObjects/Components/CompInput.h" 
     "GameObjects/Components/CompTransform.cpp"
     "GameObjects/Components/CompRender.cpp"
     "GameObjects/Components/CompInput.cpp" 
+    "GameObjects/Components/CompCamera.cpp" 
     "Scenes/Scene.cpp"
     "Scenes/SceneManager.cpp"
     "Input/InputManager.cpp"
-    "Rendering/Camera/Camera.cpp"
 ) #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol

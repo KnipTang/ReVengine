@@ -6,6 +6,7 @@
 #include "GameObjects/Components/CompTransform.h"
 #include "GameObjects/Components/CompRender.h"
 #include "GameObjects/Components/CompInput.h"
+#include "GameObjects/Components/CompCamera.h"
 #include "Scenes/Scene.h"
 #include "Scenes/SceneManager.h"
 #include "Rendering/Texture.h"
@@ -37,13 +38,19 @@ std::unique_ptr<Rev::Scene> Scene1()
 	const std::string texturePath = testDoomFile;
 	Rev::Texture* testTexture = new Rev::Texture(texturePath);
 
-	player->addComponent<Rev::CompTransform>(player.get(), Vector3{ 2,1, 5 });
-	player->addComponent<Rev::CompRender>(player.get(), player->getComponent<Rev::CompTransform>(), testTexture);
+	Rev::CompTransform* transformComp = player->addComponent<Rev::CompTransform>(player.get(), Vector3{ 2, 1, 5 });
+	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get());
+	player->addComponent<Rev::CompRender>(
+		player.get(), 
+		transformComp,
+		cameraComp,
+		testTexture
+	);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	inputComp->BindAction(SDL_SCANCODE_E, testFunction);
 
-	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 2,0, -5 });
-	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), testTexture);
+	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 0, 0, 5 });
+	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), cameraComp, testTexture);
 
 
 
