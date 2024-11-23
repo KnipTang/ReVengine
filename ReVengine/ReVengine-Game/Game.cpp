@@ -12,6 +12,7 @@
 #include "Rendering/Texture.h"
 
 #include <SDL_scancode.h>
+#include <iostream>
 
 const std::string resourceFolder = "../game_resources";
 const std::string doomSprites = "/doomSprites";
@@ -19,7 +20,7 @@ const std::string doomEnemies = "/Enemies";
 
 void testFunction()
 {
-	
+	std::cout << "e\n";
 }
 
 std::unique_ptr<Rev::Scene> Scene1()
@@ -47,7 +48,14 @@ std::unique_ptr<Rev::Scene> Scene1()
 		testTexture
 	);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
+	int a = 1;
 	inputComp->BindAction(SDL_SCANCODE_E, testFunction);
+	inputComp->BindAction(SDL_SCANCODE_I, [cameraComp, a]() { cameraComp->AddPitchInput(a); });
+	inputComp->BindAction(SDL_SCANCODE_K, [cameraComp, a]() { cameraComp->AddPitchInput(-a); });
+	inputComp->BindAction(SDL_SCANCODE_L, [cameraComp, a]() { cameraComp->AddYawInput(a); });
+	inputComp->BindAction(SDL_SCANCODE_J, [cameraComp, a]() { cameraComp->AddYawInput(-a); });
+
+
 
 	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 0, 0, 5 });
 	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), cameraComp, testTexture);

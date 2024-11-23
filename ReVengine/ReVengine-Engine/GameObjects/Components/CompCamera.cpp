@@ -14,3 +14,13 @@ void Rev::CompCamera::update()
 {
 	m_Camera->Update();
 }
+
+void Rev::CompCamera::AddYawInput(float input)
+{
+	m_Camera->AddYawInput(input);
+}
+
+void Rev::CompCamera::AddPitchInput(float input)
+{
+	m_Camera->AddPitchInput(input);
+}
