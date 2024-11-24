@@ -3,6 +3,7 @@
 #include "CompTransform.h"
 #include "CompCamera.h"
 #include "Rendering/Texture.h"
+#include "glm/vec3.hpp"
 
 using namespace Rev;
 
@@ -12,7 +13,7 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 	m_CameraComp{ camera },
 	m_MeshId{}
 {
-	Vector3 pos = m_TransformComp->GetPosition();
+	glm::vec3 pos = m_TransformComp->GetPosition();
 	m_Vertices =
 	{
 		//Bottom Left
@@ -36,5 +37,5 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 
 const void CompRender::render()
 {
-	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId, m_CameraComp->GetCamera()->GetViewMatrix());
+	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId, m_TransformComp->GetWorldMatrix(), m_CameraComp->GetCamera()->GetViewMatrix());
 }

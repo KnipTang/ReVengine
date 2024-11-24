@@ -38,10 +38,12 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, fl
         m_WindowWidth = windowWidth;
         m_WindowHeight = windowHeight;
 
-        float fieldOfView = (float)DirectX::XM_PI / 4.0f;
-        float screenAspect = (float)m_WindowWidth / (float)m_WindowHeight;
-
-        m_ProjectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, nearZ, farZ);
+        m_ProjectionMatrix = DirectX::XMMatrixPerspectiveLH(
+            1.f,
+            std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
+            nearZ,
+            farZ
+        );
         m_WorldMatrix = DirectX::XMMatrixIdentity();
 
         //Create window
@@ -80,31 +82,12 @@ uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const
     return m_Meshes.back()->GetID();
 }
 
-void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX viewMatrix)
+void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const glm::mat4 worldMatrix, const DirectX::XMMATRIX viewMatrix)
 {
-    DirectX::XMMATRIX transform2 =
-        DirectX::XMMatrixTranspose
-        (
-            DirectX::XMMatrixRotationX(3.14f) *
-            //DirectX::XMMatrixTranslation(0, 0, 5.f) *
-            DirectX::XMMatrixPerspectiveLH(
-                1.f,
-                std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
-                0.5f,
-                1000.f
-            )
-        );
-
-    DirectX::XMMATRIX tempProj = DirectX::XMMatrixPerspectiveLH(
-        1.f,
-        std::min(float(m_WindowWidth), float(m_WindowHeight)) / std::max(float(m_WindowWidth), float(m_WindowHeight)),
-        0.5f,
-        1000.f
-    );
-
-    DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(m_WorldMatrix);
+    DirectX::XMMATRIX worldMatrixDirectX = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(&worldMatrix));
+    DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(worldMatrixDirectX);
     DirectX::XMMATRIX transView = DirectX::XMMatrixTranspose(viewMatrix);
-    DirectX::XMMATRIX transProj = DirectX::XMMatrixTranspose(tempProj);
+    DirectX::XMMATRIX transProj = DirectX::XMMatrixTranspose(m_ProjectionMatrix);
 
     ID3D11DeviceContext* pDeviceContext = m_CreatorGod->GetDeviceContext();
 
@@ -122,7 +105,6 @@ void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const DirectX::XMMATRIX vie
     data->world = transWorld;
     data->view = transView;
     data->projection = transProj;
-    data->transform = transform2;
    // memcpy(msr.pData, data, sizeof(DirectX::XMMATRIX));
     pDeviceContext->Unmap(matrixBuffer.Get(), 0);
 

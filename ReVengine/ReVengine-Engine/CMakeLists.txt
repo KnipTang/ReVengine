@@ -28,6 +28,7 @@ target_link_libraries(ReVengine-Engine PUBLIC
     soloud 
     dxgi d3d11 d3dcompiler
     SDL2::SDL2 SDL2::SDL2main
+    glm::glm
 ) #link libs to engine, name "soload" is the "target_name"
 
 target_include_directories(ReVengine-Engine PUBLIC 

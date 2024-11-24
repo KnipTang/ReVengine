@@ -15,7 +15,6 @@ cbuffer MatrixBuffer : register(b0)
     matrix worldMatrix;
     matrix viewMatrix;
     matrix projectionMatrix;
-    matrix transform;
 };
 
 vs_output vs_main(vs_input input)

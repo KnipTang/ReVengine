@@ -10,22 +10,26 @@ namespace RevDev
 
 namespace Rev
 {
+	class CompTransform;
+}
+
+namespace Rev
+{
 	class CompCamera : public BaseComponent
 	{
 	public:
-		CompCamera(GameObject* gameObj);
+		CompCamera(GameObject* gameObj, Rev::CompTransform* transform);
 		~CompCamera() = default;
 
 		void update() override;
 
 		void Turn(float x, float y);
 
-		void AddYawInput(float input);
-		void AddPitchInput(float input);
-
 		RevDev::Camera* GetCamera() const { return m_Camera.get(); }
 	private:
 		std::unique_ptr<RevDev::Camera> m_Camera;
+
+		Rev::CompTransform* m_Transform;
 
 		float m_LookSensitivity;
 	};

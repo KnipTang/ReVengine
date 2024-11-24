@@ -4,6 +4,7 @@
 #include <functional>
 #include <DirectXMath.h>
 #include "Camera/Camera.h"
+#include "glm/matrix.hpp"
 
 namespace Rev
 {
@@ -30,7 +31,7 @@ namespace RevDev
 		bool InitWindow(int windowWidth, int windowHeight, float nearZ, float farZ);
 
 		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture);
-		void DrawMesh(uint32_t meshId, const DirectX::XMMATRIX viewMatrix);
+		void DrawMesh(uint32_t meshId, const glm::mat4 worldMatrix, const DirectX::XMMATRIX viewMatrix);
 
 		bool UpdateWindow();
 

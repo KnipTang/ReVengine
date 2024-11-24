@@ -2,12 +2,14 @@
 #include "Rendering/Camera/Camera.h"
 #include <Utils/MousePos.h>
 #include <Rev_CoreSystems.h>
+#include "GameObjects/Components/CompTransform.h"
 
 using namespace Rev;
 
-CompCamera::CompCamera(GameObject* gameObj) :
+CompCamera::CompCamera(GameObject* gameObj, Rev::CompTransform* transform) :
 	BaseComponent(gameObj),
 	m_Camera{ std::make_unique<RevDev::Camera>() },
+	m_Transform{ transform },
 	m_LookSensitivity{5.f}
 {
 
@@ -15,28 +17,16 @@ CompCamera::CompCamera(GameObject* gameObj) :
 
 void Rev::CompCamera::update()
 {
-	m_Camera->Update();
+	m_Camera->Update(m_Transform->GetPosition(), m_Transform->GetRotation());
 
 	MouseRelativeMotion delta = Rev::Rev_CoreSystems::pInputManager->GetMouseRelativeMotion();
 	
-	Turn((float)delta.x, (float)delta.y);
+	std::pair<float, float> turnValue = { (float)delta.x / m_LookSensitivity, (float)delta.y / m_LookSensitivity };
+
+	Turn(turnValue.first, turnValue.second);
 }
 
 void Rev::CompCamera::Turn(float x, float y)
 {
-	x = x / m_LookSensitivity;
-	y = y / m_LookSensitivity;
-
-	m_Camera->AddYawInput(x);
-	m_Camera->AddPitchInput(y);
-}
-
-void Rev::CompCamera::AddYawInput(float input)
-{
-	m_Camera->AddYawInput(input);
-}
-
-void Rev::CompCamera::AddPitchInput(float input)
-{
-	m_Camera->AddPitchInput(input);
+	m_Transform->Turn(x, y);
 }

@@ -11,6 +11,7 @@
 #include "Scenes/SceneManager.h"
 #include "Rendering/Texture.h"
 #include "GameSettings.h"
+#include <glm/vec3.hpp>
 
 #include <SDL_scancode.h>
 #include <iostream>
@@ -34,45 +35,36 @@ std::unique_ptr<Rev::Scene> Scene1()
 	}
 
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
-	std::unique_ptr<Rev::GameObject> player1 = std::make_unique<Rev::GameObject>();
+	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
+	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
 
 	const std::string testDoomFile = resourceFolder + doomSprites + doomEnemies + "/bossb1.png";
 	const std::string texturePath = testDoomFile;
 	Rev::Texture* testTexture = new Rev::Texture(texturePath);
 
-	Rev::CompTransform* transformComp = player->addComponent<Rev::CompTransform>(player.get(), Vector3{ 2, 1, 5 });
-	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get());
-	player->addComponent<Rev::CompRender>(
-		player.get(), 
-		transformComp,
-		cameraComp,
-		testTexture
-	);
+	Rev::CompTransform* transformPlayer = player->addComponent<Rev::CompTransform>(player.get(), glm::vec3{ 0,0,0 });
+	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), transformPlayer);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
+	inputComp->BindAction(SDL_SCANCODE_I, [transformPlayer]() { transformPlayer->AddPitchInput(1); });
+	inputComp->BindAction(SDL_SCANCODE_K, [transformPlayer]() { transformPlayer->AddPitchInput(-1); });
+	inputComp->BindAction(SDL_SCANCODE_L, [transformPlayer]() { transformPlayer->AddYawInput(1); });
+	inputComp->BindAction(SDL_SCANCODE_J, [transformPlayer]() { transformPlayer->AddYawInput(-1); });
+	inputComp->BindAction(SDL_SCANCODE_W, [transformPlayer]() { transformPlayer->MoveForward(1); });
+	inputComp->BindAction(SDL_SCANCODE_S, [transformPlayer]() { transformPlayer->MoveForward(-1); });
+	inputComp->BindAction(SDL_SCANCODE_D, [transformPlayer]() { transformPlayer->MoveRight(1); });
+	inputComp->BindAction(SDL_SCANCODE_A, [transformPlayer]() { transformPlayer->MoveRight(-1); });
 
-	float cameraDir = 1;
-	inputComp->BindAction(SDL_SCANCODE_I, [cameraComp, cameraDir]() { cameraComp->AddPitchInput(cameraDir); });
-	inputComp->BindAction(SDL_SCANCODE_K, [cameraComp, cameraDir]() { cameraComp->AddPitchInput(-cameraDir); });
-	inputComp->BindAction(SDL_SCANCODE_L, [cameraComp, cameraDir]() { cameraComp->AddYawInput(cameraDir); });
-	inputComp->BindAction(SDL_SCANCODE_J, [cameraComp, cameraDir]() { cameraComp->AddYawInput(-cameraDir); });
-
-	//float movSpeed = 5;
-	inputComp->BindAction(SDL_SCANCODE_Z, [transformComp]() { transformComp->MoveForward(1); });
-	inputComp->BindAction(SDL_SCANCODE_S, [transformComp]() { transformComp->MoveForward(-1); });
-	inputComp->BindAction(SDL_SCANCODE_D, [transformComp]() { transformComp->MoveRight(1); });
-	inputComp->BindAction(SDL_SCANCODE_Q, [transformComp]() { transformComp->MoveRight(-1); });
-
-
-	player1->addComponent<Rev::CompTransform>(player1.get(), Vector3{ 0, 0, 5 });
-	player1->addComponent<Rev::CompRender>(player1.get(), player1->getComponent<Rev::CompTransform>(), cameraComp, testTexture);
-
-
-
+	Rev::CompTransform* transformEnemy1 = enemy1->addComponent<Rev::CompTransform>(enemy1.get(), glm::vec3{ -2, 0, 5 });
+	enemy1->addComponent<Rev::CompRender>(enemy1.get(), transformEnemy1, cameraComp, testTexture);
+	Rev::CompTransform* transformEnemy2 = enemy2->addComponent<Rev::CompTransform>(enemy2.get(), glm::vec3{ 2, 0, 5 });
+	enemy2->addComponent<Rev::CompRender>(enemy2.get(), transformEnemy2, cameraComp, testTexture);
+	inputComp->BindAction(SDL_SCANCODE_P, [transformEnemy1]() { transformEnemy1->MoveRight(1); });
 	//Scene add gameobects & return
 	{
 		std::unique_ptr<Rev::Scene> scene = std::make_unique<Rev::Scene>();
 		scene->addGameObject(std::move(player));
-		scene->addGameObject(std::move(player1));
+		scene->addGameObject(std::move(enemy1));
+		scene->addGameObject(std::move(enemy2));
 		return std::move(scene);
 	}
 }
