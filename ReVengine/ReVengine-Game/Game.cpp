@@ -54,9 +54,9 @@ std::unique_ptr<Rev::Scene> Scene1()
 	inputComp->BindAction(SDL_SCANCODE_D, [transformPlayer]() { transformPlayer->MoveRight(1); });
 	inputComp->BindAction(SDL_SCANCODE_A, [transformPlayer]() { transformPlayer->MoveRight(-1); });
 
-	Rev::CompTransform* transformEnemy1 = enemy1->addComponent<Rev::CompTransform>(enemy1.get(), glm::vec3{ -2, 0, 5 });
+	Rev::CompTransform* transformEnemy1 = enemy1->addComponent<Rev::CompTransform>(enemy1.get(), glm::vec3{ -0, 0, 5 });
 	enemy1->addComponent<Rev::CompRender>(enemy1.get(), transformEnemy1, cameraComp, testTexture);
-	Rev::CompTransform* transformEnemy2 = enemy2->addComponent<Rev::CompTransform>(enemy2.get(), glm::vec3{ 2, 0, 5 });
+	Rev::CompTransform* transformEnemy2 = enemy2->addComponent<Rev::CompTransform>(enemy2.get(), glm::vec3{ 1, 0, 5 });
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), transformEnemy2, cameraComp, testTexture);
 	inputComp->BindAction(SDL_SCANCODE_P, [transformEnemy1]() { transformEnemy1->MoveRight(1); });
 	//Scene add gameobects & return

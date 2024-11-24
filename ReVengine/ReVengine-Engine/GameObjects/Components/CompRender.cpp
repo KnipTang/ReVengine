@@ -4,26 +4,27 @@
 #include "CompCamera.h"
 #include "Rendering/Texture.h"
 #include "glm/vec3.hpp"
+#include <iostream>
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, Texture* texture, int width, int height) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, Texture* texture, float widthTexture, float heightTexture) :
 	BaseComponent(gameObj),
 	m_TransformComp{ transform },
 	m_CameraComp{ camera },
 	m_MeshId{}
 {
-	glm::vec3 pos = m_TransformComp->GetPosition();
+	float depthZ = m_TransformComp->GetPosition().z;
 	m_Vertices =
 	{
 		//Bottom Left
-		{ { pos.x - width,  pos.y - height, pos.z }, { 0.f, 1.f } },
+		{ { 0 - widthTexture / 2,  0 - heightTexture / 2, depthZ }, { 0.f, 1.f } },
 		//Bottom Right
-		{ { pos.x + width,  pos.y - height, pos.z }, { 1.f, 1.f } },
+		{ { 0 + widthTexture / 2,  0 - heightTexture / 2, depthZ }, { 1.f, 1.f } },
 		//Top Left
-		{ { pos.x - width,  pos.y + height, pos.z }, { 0.f, 0.f } },
+		{ { 0 - widthTexture / 2,  0 + heightTexture / 2, depthZ }, { 0.f, 0.f } },
 		//Top Right
-		{ { pos.x + width,  pos.y + height, pos.z }, { 1.f, 0.f } },
+		{ { 0 + widthTexture / 2,  0 + heightTexture / 2, depthZ }, { 1.f, 0.f } },
 	};
 
 	m_Indices =
@@ -37,5 +38,6 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 
 const void CompRender::render()
 {
+	std::cout << "X: " << m_TransformComp->GetPosition().x << " Y: " << m_TransformComp->GetPosition().y << " Z: " << m_TransformComp->GetPosition().z << "\n";
 	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId, m_TransformComp->GetWorldMatrix(), m_CameraComp->GetCamera()->GetViewMatrix());
 }
