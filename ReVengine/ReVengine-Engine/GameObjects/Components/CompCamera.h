@@ -18,7 +18,7 @@ namespace Rev
 	class CompCamera : public BaseComponent
 	{
 	public:
-		CompCamera(GameObject* gameObj, Rev::CompTransform* transform);
+		CompCamera(GameObject* gameObj, Rev::CompTransform* transform, bool flipControlls = false);
 		~CompCamera() = default;
 
 		void update() override;
@@ -32,5 +32,7 @@ namespace Rev
 		Rev::CompTransform* m_Transform;
 
 		float m_LookSensitivity;
+
+		bool m_ControllsFlipped;
 	};
 }

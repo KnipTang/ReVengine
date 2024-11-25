@@ -44,7 +44,6 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, fl
             nearZ,
             farZ
         );
-        m_WorldMatrix = DirectX::XMMatrixIdentity();
 
         //Create window
         m_Window = std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>>(
@@ -82,10 +81,10 @@ uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const
     return m_Meshes.back()->GetID();
 }
 
-void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const glm::mat4 worldMatrix, const DirectX::XMMATRIX viewMatrix)
+void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const glm::mat4 modelMatrix, const DirectX::XMMATRIX viewMatrix)
 {
-    DirectX::XMMATRIX worldMatrixDirectX = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(&worldMatrix));
-    DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(worldMatrixDirectX);
+    DirectX::XMMATRIX modelMatrixDirectX = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(&modelMatrix));
+    DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(modelMatrixDirectX);
     DirectX::XMMATRIX transView = DirectX::XMMatrixTranspose(viewMatrix);
     DirectX::XMMATRIX transProj = DirectX::XMMatrixTranspose(m_ProjectionMatrix);
 
@@ -126,6 +125,9 @@ bool RenderWindow::UpdateWindow()
         {
         case SDL_KEYDOWN:
             Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(e.key.keysym.scancode);
+            break;
+
+        case SDL_MOUSEMOTION:
             break;
 
         case SDL_QUIT:

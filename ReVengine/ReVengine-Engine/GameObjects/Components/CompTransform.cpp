@@ -2,13 +2,16 @@
 #include <iostream>
 #include "Utils/ReV_Mat.h"
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/euler_angles.hpp>
 
 using namespace Rev;
 
-CompTransform::CompTransform(GameObject* gameObj, glm::vec3 position, glm::quat rotation/*, Vector3 scale*/) :
+CompTransform::CompTransform(GameObject* gameObj, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) :
 	BaseComponent(gameObj),
 	m_Position{position},
-	m_Rotation{rotation}
+	m_Rotation{rotation},
+	m_Scale{scale}
 {
 
 }
@@ -25,14 +28,8 @@ void CompTransform::Move(glm::vec3 dir, float speed)
 
 void CompTransform::MoveForward(int input, float speed)
 {
-	glm::vec3 beforePos = m_Position;
 	glm::vec3 movementDir = GetForwardVector();
 	Move(movementDir, input * speed);
-	printf("Pos: dx=%f, dy=%f, dz=%f\n", m_Position.x, m_Position.y, m_Position.z);
-	glm::vec3 diffV = beforePos - m_Position;
-	float diff = diffV.x + diffV.y + diffV.z;
-	printf("Pos Diff: dx=%f\n", diff);
-
 }
 
 void CompTransform::MoveRight(int input, float speed)
@@ -49,50 +46,27 @@ void CompTransform::Turn(float x, float y)
 
 void CompTransform::AddPitchInput(float input)
 {
-	m_Rotation.y += input;
+	m_Rotation.x += glm::radians(input);
+	m_Rotation.x = glm::mod(m_Rotation.x, glm::two_pi<float>());
 }
 
 void CompTransform::AddYawInput(float input)
 {
-	m_Rotation.x += input;
+	m_Rotation.y += glm::radians(input);
+	m_Rotation.y = glm::mod(m_Rotation.y, glm::two_pi<float>());
 }
 
 glm::vec3 CompTransform::GetForwardVector()
 {
-	float pitch = m_Rotation.x * RevMat::DEG_TO_RAD_F;
-	float yaw = m_Rotation.y * RevMat::DEG_TO_RAD_F;
-
-	float cosPitch = cos(pitch);
-	float sinPitch = sin(pitch);
-	float cosYaw = cos(yaw);
-	float sinYaw = sin(yaw);
-
-	glm::vec3 forward;
-	forward.x = cosPitch * sinYaw;
-	forward.y = sinPitch;
-	forward.z = cosPitch * cosYaw;
-
-	forward = glm::normalize(forward);
-
+	GetModelMatrix();
+	const glm::vec3 forward = glm::vec3(m_ModelMatrix[2]);
 	return forward;
 }
 
 glm::vec3 CompTransform::GetRightVector()
 {
-	float yaw = m_Rotation.y * RevMat::DEG_TO_RAD_F;
-	float roll = m_Rotation.z * RevMat::DEG_TO_RAD_F;
-
-	float cosYaw = cos(yaw);
-	float sinYaw = sin(yaw);
-	float cosRoll = cos(roll);
-	float sinRoll = sin(roll);
-
-	glm::vec3 right;
-	right.x = cosYaw * cosRoll;
-	right.y = sinRoll;
-	right.z = sinYaw * cosRoll;
-
-	right = glm::normalize(right);
+	GetModelMatrix();
+	const glm::vec3 right = glm::vec3(m_ModelMatrix[0]);
 
 	return right;
 }
@@ -107,18 +81,21 @@ glm::vec3& CompTransform::GetPosition()
 	return m_Position;
 }
 
-void CompTransform::SetRotation(glm::quat dir)
+void CompTransform::SetRotation(glm::vec3 dir)
 {
-	m_Rotation = dir;
+	m_Rotation = glm::radians(dir);
 }
 
-glm::quat& CompTransform::GetRotation()
+glm::vec3& CompTransform::GetRotation()
 {
 	return m_Rotation;
 }
 
-glm::mat4 CompTransform::GetWorldMatrix()
+glm::mat4 CompTransform::GetModelMatrix()
 {
-	m_WorldMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::mat4_cast(m_Rotation);
-	return m_WorldMatrix;
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), m_Scale);
+	glm::mat4 rotationMat = glm::yawPitchRoll(m_Rotation.y, m_Rotation.x, m_Rotation.z);
+	glm::mat4 positionMat = glm::translate(glm::mat4(1.0f), m_Position);
+	m_ModelMatrix = scaleMat * rotationMat * positionMat;
+	return m_ModelMatrix;
 }

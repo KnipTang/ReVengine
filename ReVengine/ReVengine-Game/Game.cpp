@@ -45,10 +45,10 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::CompTransform* transformPlayer = player->addComponent<Rev::CompTransform>(player.get(), glm::vec3{ 0,0,0 });
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), transformPlayer);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
-	inputComp->BindAction(SDL_SCANCODE_I, [transformPlayer]() { transformPlayer->AddPitchInput(1); });
-	inputComp->BindAction(SDL_SCANCODE_K, [transformPlayer]() { transformPlayer->AddPitchInput(-1); });
-	inputComp->BindAction(SDL_SCANCODE_L, [transformPlayer]() { transformPlayer->AddYawInput(1); });
-	inputComp->BindAction(SDL_SCANCODE_J, [transformPlayer]() { transformPlayer->AddYawInput(-1); });
+	inputComp->BindAction(SDL_SCANCODE_I, [transformPlayer]() { transformPlayer->AddPitchInput(10); });
+	inputComp->BindAction(SDL_SCANCODE_K, [transformPlayer]() { transformPlayer->AddPitchInput(-10); });
+	inputComp->BindAction(SDL_SCANCODE_L, [transformPlayer]() { transformPlayer->AddYawInput(10); });
+	inputComp->BindAction(SDL_SCANCODE_J, [transformPlayer]() { transformPlayer->AddYawInput(-10); });
 	inputComp->BindAction(SDL_SCANCODE_W, [transformPlayer]() { transformPlayer->MoveForward(1); });
 	inputComp->BindAction(SDL_SCANCODE_S, [transformPlayer]() { transformPlayer->MoveForward(-1); });
 	inputComp->BindAction(SDL_SCANCODE_D, [transformPlayer]() { transformPlayer->MoveRight(1); });

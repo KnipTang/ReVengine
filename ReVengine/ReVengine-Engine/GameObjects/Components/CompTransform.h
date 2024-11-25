@@ -3,23 +3,22 @@
 #include "GameObjects/BaseComponent.h"
 #include "glm/vec3.hpp"
 #include "glm/matrix.hpp"
-#include <glm/gtc/quaternion.hpp>
 
 namespace Rev
 {
 	class CompTransform : public BaseComponent
 	{
 	public:
-		CompTransform(GameObject* gameObj, glm::vec3 position = glm::vec3{0,0,0}, glm::quat rotation = glm::quat{ 0, 0, 0, 0 }/*, Vector3 scale = Vector3{ 1,1,1 }*/);
+		CompTransform(GameObject* gameObj, glm::vec3 position = glm::vec3{0,0,0}, glm::vec3 rotation = glm::vec3{ 0, 0, 0 }, glm::vec3 scale = glm::vec3{ 1,1,1 });
 		~CompTransform() {};
 
 		void update() override;
 
 		void SetPosition(glm::vec3 pos);
 		glm::vec3& GetPosition();
-		void SetRotation(glm::quat dir);
-		glm::quat& GetRotation();
-		glm::mat4 GetWorldMatrix();
+		void SetRotation(glm::vec3 dir);
+		glm::vec3& GetRotation();
+		glm::mat4 GetModelMatrix();
 
 		glm::vec3 GetForwardVector();
 		glm::vec3 GetRightVector();
@@ -32,11 +31,11 @@ namespace Rev
 		void AddYawInput(float input);
 		void AddPitchInput(float input);
 	public:
-		glm::vec3 m_Position;
-		glm::quat m_Rotation;
-
-		glm::mat4 m_WorldMatrix;
-		//Vector3 m_Scale; //TODO
 	private:
+		glm::vec3 m_Position;
+		glm::vec3 m_Rotation;
+		glm::vec3 m_Scale; //TODO
+
+		glm::mat4 m_ModelMatrix;
 	};
 }

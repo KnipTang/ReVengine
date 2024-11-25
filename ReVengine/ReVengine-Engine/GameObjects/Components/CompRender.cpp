@@ -38,6 +38,5 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 
 const void CompRender::render()
 {
-	std::cout << "X: " << m_TransformComp->GetPosition().x << " Y: " << m_TransformComp->GetPosition().y << " Z: " << m_TransformComp->GetPosition().z << "\n";
-	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId, m_TransformComp->GetWorldMatrix(), m_CameraComp->GetCamera()->GetViewMatrix());
+	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId, m_TransformComp->GetModelMatrix(), m_CameraComp->GetCamera()->GetViewMatrix());
 }

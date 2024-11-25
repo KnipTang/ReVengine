@@ -12,7 +12,7 @@ namespace RevDev
 		Camera();
 		~Camera();
 
-		void Update(glm::vec3 position, glm::quat rotation);
+		void Update(glm::vec3 position, glm::vec3 rotation);
 
 		DirectX::XMMATRIX GetViewMatrix() const { return m_ViewMatrix; };
 	private:

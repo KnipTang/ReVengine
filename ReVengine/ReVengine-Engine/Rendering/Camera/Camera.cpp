@@ -12,15 +12,15 @@ Camera::~Camera()
 
 }
 
-void Camera::Update(glm::vec3 position, glm::quat rotation)
+void Camera::Update(glm::vec3 position, glm::vec3 rotation)
 {
 	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0, 0.0, 1.0f);
 	DirectX::XMVECTOR vecPosition = DirectX::XMVECTOR{ position.x, position.y, position.z };
 	DirectX::XMVECTOR lookAt = DirectX::XMVectorSet(0.0, 0.0, 1.0f, 1.0f);
 
-	float pitch = rotation.x * RevMat::DEG_TO_RAD_F;
-	float yaw = rotation.y * RevMat::DEG_TO_RAD_F;
-	float roll = rotation.z * RevMat::DEG_TO_RAD_F;
+	float pitch = rotation.x;
+	float yaw = rotation.y;
+	float roll = rotation.z;
 
 	DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
