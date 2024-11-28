@@ -8,6 +8,7 @@ include(FetchContent)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(unofficial-omniverse-physx-sdk CONFIG REQUIRED)
 
 FetchContent_Declare(
   soLoud

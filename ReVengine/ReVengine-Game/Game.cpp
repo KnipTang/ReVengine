@@ -12,7 +12,6 @@
 #include "Rendering/Texture.h"
 #include "GameSettings.h"
 #include <glm/vec3.hpp>
-
 #include <SDL_scancode.h>
 #include <iostream>
 

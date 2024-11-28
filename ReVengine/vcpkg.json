@@ -1,7 +1,8 @@
 {
   "dependencies": [
+    "glm",
     "sdl2",
     "stb",
-    "glm"
+    "physx"
   ]
 }
