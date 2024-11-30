@@ -2,11 +2,8 @@
 
 #include <vector>
 #include <memory>
-
-namespace Rev
-{
-	class BaseComponent;
-}
+#include <algorithm>
+#include "BaseComponent.h"
 
 namespace Rev
 {
@@ -64,15 +61,61 @@ namespace Rev
 		{
 			m_Components.erase(
 				std::remove_if(m_Components.begin(), m_Components.end(),
-					[](const std::unique_ptr<BaseComponent>& comp) {
+					[](const std::unique_ptr<BaseComponent>& comp) -> bool {
 						return dynamic_cast<T*>(comp.get()) != nullptr;
 					}),
 				m_Components.end());
 		}
 
+		GameObject* AddChild(GameObject* childObj)
+		{
+			m_Children.emplace_back(childObj);
+			return m_Children.back().get();
+		}
+
+		void RemoveChild(GameObject* childObj)
+		{
+			m_Children.erase(
+				std::remove_if(m_Children.begin(), m_Children.end(), [childObj](std::unique_ptr<GameObject>& obj) -> bool
+					{
+						return obj.get() == childObj;
+					}),
+				m_Children.end()
+			);
+		}
+
+		std::vector<std::unique_ptr<GameObject>>& GetChildren()
+		{
+			return m_Children;
+		}
+
+		void DisplayHierarchy()
+		{
+			std::printf("\tGameObject: %s\tID: %i\n", typeid(*this).name(), objID);
+			std::for_each(m_Components.begin(), m_Components.end(), 
+				[](std::unique_ptr<BaseComponent>& comp) -> bool
+				{
+					return std::printf("\t\tComponents: %s\n", typeid(*comp).name());
+				}
+			);
+			std::ranges::for_each(m_Children,
+				[](std::unique_ptr<GameObject>& child) -> void
+				{
+					child->DisplayHierarchy();
+				}
+			);
+		}
+
 		const int GetID() { return objID; }
+
+	public:
+		bool m_Enabled;
+
 	private:
 		std::vector<std::unique_ptr<BaseComponent>> m_Components;
+
+		std::vector<std::unique_ptr<GameObject>> m_Children;
+
 		static int objIDCounter;
 		int objID;
 	};

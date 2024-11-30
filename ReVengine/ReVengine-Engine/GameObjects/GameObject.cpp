@@ -6,6 +6,7 @@ using namespace Rev;
 int GameObject::objIDCounter = 0;
 
 GameObject::GameObject() :
+	m_Enabled{true},
 	objID{objIDCounter++}
 {
 }

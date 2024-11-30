@@ -18,7 +18,7 @@ void Scene::update()
 {
 	for (auto& obj : m_GameObjects)
 	{
-		obj->update();
+		if(obj->m_Enabled) obj->update();
 	}
 }
 
@@ -26,7 +26,7 @@ void Scene::fixedUpdate()
 {
 	for (auto& obj : m_GameObjects)
 	{
-		obj->fixedUpdate();
+		if (obj->m_Enabled) obj->fixedUpdate();
 	}
 }
 
@@ -34,7 +34,7 @@ const void Scene::render()
 {
 	for (auto& obj : m_GameObjects)
 	{
-		obj->render();
+		if (obj->m_Enabled) obj->render();
 	}
 }
 

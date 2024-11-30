@@ -2,11 +2,8 @@
 
 #include <vector>
 #include <memory>
-
-namespace Rev
-{
-	class GameObject;
-}
+#include <algorithm>
+#include "GameObjects/GameObject.h"
 
 namespace Rev
 {
@@ -58,6 +55,17 @@ namespace Rev
 						return dynamic_cast<T*>(obj.get()) != nullptr;
 					}),
 				m_GameObjects.end());
+		}
+
+		void DisplaySceneHierarchy()
+		{
+			std::printf("Scene Hierachy: %s\tSceneID: %i\n", typeid(*this).name(), sceneID);
+			std::ranges::for_each(m_GameObjects,
+				[](std::unique_ptr<GameObject>& obj) -> void
+				{
+					obj->DisplayHierarchy();
+				}
+			);
 		}
 
 		const int GetID() { return sceneID; }
