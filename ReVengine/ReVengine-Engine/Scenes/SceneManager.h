@@ -19,8 +19,8 @@ namespace Rev
 		SceneManager();
 		~SceneManager();
 
-		void update();
-		void fixedUpdate();
+		void update(float deltaTime);
+		void fixedUpdate(float fixedDeltaTime);
 		const void render();
 
 		const Scene* addScene(std::unique_ptr<Scene> scene);

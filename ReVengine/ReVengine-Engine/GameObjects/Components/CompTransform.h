@@ -12,12 +12,15 @@ namespace Rev
 		CompTransform(GameObject* gameObj, glm::vec3 position = glm::vec3{0,0,0}, glm::vec3 rotation = glm::vec3{ 0, 0, 0 }, glm::vec3 scale = glm::vec3{ 1,1,1 });
 		~CompTransform() {};
 
-		void update() override;
+		void update([[maybe_unused]] float deltaTime) override;
 
+		void SetPosition(float x, float y, float z);
 		void SetPosition(glm::vec3 pos);
-		glm::vec3& GetPosition();
+		glm::vec3 GetPosition();
+		void SetRotation(float x, float y, float z);
 		void SetRotation(glm::vec3 dir);
-		glm::vec3& GetRotation();
+		glm::vec3 GetRotation();
+
 		glm::mat4 GetModelMatrix();
 
 		glm::vec3 GetForwardVector();
@@ -31,10 +34,13 @@ namespace Rev
 		void AddYawInput(float input);
 		void AddPitchInput(float input);
 	public:
+		glm::vec3 m_LocalPosition;
+		glm::vec3 m_LocalRotation;
 	private:
 		glm::vec3 m_Position;
 		glm::vec3 m_Rotation;
 		glm::vec3 m_Scale; //TODO
+
 
 		glm::mat4 m_ModelMatrix;
 	};

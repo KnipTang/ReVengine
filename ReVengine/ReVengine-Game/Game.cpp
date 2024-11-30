@@ -14,6 +14,7 @@
 #include <glm/vec3.hpp>
 #include <SDL_scancode.h>
 #include <iostream>
+#include "Objects/Weapons/BulletComp.h"
 
 const std::string resourceFolder = "../game_resources";
 const std::string doomSprites = "/doomSprites";
@@ -31,39 +32,63 @@ std::unique_ptr<Rev::Scene> Scene1()
 
 	//Textures
 	const std::string mainBulletPath = resourceFolder + doomSprites + doomBullets + "/misla5.png";
+	const std::string secondBulletPath = resourceFolder + doomSprites + doomBullets + "/misla1.png";
 	const std::string testDoomFile = resourceFolder + doomSprites + doomEnemies + "/bossb1.png";
 	Rev::Texture* testTexture = new Rev::Texture(testDoomFile);
 	Rev::Texture* bulletTexture = new Rev::Texture(mainBulletPath);
+	Rev::Texture* bullet2Texture = new Rev::Texture(secondBulletPath);
 
 	//Player
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
-	Rev::CompTransform* transformPlayer = player->addComponent<Rev::CompTransform>(player.get(), glm::vec3{ 0,0,0 });
-	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), transformPlayer);
+	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
+	//Gun
+	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
+
 	//Input Config
 	{
-	inputComp->BindAction(SDL_SCANCODE_I, [transformPlayer]() { transformPlayer->AddPitchInput(10); });
-	inputComp->BindAction(SDL_SCANCODE_K, [transformPlayer]() { transformPlayer->AddPitchInput(-10); });
-	inputComp->BindAction(SDL_SCANCODE_L, [transformPlayer]() { transformPlayer->AddYawInput(10); });
-	inputComp->BindAction(SDL_SCANCODE_J, [transformPlayer]() { transformPlayer->AddYawInput(-10); });
-	inputComp->BindAction(SDL_SCANCODE_W, [transformPlayer]() { transformPlayer->MoveForward(1); });
-	inputComp->BindAction(SDL_SCANCODE_S, [transformPlayer]() { transformPlayer->MoveForward(-1); });
-	inputComp->BindAction(SDL_SCANCODE_D, [transformPlayer]() { transformPlayer->MoveRight(1); });
-	inputComp->BindAction(SDL_SCANCODE_A, [transformPlayer]() { transformPlayer->MoveRight(-1); });
+	Rev::CompTransform* playerTransform = player->transform;
+	inputComp->BindAction(SDL_SCANCODE_I, [playerTransform]() { playerTransform->AddPitchInput(10); });
+	inputComp->BindAction(SDL_SCANCODE_K, [playerTransform]() { playerTransform->AddPitchInput(-10); });
+	inputComp->BindAction(SDL_SCANCODE_L, [playerTransform]() { playerTransform->AddYawInput(10); });
+	inputComp->BindAction(SDL_SCANCODE_J, [playerTransform]() { playerTransform->AddYawInput(-10); });
+	inputComp->BindAction(SDL_SCANCODE_W, [playerTransform]() { playerTransform->MoveForward(1); });
+	inputComp->BindAction(SDL_SCANCODE_S, [playerTransform]() { playerTransform->MoveForward(-1); });
+	inputComp->BindAction(SDL_SCANCODE_D, [playerTransform]() { playerTransform->MoveRight(1); });
+	inputComp->BindAction(SDL_SCANCODE_A, [playerTransform]() { playerTransform->MoveRight(-1); });
 	}
 
 	//Enemies
 	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
-	Rev::CompTransform* transformEnemy1 = enemy1->addComponent<Rev::CompTransform>(enemy1.get(), glm::vec3{ -0, 0, 5 });
-	enemy1->addComponent<Rev::CompRender>(enemy1.get(), transformEnemy1, cameraComp, testTexture);
+	enemy1->transform->SetPosition(0, 0, 5);
+	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, testTexture);
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
-	Rev::CompTransform* transformEnemy2 = enemy2->addComponent<Rev::CompTransform>(enemy2.get(), glm::vec3{ 1, 0, 5 });
-	enemy2->addComponent<Rev::CompRender>(enemy2.get(), transformEnemy2, cameraComp, testTexture);
+	enemy2->transform->SetPosition(1, 0, 5);
+	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, testTexture);
 
 	//Bullet
 	std::unique_ptr<Rev::GameObject> bullet = std::make_unique<Rev::GameObject>();
-	Rev::CompTransform* transformBullet = bullet->addComponent<Rev::CompTransform>(bullet.get());
-	bullet->addComponent<Rev::CompRender>(bullet.get(), transformBullet, cameraComp, bulletTexture);
+	bullet->addComponent<Rev::CompRender>(bullet.get(), bullet->transform, cameraComp, bulletTexture);
+	bullet->addComponent<BulletComp>(bullet.get(), bullet->transform);
+
+	std::unique_ptr<Rev::GameObject> grandParent = std::make_unique<Rev::GameObject>();
+	grandParent->transform->SetPosition(3, 0, 0);
+	grandParent->addComponent<Rev::CompRender>(grandParent.get(), grandParent->transform, cameraComp, bullet2Texture);
+	Rev::GameObject* parent = new Rev::GameObject;
+	parent->transform->SetPosition(4, 0, 0);
+	parent->addComponent<Rev::CompRender>(parent, parent->transform, cameraComp, bulletTexture);
+	Rev::GameObject* son = new Rev::GameObject;
+	son->transform->SetPosition(8, 1, 0);
+	son->addComponent<Rev::CompRender>(son, son->transform, cameraComp, bulletTexture);
+	grandParent->AddChild(parent);
+	parent->AddChild(son);
+
+	Rev::CompTransform* grandTransform = grandParent->transform;
+	inputComp->BindAction(SDL_SCANCODE_T, [grandTransform]() { grandTransform->MoveRight(1); });
+	Rev::CompTransform* parentTransform = parent->transform;
+	inputComp->BindAction(SDL_SCANCODE_G, [parentTransform]() { parentTransform->MoveRight(1); });
+	Rev::CompTransform* childTransform = son->transform;
+	inputComp->BindAction(SDL_SCANCODE_B, [childTransform]() { childTransform->MoveRight(1); });
 
 	//Scene add gameobects & return
 	{
@@ -71,7 +96,8 @@ std::unique_ptr<Rev::Scene> Scene1()
 		scene->addGameObject(std::move(player));
 		scene->addGameObject(std::move(enemy1));
 		scene->addGameObject(std::move(enemy2));
-		scene->addGameObject(std::move(bullet));
+		//scene->addGameObject(std::move(bullet));
+		scene->addGameObject(std::move(grandParent));
 		scene->DisplaySceneHierarchy();
 		return std::move(scene);
 	}

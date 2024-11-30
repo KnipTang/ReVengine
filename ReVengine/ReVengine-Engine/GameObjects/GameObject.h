@@ -4,6 +4,12 @@
 #include <memory>
 #include <algorithm>
 #include "BaseComponent.h"
+#include <cassert>
+
+namespace Rev
+{
+	class CompTransform;
+}
 
 namespace Rev
 {
@@ -16,15 +22,18 @@ namespace Rev
 		GameObject();
 		~GameObject();
 
-		void update();
-		void fixedUpdate();
+		void update(float deltaTime);
+		void fixedUpdate(float fixedDeltaTime);
 		const void render();
 
 		template <baseCompConcept T, typename... TArguments>
 		T* addComponent(GameObject* gameObj, TArguments&&... args)
 		{
 			if (hasComponent<T>())
+			{
+				assert(false && "GameObject already has this component");
 				return nullptr;
+			}
 
 			std::unique_ptr<T> comp = std::make_unique<T>(gameObj, std::forward<TArguments>(args)...);
 			m_Components.emplace_back(std::move(comp));
@@ -67,17 +76,20 @@ namespace Rev
 				m_Components.end());
 		}
 
-		GameObject* AddChild(GameObject* childObj)
-		{
-			m_Children.emplace_back(childObj);
-			return m_Children.back().get();
-		}
+		GameObject* AddChild(GameObject* childObj);
 
 		void RemoveChild(GameObject* childObj)
 		{
+			std::ranges::for_each(childObj->GetChildren(),
+				[childObj](std::unique_ptr<GameObject>& childOfChild) -> void
+				{
+					childObj->RemoveChild(childOfChild.get());
+				});
+
 			m_Children.erase(
-				std::remove_if(m_Children.begin(), m_Children.end(), [childObj](std::unique_ptr<GameObject>& obj) -> bool
+				std::remove_if(m_Children.begin(), m_Children.end(), [childObj, this](std::unique_ptr<GameObject>& obj) -> bool
 					{
+						m_ChildrenCount--;
 						return obj.get() == childObj;
 					}),
 				m_Children.end()
@@ -88,6 +100,9 @@ namespace Rev
 		{
 			return m_Children;
 		}
+
+		int const GetChildCount() { return m_ChildrenCount; }
+
 
 		void DisplayHierarchy()
 		{
@@ -101,20 +116,30 @@ namespace Rev
 			std::ranges::for_each(m_Children,
 				[](std::unique_ptr<GameObject>& child) -> void
 				{
+					std::printf("Parent: %s\tID: %i\n", typeid(*child->GetParent()).name(), child->GetParent()->GetID());
 					child->DisplayHierarchy();
 				}
 			);
 		}
 
-		const int GetID() { return objID; }
+		int GetID() const { return objID; }
+		const GameObject* GetParent() { return m_Parent; }
 
+	private:
+		void SetParent(GameObject* parent)
+		{
+			m_Parent = parent;
+		}
 	public:
 		bool m_Enabled;
 
+		Rev::CompTransform* transform;
 	private:
 		std::vector<std::unique_ptr<BaseComponent>> m_Components;
 
 		std::vector<std::unique_ptr<GameObject>> m_Children;
+		int m_ChildrenCount;
+		GameObject* m_Parent;
 
 		static int objIDCounter;
 		int objID;

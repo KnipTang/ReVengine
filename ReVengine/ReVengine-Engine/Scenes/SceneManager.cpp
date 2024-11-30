@@ -14,25 +14,25 @@ SceneManager::~SceneManager()
 {
 }
 
-void SceneManager::update()
+void SceneManager::update(float deltaTime)
 {
-	for (auto& scene : m_Scenes)
+	for (auto&& scene : m_Scenes)
 	{
-		scene->update();
+		scene->update(deltaTime);
 	}
 }
 
-void SceneManager::fixedUpdate()
+void SceneManager::fixedUpdate(float fixedDeltaTime)
 {
-	for (auto& scene : m_Scenes)
+	for (auto&& scene : m_Scenes)
 	{
-		scene->fixedUpdate();
+		scene->fixedUpdate(fixedDeltaTime);
 	}
 }
 
 const void SceneManager::render()
 {
-	for (auto& scene : m_Scenes)
+	for (auto&& scene : m_Scenes)
 	{
 		scene->render();
 	}

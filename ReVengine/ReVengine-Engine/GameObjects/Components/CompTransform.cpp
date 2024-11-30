@@ -4,6 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
+#include "GameObjects/GameObject.h"
+#include <algorithm>
 
 using namespace Rev;
 
@@ -16,14 +18,14 @@ CompTransform::CompTransform(GameObject* gameObj, glm::vec3 position, glm::vec3 
 
 }
 
-void CompTransform::update()
+void CompTransform::update([[maybe_unused]] float deltaTime)
 {
 
 }
 
 void CompTransform::Move(glm::vec3 dir, float speed)
 {
-	m_Position += dir * speed;
+	SetPosition(m_Position + dir * speed);
 }
 
 void CompTransform::MoveForward(int input, float speed)
@@ -71,22 +73,52 @@ glm::vec3 CompTransform::GetRightVector()
 	return right;
 }
 
-void CompTransform::SetPosition(glm::vec3 pos)
-{
-	m_Position = pos;
+void CompTransform::SetPosition(float x, float y, float z)
+{	
+	SetPosition(glm::vec3(x, y, z));
 }
 
-glm::vec3& CompTransform::GetPosition()
+void CompTransform::SetPosition(glm::vec3 pos)
+{	
+	m_Position = pos;
+
+	if (m_GameObject->GetChildCount() > 0)
+	{
+		std::ranges::for_each(m_GameObject->GetChildren(),
+			[pos](std::unique_ptr<GameObject>& child) -> void
+			{
+				child->transform->SetPosition(child->transform->m_LocalPosition + pos);
+			});
+	}
+}
+
+glm::vec3 CompTransform::GetPosition()
 {
 	return m_Position;
 }
 
-void CompTransform::SetRotation(glm::vec3 dir)
+void CompTransform::SetRotation(float x, float y, float z)
 {
-	m_Rotation = glm::radians(dir);
+	SetRotation(glm::vec3(x, y, z));
 }
 
-glm::vec3& CompTransform::GetRotation()
+void CompTransform::SetRotation(glm::vec3 dir)
+{
+	if (m_GameObject->GetParent() != nullptr)
+		m_Rotation = m_GameObject->GetParent()->transform->GetRotation() + glm::radians(dir);
+	else m_Position = glm::radians(dir);
+
+	if (m_GameObject->GetChildCount() > 0)
+	{
+		std::ranges::for_each(m_GameObject->GetChildren(),
+			[this](std::unique_ptr<GameObject>& child) -> void
+			{
+				child->transform->SetPosition(child->transform->GetPosition() + GetPosition());
+			});
+	}
+}
+
+glm::vec3 CompTransform::GetRotation()
 {
 	return m_Rotation;
 }

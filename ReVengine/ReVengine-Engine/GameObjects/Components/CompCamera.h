@@ -21,7 +21,7 @@ namespace Rev
 		CompCamera(GameObject* gameObj, Rev::CompTransform* transform, bool flipControlls = false);
 		~CompCamera() = default;
 
-		void update() override;
+		void update([[maybe_unused]] float deltaTime) override;
 
 		void Turn(float x, float y);
 

@@ -16,8 +16,8 @@ namespace Rev
 		Scene();
 		~Scene();
 
-		void update();
-		void fixedUpdate();
+		void update(float deltaTime);
+		void fixedUpdate(float fixedDeltaTime);
 		const void render();
 
 		const GameObject* addGameObject(std::unique_ptr<GameObject> gameObj);
