@@ -42,20 +42,18 @@ void CompTransform::MoveRight(int input, float speed)
 
 void CompTransform::Turn(float x, float y)
 {
-	AddPitchInput(x);
-	AddYawInput(y);
+	AddPitchInput(glm::radians(x));
+	AddYawInput(glm::radians(y));
 }
 
 void CompTransform::AddPitchInput(float input)
 {
-	m_Rotation.x += glm::radians(input);
-	m_Rotation.x = glm::mod(m_Rotation.x, glm::two_pi<float>());
+	SetRotationRad(m_Rotation.x + input, m_Rotation.y, m_Rotation.z);
 }
 
 void CompTransform::AddYawInput(float input)
 {
-	m_Rotation.y += glm::radians(input);
-	m_Rotation.y = glm::mod(m_Rotation.y, glm::two_pi<float>());
+	SetRotationRad(m_Rotation.x, m_Rotation.y + input, m_Rotation.z);
 }
 
 glm::vec3 CompTransform::GetForwardVector()
@@ -97,24 +95,34 @@ glm::vec3 CompTransform::GetPosition()
 	return m_Position;
 }
 
-void CompTransform::SetRotation(float x, float y, float z)
+void CompTransform::SetRotationRad(float x, float y, float z)
 {
-	SetRotation(glm::vec3(x, y, z));
+	SetRotationRad(glm::vec3(x, y, z));
 }
 
-void CompTransform::SetRotation(glm::vec3 dir)
+void CompTransform::SetRotationRad(glm::vec3 dir)
 {
-	glm::vec3 radDir = glm::radians(dir);
-	m_Position = radDir;
+	m_Rotation = dir;
+	m_Rotation = glm::mod(m_Rotation, glm::two_pi<float>());
 
 	if (m_GameObject->GetChildCount() > 0)
 	{
 		std::ranges::for_each(m_GameObject->GetChildren(),
-			[radDir](std::unique_ptr<GameObject>& child) -> void
+			[dir](std::unique_ptr<GameObject>& child) -> void
 			{
-				child->transform->SetRotation(child->transform->m_LocalRotation + radDir);
+				child->transform->SetRotationRad(child->transform->m_LocalRotation + dir);
 			});
 	}
+}
+
+void CompTransform::SetRotationDegree(float x, float y, float z)
+{
+	SetRotationDegree(glm::vec3(x, y, z));
+}
+
+void CompTransform::SetRotationDegree(glm::vec3 dir)
+{
+	SetRotationRad(glm::radians(dir));
 }
 
 glm::vec3 CompTransform::GetRotation()

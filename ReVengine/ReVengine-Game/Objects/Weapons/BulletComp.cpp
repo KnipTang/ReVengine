@@ -15,7 +15,7 @@ BulletComp::~BulletComp()
 void BulletComp::Init(glm::vec3 pos, glm::vec3 rotation)
 {
 	m_Transform->SetPosition(pos);
-	m_Transform->SetRotation(rotation);
+	m_Transform->SetRotationDegree(rotation);
 }
 
 void BulletComp::fixedUpdate([[maybe_unused]] float fixedDeltaTime)

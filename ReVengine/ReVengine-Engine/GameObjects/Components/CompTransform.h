@@ -17,8 +17,10 @@ namespace Rev
 		void SetPosition(float x, float y, float z);
 		void SetPosition(glm::vec3 pos);
 		glm::vec3 GetPosition();
-		void SetRotation(float x, float y, float z);
-		void SetRotation(glm::vec3 dir);
+		void SetRotationRad(float x, float y, float z);
+		void SetRotationRad(glm::vec3 dir);
+		void SetRotationDegree(float x, float y, float z);
+		void SetRotationDegree(glm::vec3 dir);
 		glm::vec3 GetRotation();
 
 		glm::mat4 GetModelMatrix();

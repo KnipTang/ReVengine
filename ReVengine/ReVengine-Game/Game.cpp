@@ -20,6 +20,7 @@ const std::string resourceFolder = "../game_resources";
 const std::string doomSprites = "/doomSprites";
 const std::string doomEnemies = "/Enemies";
 const std::string doomBullets = "/Bullets";
+const std::string doomWeapons = "/Weapons";
 
 std::unique_ptr<Rev::Scene> Scene1()
 {
@@ -33,17 +34,22 @@ std::unique_ptr<Rev::Scene> Scene1()
 	//Textures
 	const std::string mainBulletPath = resourceFolder + doomSprites + doomBullets + "/misla5.png";
 	const std::string secondBulletPath = resourceFolder + doomSprites + doomBullets + "/misla1.png";
+	const std::string weaponBulletPath = resourceFolder + doomSprites + doomWeapons + "/pisga0.png";
 	const std::string testDoomFile = resourceFolder + doomSprites + doomEnemies + "/bossb1.png";
 	Rev::Texture* testTexture = new Rev::Texture(testDoomFile);
 	Rev::Texture* bulletTexture = new Rev::Texture(mainBulletPath);
 	Rev::Texture* bullet2Texture = new Rev::Texture(secondBulletPath);
+	Rev::Texture* weaponTexture = new Rev::Texture(weaponBulletPath);
 
 	//Player
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	//Gun
-	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
+	Rev::GameObject* gun = new Rev::GameObject{};
+	gun->transform->SetPosition(0, 0, 1);
+	gun->addComponent<Rev::CompRender>(gun, gun->transform, cameraComp, weaponTexture, 0.3f, 0.3f);
+	player->AddChild(gun);
 
 	//Input Config
 	{
