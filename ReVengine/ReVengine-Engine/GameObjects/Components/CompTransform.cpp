@@ -104,16 +104,15 @@ void CompTransform::SetRotation(float x, float y, float z)
 
 void CompTransform::SetRotation(glm::vec3 dir)
 {
-	if (m_GameObject->GetParent() != nullptr)
-		m_Rotation = m_GameObject->GetParent()->transform->GetRotation() + glm::radians(dir);
-	else m_Position = glm::radians(dir);
+	glm::vec3 radDir = glm::radians(dir);
+	m_Position = radDir;
 
 	if (m_GameObject->GetChildCount() > 0)
 	{
 		std::ranges::for_each(m_GameObject->GetChildren(),
-			[this](std::unique_ptr<GameObject>& child) -> void
+			[radDir](std::unique_ptr<GameObject>& child) -> void
 			{
-				child->transform->SetPosition(child->transform->GetPosition() + GetPosition());
+				child->transform->SetRotation(child->transform->m_LocalRotation + radDir);
 			});
 	}
 }
