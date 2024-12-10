@@ -15,8 +15,8 @@ namespace Rev
 		Rev_Sound();
 		~Rev_Sound();
 
-		bool PlaySound(const std::string source);
-	
+		void PlaySound(const std::string name);
+		void LoadSound(const std::string& name, const std::string& source);
 	private:
 
 		//Point of pImpl is so you dont have to include the SoLoud in the header file, in the cpp file doesnt matter if you include it there

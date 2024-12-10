@@ -14,17 +14,19 @@ Rev_SoundImpl::~Rev_SoundImpl()
 
 }
 
-bool Rev_SoundImpl::PlaySound(const std::string source)
+void Rev_SoundImpl::LoadSound(const std::string& name, const std::string& source)
 {
 	if (!FileValid(source))
 	{
 		std::cerr << "source file not found";
-		return 0;
 	}
 	else
-		pSoLoud->PlaySound(source);
+		pSoLoud->LoadSound(name, source);
+}
 
-	return 1;
+void Rev_SoundImpl::PlaySound(const std::string name)
+{
+	return pSoLoud->PlaySound(name);
 }
 
 bool Rev_SoundImpl::FileValid(const std::string source)

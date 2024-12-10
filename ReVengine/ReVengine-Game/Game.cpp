@@ -28,7 +28,8 @@ std::unique_ptr<Rev::Scene> Scene1()
 	{
 		const std::string SoundPew = "/sound/pew_pew.wav";
 
-		Rev::Rev_CoreSystems::pRevSound->PlaySound(resourceFolder + SoundPew);
+		Rev::Rev_CoreSystems::pRevSound->LoadSound("pew", resourceFolder + SoundPew);
+		Rev::Rev_CoreSystems::pRevSound->PlaySound("pew");
 	}
 
 	//Textures

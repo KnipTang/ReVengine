@@ -14,8 +14,13 @@ Rev_Sound::~Rev_Sound()
 
 }
 
-bool Rev_Sound::PlaySound(const std::string source)
+void Rev_Sound::LoadSound(const std::string& name, const std::string& source)
 {
-	return pSoundImpl->PlaySound(source);
+	pSoundImpl->LoadSound(name, source);
+}
+
+void Rev_Sound::PlaySound(const std::string name)
+{
+	pSoundImpl->PlaySound(name);
 }
 
