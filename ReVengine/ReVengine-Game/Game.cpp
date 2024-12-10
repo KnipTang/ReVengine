@@ -36,11 +36,11 @@ std::unique_ptr<Rev::Scene> Scene1()
 	const std::string secondBulletPath = resourceFolder + doomSprites + doomBullets + "/misla1.png";
 	const std::string weaponBulletPath = resourceFolder + doomSprites + doomWeapons + "/pisga0.png";
 	const std::string testDoomFile = resourceFolder + doomSprites + doomEnemies + "/bossb1.png";
-	Rev::Texture* testTexture = new Rev::Texture(testDoomFile);
-	Rev::Texture* bulletTexture = new Rev::Texture(mainBulletPath);
-	Rev::Texture* bullet2Texture = new Rev::Texture(secondBulletPath);
-	Rev::Texture* weaponTexture = new Rev::Texture(weaponBulletPath);
-
+	Rev::Texture* testTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("TestTexture", testDoomFile);
+	Rev::Texture* bulletTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("bulletTexture", mainBulletPath);
+	Rev::Texture* bullet2Texture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("bullet2Texture", secondBulletPath);
+	Rev::Rev_CoreSystems::pResourceManager->LoadResource("weaponTexture", weaponBulletPath);
+	Rev::Texture* weaponTexture = Rev::Rev_CoreSystems::pResourceManager->GetResource("weaponTexture");
 	//Player
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);

@@ -22,6 +22,14 @@ void SceneManager::update(float deltaTime)
 	}
 }
 
+void SceneManager::lateUpdate(float deltaTime)
+{
+	for (auto&& scene : m_Scenes)
+	{
+		scene->lateUpdate(deltaTime);
+	}
+}
+
 void SceneManager::fixedUpdate(float fixedDeltaTime)
 {
 	for (auto&& scene : m_Scenes)

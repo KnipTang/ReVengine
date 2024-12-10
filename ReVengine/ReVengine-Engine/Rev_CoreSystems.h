@@ -4,6 +4,7 @@
 #include "Rendering/RenderWindow.h"
 #include "Sound/Rev_Sound.h"
 #include "Input/InputManager.h"
+#include "ResourceManagement/ResourceManager.h"
 
 namespace Rev
 {
@@ -18,6 +19,7 @@ namespace Rev
 		static inline std::unique_ptr<Rev::Rev_Sound> pRevSound = std::make_unique<Rev::Rev_Sound>();
 		static inline std::unique_ptr<RevDev::RenderWindow> pRevRender = std::make_unique<RevDev::RenderWindow>();
 		static inline std::unique_ptr<RevDev::InputManager> pInputManager = std::make_unique<RevDev::InputManager>();
+		static inline std::unique_ptr<RevDev::ResourceManager> pResourceManager = std::make_unique<RevDev::ResourceManager>();
 	private:
 	};
 }

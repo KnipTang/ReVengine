@@ -31,6 +31,18 @@ void GameObject::update(float deltaTime)
 	}
 }
 
+void GameObject::lateUpdate(float deltaTime)
+{
+	for (auto&& comp : m_Components)
+	{
+		comp->lateUpdate(deltaTime);
+	}
+	for (auto&& obj : m_Children)
+	{
+		obj->lateUpdate(deltaTime);
+	}
+}
+
 void GameObject::fixedUpdate(float fixeDeltaTime)
 {
 	for (auto&& comp : m_Components)

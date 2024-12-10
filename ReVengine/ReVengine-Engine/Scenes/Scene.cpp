@@ -22,6 +22,14 @@ void Scene::update(float deltaTime)
 	}
 }
 
+void Scene::lateUpdate(float deltaTime)
+{
+	for (auto&& obj : m_GameObjects)
+	{
+		if (obj->m_Enabled) obj->lateUpdate(deltaTime);
+	}
+}
+
 void Scene::fixedUpdate(float fixedDeltaTime)
 {
 	for (auto&& obj : m_GameObjects)

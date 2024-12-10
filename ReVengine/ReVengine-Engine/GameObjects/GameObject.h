@@ -23,6 +23,7 @@ namespace Rev
 		~GameObject();
 
 		void update(float deltaTime);
+		void lateUpdate(float deltaTime);
 		void fixedUpdate(float fixedDeltaTime);
 		const void render();
 

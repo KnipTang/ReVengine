@@ -49,6 +49,8 @@ void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRu
 
 		sceneMan.get()->update(deltaTime);
 
+		sceneMan.get()->lateUpdate(deltaTime);
+
 		sceneMan.get()->render();
 
 		quit = Rev_CoreSystems::pRevRender->UpdateWindow();

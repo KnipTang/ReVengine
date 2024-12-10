@@ -17,6 +17,7 @@ namespace Rev
 		~Scene();
 
 		void update(float deltaTime);
+		void lateUpdate(float deltaTime);
 		void fixedUpdate(float fixedDeltaTime);
 		const void render();
 

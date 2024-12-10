@@ -16,6 +16,7 @@ namespace Rev
 		virtual ~BaseComponent() = default;
 
 		virtual void update([[maybe_unused]] float deltaTime) {}; // = 0 means pure virtual // If function is not pure virtual it has the option of being overriten. Pure function have to be overritten
+		virtual void lateUpdate([[maybe_unused]] float deltaTime) {};
 		virtual void fixedUpdate([[maybe_unused]] float fixedDeltaTime) {};
 		virtual const void render() {};
 	protected:
