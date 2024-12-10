@@ -39,8 +39,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::Texture* testTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("TestTexture", testDoomFile);
 	Rev::Texture* bulletTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("bulletTexture", mainBulletPath);
 	Rev::Texture* bullet2Texture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("bullet2Texture", secondBulletPath);
-	Rev::Rev_CoreSystems::pResourceManager->LoadResource("weaponTexture", weaponBulletPath);
-	Rev::Texture* weaponTexture = Rev::Rev_CoreSystems::pResourceManager->GetResource("weaponTexture");
+	Rev::Texture* weaponTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("weaponTexture", weaponBulletPath);
 	//Player
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);

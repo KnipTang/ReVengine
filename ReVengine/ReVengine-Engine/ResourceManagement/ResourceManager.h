@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <string>
+#include <memory>
 
 namespace Rev
 {
@@ -15,11 +16,11 @@ namespace RevDev
 		ResourceManager();
 		~ResourceManager();
 
-		Rev::Texture* LoadResource(std::string name, std::string path);
+		Rev::Texture* LoadResource(const std::string& name, const std::string& path);
 
-		Rev::Texture* GetResource(std::string name);
+		Rev::Texture* GetResource(const std::string& name);
 
 	private:
-		std::unordered_map<std::string, Rev::Texture*> m_LoadedResources;
+		std::unordered_map<std::string, std::unique_ptr<Rev::Texture>> m_LoadedResources;
 	};
 }
