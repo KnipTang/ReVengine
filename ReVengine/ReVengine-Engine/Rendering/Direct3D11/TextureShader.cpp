@@ -62,10 +62,10 @@ void TextureShader::SetupImageSampler()
 {
 	D3D11_SAMPLER_DESC ImageSamplerDesc = {};
 
-	ImageSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	ImageSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	ImageSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	ImageSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	ImageSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	ImageSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	ImageSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	ImageSamplerDesc.MipLODBias = 0.0f;
 	ImageSamplerDesc.MaxAnisotropy = 1;
 	ImageSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;

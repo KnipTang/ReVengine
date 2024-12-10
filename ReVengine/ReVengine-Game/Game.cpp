@@ -92,9 +92,9 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::CompTransform* grandTransform = grandParent->transform;
 	inputComp->BindAction(SDL_SCANCODE_T, [grandTransform]() { grandTransform->MoveRight(1); });
 	Rev::CompTransform* parentTransform = parent->transform;
-	inputComp->BindAction(SDL_SCANCODE_G, [parentTransform]() { parentTransform->MoveRight(1); });
+	inputComp->BindAction(SDL_SCANCODE_G, [parentTransform]() { parentTransform->AddYawInput(0.1); });
 	Rev::CompTransform* childTransform = son->transform;
-	inputComp->BindAction(SDL_SCANCODE_B, [childTransform]() { childTransform->MoveRight(1); });
+	inputComp->BindAction(SDL_SCANCODE_B, [childTransform]() { childTransform->AddYawInput(0.1); });
 
 	//Scene add gameobects & return
 	{

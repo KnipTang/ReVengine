@@ -108,9 +108,19 @@ void CompTransform::SetRotationRad(glm::vec3 dir)
 	if (m_GameObject->GetChildCount() > 0)
 	{
 		std::ranges::for_each(m_GameObject->GetChildren(),
-			[dir](std::unique_ptr<GameObject>& child) -> void
+			[this](std::unique_ptr<GameObject>& child) -> void
 			{
-				child->transform->SetRotationRad(child->transform->m_LocalRotation + dir);
+				glm::mat4 parentModelMat = GetModelMatrix();
+
+				glm::vec3 parentWorldPos = glm::vec3(parentModelMat[3]);
+				glm::mat4 parentRotationMat = glm::mat4(glm::mat3(parentModelMat));
+
+				glm::vec4 localChildPos = glm::vec4(child->transform->m_LocalPosition, 1.0f);
+				glm::vec3 rotatedChildPos = glm::vec3(parentRotationMat * localChildPos);
+
+				child->transform->SetPosition(parentWorldPos + rotatedChildPos);
+
+				child->transform->SetRotationRad(child->transform->m_LocalRotation + m_Rotation);
 			});
 	}
 }
@@ -135,6 +145,6 @@ glm::mat4 CompTransform::GetModelMatrix()
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), m_Scale);
 	glm::mat4 rotationMat = glm::yawPitchRoll(m_Rotation.y, m_Rotation.x, m_Rotation.z);
 	glm::mat4 positionMat = glm::translate(glm::mat4(1.0f), m_Position);
-	m_ModelMatrix = scaleMat * rotationMat * positionMat;
+	m_ModelMatrix = positionMat * rotationMat * scaleMat;
 	return m_ModelMatrix;
 }
