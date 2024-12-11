@@ -16,7 +16,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::update(float deltaTime)
 {
-	for (auto&& scene : m_Scenes)
+	for (auto&& scene : m_ActiveScenes)
 	{
 		scene->update(deltaTime);
 	}
@@ -24,7 +24,7 @@ void SceneManager::update(float deltaTime)
 
 void SceneManager::lateUpdate(float deltaTime)
 {
-	for (auto&& scene : m_Scenes)
+	for (auto&& scene : m_ActiveScenes)
 	{
 		scene->lateUpdate(deltaTime);
 	}
@@ -32,7 +32,7 @@ void SceneManager::lateUpdate(float deltaTime)
 
 void SceneManager::fixedUpdate(float fixedDeltaTime)
 {
-	for (auto&& scene : m_Scenes)
+	for (auto&& scene : m_ActiveScenes)
 	{
 		scene->fixedUpdate(fixedDeltaTime);
 	}
@@ -40,7 +40,7 @@ void SceneManager::fixedUpdate(float fixedDeltaTime)
 
 const void SceneManager::render()
 {
-	for (auto&& scene : m_Scenes)
+	for (auto&& scene : m_ActiveScenes)
 	{
 		scene->render();
 	}
@@ -48,7 +48,14 @@ const void SceneManager::render()
 
 const Scene* SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
-	m_Scenes.emplace_back(std::move(scene));
+	scene->SetActive(true);
 
-	return m_Scenes.back().get();
+	m_AllScenes.emplace_back(std::move(scene));
+
+	return m_AllScenes.back().get();
+}
+
+std::vector<Scene*> SceneManager::GetActiveScenes()
+{
+	return m_ActiveScenes;
 }

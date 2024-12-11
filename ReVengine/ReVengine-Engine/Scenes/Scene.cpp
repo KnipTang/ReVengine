@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "GameObjects/GameObject.h"
+#include "Rev_CoreSystems.h"
 
 using namespace Rev;
 
@@ -54,4 +55,13 @@ const GameObject* Scene::addGameObject(std::unique_ptr<GameObject> gameObj)
 	m_GameObjects.emplace_back(std::move(gameObj));
 
 	return m_GameObjects.back().get();
+}
+
+void Scene::SetActive(bool active)
+{
+	m_Active = active;
+	if (active)
+		Rev::Rev_CoreSystems::pSceneManager->AddActiveScene(this);
+	else
+		Rev::Rev_CoreSystems::pSceneManager->RemoveActiveScene(this);
 }

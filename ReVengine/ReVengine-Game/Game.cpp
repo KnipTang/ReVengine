@@ -54,6 +54,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	//Gun
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
+	gun->transform->SetPosition(0, -0.5f, 0);
 	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, weaponTexture, 0.3f, 0.3f);
 
 	//Input Config
@@ -114,13 +115,12 @@ std::unique_ptr<Rev::Scene> Scene1()
 	}
 }
 
-std::unique_ptr<Rev::SceneManager> Load()
+Rev::SceneManager* Load()
 {
 	std::unique_ptr<Rev::Scene> scene(Scene1());
 
-	std::unique_ptr<Rev::SceneManager> sceneMan = std::make_unique<Rev::SceneManager>();
-	sceneMan->addScene(std::move(scene));
-	return std::move(sceneMan);
+	Rev::Rev_CoreSystems::pSceneManager->addScene(std::move(scene));
+	return Rev::Rev_CoreSystems::pSceneManager.get();
 }
 
 int main(int argc, char* argv[])

@@ -22,9 +22,9 @@ ReVengine::~ReVengine()
 
 }
 
-void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRun)
+void ReVengine::Run(const std::function<SceneManager*()>& GameRun)
 {
-	std::unique_ptr<SceneManager> sceneMan = std::move(GameRun());
+	SceneManager* sceneMan = GameRun();
 
 	auto lastTime = std::chrono::high_resolution_clock::now();
 	float lag = 0.0f;
@@ -43,15 +43,15 @@ void ReVengine::Run(const std::function<std::unique_ptr<SceneManager>()>& GameRu
 
 		while (lag >= fixedTimeStep)
 		{
-			sceneMan.get()->fixedUpdate(fixedTimeStep);
+			sceneMan->fixedUpdate(fixedTimeStep);
 			lag -= fixedTimeStep;
 		}
 
-		sceneMan.get()->update(deltaTime);
+		sceneMan->update(deltaTime);
 
-		sceneMan.get()->lateUpdate(deltaTime);
+		sceneMan->lateUpdate(deltaTime);
 
-		sceneMan.get()->render();
+		sceneMan->render();
 
 		quit = Rev_CoreSystems::pRevRender->UpdateWindow();
 

@@ -29,7 +29,7 @@ namespace Rev
 		template <sceneConcept T>
 		T* getScene()
 		{
-			for (auto& scene : m_Scenes)
+			for (auto& scene : m_AllScenes)
 			{
 				if (auto derivedComp = dynamic_cast<T*>(scene.get()))
 					return derivedComp;
@@ -41,17 +41,42 @@ namespace Rev
 		template <sceneConcept T>
 		void removeScene()
 		{
-			m_Scenes.erase(
-				std::remove_if(m_Scenes.begin(), m_Scenes.end(),
+			m_AllScenes.erase(
+				std::remove_if(m_AllScenes.begin(), m_AllScenes.end(),
 					[](const std::unique_ptr<Scene>& scene) {
 						return dynamic_cast<T*>(scene.get()) != nullptr;
 					}),
-				m_Scenes.end());
+				m_AllScenes.end());
 		}
 
+		void AddActiveScene(Scene* scene)
+		{
+			if (!IsSceneActive(scene))
+				m_ActiveScenes.emplace_back(scene);
+		}
+		void RemoveActiveScene(Scene* scene)
+		{
+			if (IsSceneActive(scene))
+				m_ActiveScenes.erase(std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), scene));
+		}
+		std::vector<Scene*> GetActiveScenes();
+
 		const int GetID() { return sceneManagerID; }
+
 	private:
-		std::vector<std::unique_ptr<Scene>> m_Scenes;
+		bool IsSceneActive(Scene* scene)
+		{
+			for (const auto& actScene : m_ActiveScenes)
+			{
+				if (actScene == scene)
+					return true;
+			}
+			return false;
+		}
+	private:
+		std::vector<std::unique_ptr<Scene>> m_AllScenes;
+		std::vector<Scene*> m_ActiveScenes;
+
 		static int sceneManagerIDCounter;
 		int sceneManagerID;
 	};

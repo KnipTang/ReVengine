@@ -21,7 +21,7 @@ namespace Rev
 		ReVengine(int windowWidth, int windowHeight, float nearZ = 1.f, float farZ = 1000);
 		~ReVengine();
 
-		void Run(const std::function<std::unique_ptr<SceneManager>()>& GameRun);
+		void Run(const std::function<SceneManager* ()>& GameRun);
 	private:
 		std::unique_ptr<RevDev::RenderWindow> pRenderWindow;
 

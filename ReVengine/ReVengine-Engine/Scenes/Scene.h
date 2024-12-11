@@ -70,8 +70,14 @@ namespace Rev
 		}
 
 		const int GetID() { return sceneID; }
+		
+		void SetActive(bool active);
+		bool IsActive() { return m_Active; }
 	private:
 		std::vector<std::unique_ptr<GameObject>> m_GameObjects;
+
+		bool m_Active;
+
 		static int sceneIDCounter;
 		int sceneID;
 	};
