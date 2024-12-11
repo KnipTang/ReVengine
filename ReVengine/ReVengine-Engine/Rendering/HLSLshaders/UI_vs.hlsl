@@ -1,23 +1,23 @@
-cbuffer MatrixBuffer
+cbuffer MatrixBuffer : register(b0)
 {
     matrix orthoMatrix;
 };
 
-struct VertexInputType
+struct vs_input
 {
     float4 position : POSITION;
     float2 uv : UV;
 };
 
-struct PixelInputType
+struct vs_output
 {
     float4 position : SV_POSITION;
     float2 uv : UV;
 };
 
-PixelInputType main(VertexInputType input)
+vs_output vs_main(vs_input input)
 {
-    PixelInputType output;
+    vs_output output;
     output.position = mul(input.position, orthoMatrix);
     output.uv = input.uv;
     return output;

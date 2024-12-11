@@ -16,9 +16,12 @@ namespace Rev
 	{
 	public:
 		BaseShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-		~BaseShader() = default;
+		virtual ~BaseShader() = default;
+
+		virtual void SetShader(const DirectX::XMMATRIX modelMatrix, const DirectX::XMMATRIX viewMatrix, const DirectX::XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture) = 0;
 
 		std::string GetVertexByteCode() { return m_VertexBytecode; }
+		void SetShaderStages();
 
 	protected:
 		virtual void SetupInputLayer(); //Optionally overwritten
@@ -32,6 +35,8 @@ namespace Rev
 
 		wrl::ComPtr<ID3D11VertexShader> m_VertexShader = NULL;
 		wrl::ComPtr<ID3D11PixelShader> m_PixelShader = NULL;
+
+		wrl::ComPtr<ID3D11InputLayout> m_InputLayer;
 
 		std::string m_VertexBytecode;
 	private:

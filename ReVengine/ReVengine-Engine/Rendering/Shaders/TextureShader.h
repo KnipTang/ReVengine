@@ -14,21 +14,22 @@ namespace Rev {
 
 namespace Rev
 {
-	struct MatrixBufferType
-	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
-	};
-
 	class TextureShader : public Rev::BaseShader
 	{
+	private:
+		struct MatrixBufferType
+		{
+			DirectX::XMMATRIX world;
+			DirectX::XMMATRIX view;
+			DirectX::XMMATRIX projection;
+		};
+
 	public:
 		TextureShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 		~TextureShader();
 
 		void InitShader();
-		void SetShader(const DirectX::XMMATRIX modelMatrix, const DirectX::XMMATRIX viewMatrix, const DirectX::XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture); //Every frame
+		void SetShader(const DirectX::XMMATRIX modelMatrix, const DirectX::XMMATRIX viewMatrix, const DirectX::XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture) override; //Every frame
 
 		std::string GetVertexByteCode() { return m_VertexBytecode; }
 		wrl::ComPtr<ID3D11Buffer> GetMatrixBuffer() { return m_MatrixBuffer; }

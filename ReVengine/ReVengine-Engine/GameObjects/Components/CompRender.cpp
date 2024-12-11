@@ -5,12 +5,11 @@
 #include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Texture.h"
 #include "glm/vec3.hpp"
-#include <iostream>
 #include "DirectXMath.h"
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, TextureShader* shader, Texture* texture, float widthTexture, float heightTexture) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, BaseShader* shader, Texture* texture, float widthTexture, float heightTexture) :
 	BaseComponent(gameObj),
 	m_TransformComp{ transform },
 	m_CameraComp{ camera },
@@ -45,5 +44,6 @@ const void CompRender::render()
 	DirectX::XMMATRIX modelMatrix = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(&m_TransformComp->GetModelMatrix()));
 	m_Shader->SetShader(modelMatrix, m_CameraComp->GetCamera()->GetViewMatrix(), Rev::Rev_CoreSystems::pRevRender->getProjectionMatrix(),
 		m_Texture->GetShaderResourceView());
+	m_Shader->SetShaderStages();
 	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId);
 }

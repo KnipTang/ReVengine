@@ -1,3 +1,10 @@
+cbuffer MatrixBuffer : register(b0)
+{
+    matrix worldMatrix;
+    matrix viewMatrix;
+    matrix projectionMatrix;
+};
+
 struct vs_input
 {
     float4 position : POSITION;
@@ -8,13 +15,6 @@ struct vs_output
 {
     float4 position : SV_POSITION;
     float2 uv : UV;
-};
-
-cbuffer MatrixBuffer : register(b0)
-{
-    matrix worldMatrix;
-    matrix viewMatrix;
-    matrix projectionMatrix;
 };
 
 vs_output vs_main(vs_input input)

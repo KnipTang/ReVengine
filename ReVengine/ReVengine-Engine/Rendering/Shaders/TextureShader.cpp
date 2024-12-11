@@ -64,7 +64,7 @@ void TextureShader::SetShader(const DirectX::XMMATRIX modelMatrix, const DirectX
 
 	D3D11_MAPPED_SUBRESOURCE msr;
 	m_DeviceContext->Map(m_MatrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-	Rev::MatrixBufferType* data = (Rev::MatrixBufferType*)msr.pData;
+	MatrixBufferType* data = (MatrixBufferType*)msr.pData;
 	data->world = transWorld;
 	data->view = transView;
 	data->projection = transProj;

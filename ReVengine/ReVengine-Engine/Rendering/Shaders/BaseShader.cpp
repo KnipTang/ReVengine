@@ -11,15 +11,20 @@ BaseShader::BaseShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContex
 
 void Rev::BaseShader::SetupInputLayer()
 {
-	wrl::ComPtr<ID3D11InputLayout> inputLayer;
 	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	m_Device->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &inputLayer);
+	m_Device->CreateInputLayout(inputElement_DESC, std::size(inputElement_DESC), m_VertexBytecode.c_str(), m_VertexBytecode.size(), &m_InputLayer);
+}
 
-	m_DeviceContext->IASetInputLayout(inputLayer.Get());
+void BaseShader::SetShaderStages()
+{
+	m_DeviceContext->IASetInputLayout(m_InputLayer.Get());
+
+	m_DeviceContext->VSSetShader(m_VertexShader.Get(), 0, 0);
+	m_DeviceContext->PSSetShader(m_PixelShader.Get(), 0, 0);
 }
 
 void BaseShader::LoadShaders(std::string vertexFile, std::string pixelFile)
@@ -54,8 +59,6 @@ void BaseShader::LoadShaders(std::string vertexFile, std::string pixelFile)
 	{
 		printf("Failed creating pixel shader %08X\n", hr);
 	}
-
-	m_DeviceContext->PSSetShader(m_PixelShader.Get(), 0, 0);
 }
 HRESULT BaseShader::CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob)
 {
