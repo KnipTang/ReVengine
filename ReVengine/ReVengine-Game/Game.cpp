@@ -15,6 +15,7 @@
 #include <SDL_scancode.h>
 #include <iostream>
 #include "Objects/Weapons/BulletComp.h"
+#include "Rendering/Shaders/TextureShader.h"
 
 const std::string resourceFolder = "../game_resources";
 const std::string doomSprites = "/doomSprites";
@@ -24,12 +25,14 @@ const std::string doomWeapons = "/Weapons";
 
 std::unique_ptr<Rev::Scene> Scene1()
 {
+	RevDev::RenderWindow* renderer = Rev::Rev_CoreSystems::pRevRender.get();
+
 	//Sound
 	{
 		const std::string SoundPew = "/sound/pew_pew.wav";
 
 		Rev::Rev_CoreSystems::pRevSound->LoadSound("pew", resourceFolder + SoundPew);
-		Rev::Rev_CoreSystems::pRevSound->PlaySound("pew");
+		Rev::Rev_CoreSystems::pRevSound->PlayRevSound("pew");
 	}
 
 	//Textures
@@ -37,10 +40,13 @@ std::unique_ptr<Rev::Scene> Scene1()
 	const std::string secondBulletPath = resourceFolder + doomSprites + doomBullets + "/misla1.png";
 	const std::string weaponBulletPath = resourceFolder + doomSprites + doomWeapons + "/pisga0.png";
 	const std::string testDoomFile = resourceFolder + doomSprites + doomEnemies + "/bossb1.png";
-	Rev::Texture* testTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("TestTexture", testDoomFile);
-	Rev::Texture* bulletTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("bulletTexture", mainBulletPath);
-	Rev::Texture* bullet2Texture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("bullet2Texture", secondBulletPath);
-	Rev::Texture* weaponTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource("weaponTexture", weaponBulletPath);
+	Rev::Texture* testTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(),  "TestTexture", testDoomFile);
+	Rev::Texture* bulletTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(), "bulletTexture", mainBulletPath);
+	Rev::Texture* bullet2Texture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(), "bullet2Texture", secondBulletPath);
+	Rev::Texture* weaponTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(), "weaponTexture", weaponBulletPath);
+
+	Rev::TextureShader* textureShader = new Rev::TextureShader{ renderer->GetDevice(), renderer->GetDeviceContext()};
+
 	//Player
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
@@ -48,7 +54,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	//Gun
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
 	gun->transform->SetPosition(0, 0, 1);
-	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, weaponTexture, 0.3f, 0.3f);
+	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader, weaponTexture, 0.3f, 0.3f);
 
 	//Input Config
 	{
@@ -66,25 +72,25 @@ std::unique_ptr<Rev::Scene> Scene1()
 	//Enemies
 	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
 	enemy1->transform->SetPosition(0, 0, 5);
-	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, testTexture);
+	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture);
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
 	enemy2->transform->SetPosition(1, 0, 5);
-	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, testTexture);
+	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture);
 
 	//Bullet
 	std::unique_ptr<Rev::GameObject> bullet = std::make_unique<Rev::GameObject>();
-	bullet->addComponent<Rev::CompRender>(bullet.get(), bullet->transform, cameraComp, bulletTexture);
+	bullet->addComponent<Rev::CompRender>(bullet.get(), bullet->transform, cameraComp, textureShader, bulletTexture);
 	bullet->addComponent<BulletComp>(bullet.get(), bullet->transform);
 
 	std::unique_ptr<Rev::GameObject> grandParent = std::make_unique<Rev::GameObject>();
 	grandParent->transform->SetPosition(3, 0, 0);
-	grandParent->addComponent<Rev::CompRender>(grandParent.get(), grandParent->transform, cameraComp, bullet2Texture);
+	grandParent->addComponent<Rev::CompRender>(grandParent.get(), grandParent->transform, cameraComp, textureShader, bullet2Texture);
 	Rev::GameObject* parent = new Rev::GameObject;
 	parent->transform->SetPosition(4, 0, 0);
-	parent->addComponent<Rev::CompRender>(parent, parent->transform, cameraComp, bulletTexture);
+	parent->addComponent<Rev::CompRender>(parent, parent->transform, cameraComp, textureShader, bulletTexture);
 	Rev::GameObject* son = new Rev::GameObject;
 	son->transform->SetPosition(8, 1, 0);
-	son->addComponent<Rev::CompRender>(son, son->transform, cameraComp, bulletTexture);
+	son->addComponent<Rev::CompRender>(son, son->transform, cameraComp, textureShader, bulletTexture);
 	grandParent->AddChild(parent);
 	parent->AddChild(son);
 

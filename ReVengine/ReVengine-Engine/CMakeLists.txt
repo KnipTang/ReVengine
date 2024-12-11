@@ -3,7 +3,7 @@
     "Rev_CoreSystems.cpp"
     "Rendering/RenderWindow.cpp"
     "Rendering/Texture.cpp"
-    "Rendering/Direct3D11/Mesh.cpp"
+    "Rendering/Direct3D11/Meshes/Mesh.cpp"
     "Rendering/Shaders/BaseShader.cpp"
     "Rendering/Shaders/TextureShader.cpp"
     "Rendering/Shaders/TextureShader2D.cpp" 

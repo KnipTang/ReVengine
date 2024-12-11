@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include <d3d11.h>
 
 namespace Rev
 {
@@ -17,7 +18,7 @@ namespace RevDev
 		ResourceManager();
 		~ResourceManager();
 
-		Rev::Texture* LoadResource(const std::string& name, const std::string& path);
+		Rev::Texture* LoadResource(ID3D11Device* pDevice, const std::string& name, const std::string& path);
 
 		Rev::Texture* GetResource(const std::string& name);
 

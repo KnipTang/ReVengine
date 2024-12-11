@@ -15,7 +15,7 @@ namespace Rev
 		Rev_Sound();
 		~Rev_Sound();
 
-		void PlaySound(const std::string name);
+		void PlayRevSound(const std::string name);
 		void LoadSound(const std::string& name, const std::string& source);
 	private:
 

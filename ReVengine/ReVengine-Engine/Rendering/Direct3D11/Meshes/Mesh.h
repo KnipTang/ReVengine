@@ -21,7 +21,7 @@ namespace RevDev
 	class Mesh
 	{
 	public:
-		Mesh(ID3D11Device* pDevice, Rev::TextureShader* shader);
+		Mesh(ID3D11Device* pDevice);
 		~Mesh();
 
 		void setupVertexBuffer(const std::vector<Vertex> vertices);
@@ -31,8 +31,6 @@ namespace RevDev
 		wrl::ComPtr<ID3D11Buffer> GetVertexBuffer() { return m_VertexBuffer; }
 		wrl::ComPtr<ID3D11Buffer> GetIndexBuffer() { return m_IndexBuffer; }
 		const UINT GetIndiceCount() { return m_IndiceCount; }
-
-		Rev::TextureShader* GetShader() { return m_Shader; }
 	private:
 
 	private:
@@ -41,8 +39,6 @@ namespace RevDev
 		wrl::ComPtr<ID3D11Buffer> m_VertexBuffer;
 		wrl::ComPtr<ID3D11Buffer> m_IndexBuffer;
 		UINT m_IndiceCount;
-
-		Rev::TextureShader* m_Shader;
 
 		static uint32_t meshIDCounter;
 		uint32_t meshID;

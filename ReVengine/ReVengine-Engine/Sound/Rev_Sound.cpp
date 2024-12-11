@@ -19,7 +19,7 @@ void Rev_Sound::LoadSound(const std::string& name, const std::string& source)
 	pSoundImpl->LoadSound(name, source);
 }
 
-void Rev_Sound::PlaySound(const std::string name)
+void Rev_Sound::PlayRevSound(const std::string name)
 {
 	pSoundImpl->PlaySound(name);
 }

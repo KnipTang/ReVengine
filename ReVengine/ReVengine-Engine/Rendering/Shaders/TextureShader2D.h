@@ -41,7 +41,7 @@ namespace Rev
 
 		wrl::ComPtr<ID3D11Buffer> m_MatrixBuffer;
 
-		wrl::ComPtr<ID3D11SamplerState> m_ImageSamplerState;
+		wrl::ComPtr<ID3D11SamplerState> m_SamplerState;
 		wrl::ComPtr<ID3D11Texture2D> m_ImageTexture;
 		wrl::ComPtr<ID3D11ShaderResourceView> m_ImageShaderResourceView;
 

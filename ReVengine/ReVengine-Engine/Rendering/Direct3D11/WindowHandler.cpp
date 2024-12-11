@@ -7,7 +7,7 @@
 #include "fstream"
 #include "DirectXMath.h"
 #include "Utils/Vertex.h"
-#include "Rendering/Direct3D11/Mesh.h"
+#include "Rendering/Direct3D11/Meshes/Mesh.h"
 #include "Rendering/Texture.h"
 #include <d3dcompiler.h>
 #include "Rendering/Shaders/TextureShader.h"

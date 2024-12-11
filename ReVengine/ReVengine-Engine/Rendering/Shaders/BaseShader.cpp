@@ -11,7 +11,6 @@ BaseShader::BaseShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContex
 
 void Rev::BaseShader::SetupInputLayer()
 {
-	//Explain layout of vertices
 	wrl::ComPtr<ID3D11InputLayout> inputLayer;
 	const D3D11_INPUT_ELEMENT_DESC inputElement_DESC[] =
 	{

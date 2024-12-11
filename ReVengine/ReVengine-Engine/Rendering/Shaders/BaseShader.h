@@ -21,7 +21,7 @@ namespace Rev
 		std::string GetVertexByteCode() { return m_VertexBytecode; }
 
 	protected:
-		void SetupInputLayer();
+		virtual void SetupInputLayer(); //Optionally overwritten
 
 		void LoadShaders(std::string vertexFile, std::string pixelFile);
 		HRESULT CompileShader(LPCWSTR srcFile, LPCSTR entryPoint, LPCSTR profile, ID3DBlob** blob);

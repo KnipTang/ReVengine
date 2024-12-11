@@ -14,7 +14,7 @@ ResourceManager::~ResourceManager()
 
 }
 
-Rev::Texture* ResourceManager::LoadResource(const std::string& name, const std::string& path)
+Rev::Texture* ResourceManager::LoadResource(ID3D11Device* pDevice, const std::string& name, const std::string& path)
 {
 	auto it = m_LoadedResources.find(name);
 	if (it != m_LoadedResources.end()) //Check if inside of loadedResources
@@ -23,7 +23,7 @@ Rev::Texture* ResourceManager::LoadResource(const std::string& name, const std::
 	}
 	else
 	{
-		Rev::Texture* newTexture = new Rev::Texture{ path };
+		Rev::Texture* newTexture = new Rev::Texture{ pDevice, path };
 		auto newResource = m_LoadedResources.emplace(name, newTexture);
 		return newResource.first->second.get();
 	}

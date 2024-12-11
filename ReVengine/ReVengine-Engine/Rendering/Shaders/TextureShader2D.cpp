@@ -29,7 +29,7 @@ void TextureShader2D::InitShader()
 void TextureShader2D::SetShader()
 {
 	m_DeviceContext->PSSetShaderResources(0, 1, m_ImageShaderResourceView.GetAddressOf());
-	m_DeviceContext->PSSetSamplers(0, 1, m_ImageSamplerState.GetAddressOf());
+	m_DeviceContext->PSSetSamplers(0, 1, m_SamplerState.GetAddressOf());
 }
 
 void TextureShader2D::SetupShaderBuffers()
@@ -62,7 +62,7 @@ void TextureShader2D::SetupImageSampler()
 	ImageSamplerDesc.MaxLOD = FLT_MAX;
 
 	HRESULT result = m_Device->CreateSamplerState(&ImageSamplerDesc,
-		&m_ImageSamplerState);
+		&m_SamplerState);
 
 	assert(SUCCEEDED(result));
 }

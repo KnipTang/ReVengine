@@ -140,7 +140,7 @@ glm::vec3 CompTransform::GetRotation()
 	return m_Rotation;
 }
 
-glm::mat4 CompTransform::GetModelMatrix()
+glm::mat4& CompTransform::GetModelMatrix()
 {
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), m_Scale);
 	glm::mat4 rotationMat = glm::yawPitchRoll(m_Rotation.y, m_Rotation.x, m_Rotation.z);

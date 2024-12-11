@@ -3,9 +3,8 @@
 
 using namespace Rev;
 
-TextureShader::TextureShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, Rev::Texture* texture) :
-	BaseShader(pDevice, pDeviceContext),
-	m_Texture{ texture }
+TextureShader::TextureShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext) :
+	BaseShader(pDevice, pDeviceContext)
 {
 	LoadShaders(m_VertexFile, m_PixelFile);
 	InitShader();
@@ -20,15 +19,7 @@ void TextureShader::InitShader()
 {
 	SetupInputLayer();
 	SetupShaderBuffers();
-	SetupImageSampler();
-	SetupTexture(m_Texture);
-	SetupShaderResourceView();
-}
-
-void TextureShader::SetShader()
-{
-	m_DeviceContext->PSSetShaderResources(0, 1, m_ImageShaderResourceView.GetAddressOf());
-	m_DeviceContext->PSSetSamplers(0, 1, m_ImageSamplerState.GetAddressOf());
+	SetupSampler();
 }
 
 void TextureShader::SetupShaderBuffers()
@@ -42,65 +33,45 @@ void TextureShader::SetupShaderBuffers()
 	matrixBuffer_DESC.StructureByteStride = 0;
 	m_Device->CreateBuffer(&matrixBuffer_DESC, NULL, &m_MatrixBuffer);
 }
-void TextureShader::SetupImageSampler()
+void TextureShader::SetupSampler()
 {
-	D3D11_SAMPLER_DESC ImageSamplerDesc = {};
+	D3D11_SAMPLER_DESC samplerDesc = {};
 
-	ImageSamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	ImageSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	ImageSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	ImageSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	ImageSamplerDesc.MipLODBias = 0.0f;
-	ImageSamplerDesc.MaxAnisotropy = 1;
-	ImageSamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	ImageSamplerDesc.BorderColor[0] = 1.0f;
-	ImageSamplerDesc.BorderColor[1] = 1.0f;
-	ImageSamplerDesc.BorderColor[2] = 1.0f;
-	ImageSamplerDesc.BorderColor[3] = 1.0f;
-	ImageSamplerDesc.MinLOD = -FLT_MAX;
-	ImageSamplerDesc.MaxLOD = FLT_MAX;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	samplerDesc.BorderColor[0] = 1.0f;
+	samplerDesc.BorderColor[1] = 1.0f;
+	samplerDesc.BorderColor[2] = 1.0f;
+	samplerDesc.BorderColor[3] = 1.0f;
+	samplerDesc.MinLOD = -FLT_MAX;
+	samplerDesc.MaxLOD = FLT_MAX;
 
-	HRESULT result = m_Device->CreateSamplerState(&ImageSamplerDesc,
-		&m_ImageSamplerState);
+	HRESULT result = m_Device->CreateSamplerState(&samplerDesc, &m_SamplerState);
 
 	assert(SUCCEEDED(result));
 }
-void TextureShader::SetupTexture(Rev::Texture* texture)
+
+void TextureShader::SetShader(const DirectX::XMMATRIX modelMatrix, const DirectX::XMMATRIX viewMatrix, const DirectX::XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
 {
-	auto&& data = texture->GetTextureDate();
-	auto&& imageData = texture->GetImageData();
+	DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(modelMatrix);
+	DirectX::XMMATRIX transView = DirectX::XMMatrixTranspose(viewMatrix);
+	DirectX::XMMATRIX transProj = DirectX::XMMatrixTranspose(projectionMatrix);
 
-	int ImagePitch = data->ImageWidth * 4;
+	D3D11_MAPPED_SUBRESOURCE msr;
+	m_DeviceContext->Map(m_MatrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
+	Rev::MatrixBufferType* data = (Rev::MatrixBufferType*)msr.pData;
+	data->world = transWorld;
+	data->view = transView;
+	data->projection = transProj;
+	m_DeviceContext->Unmap(m_MatrixBuffer.Get(), 0);
 
-	D3D11_TEXTURE2D_DESC ImageTextureDesc = {};
+	m_DeviceContext->VSSetConstantBuffers(0, 1, m_MatrixBuffer.GetAddressOf());
 
-	ImageTextureDesc.Width = (UINT)data->ImageWidth;
-	ImageTextureDesc.Height = (UINT)data->ImageHeight;
-	ImageTextureDesc.MipLevels = 1;
-	ImageTextureDesc.ArraySize = 1;
-	ImageTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	ImageTextureDesc.SampleDesc.Count = 1;
-	ImageTextureDesc.SampleDesc.Quality = 0;
-	ImageTextureDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	ImageTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-	D3D11_SUBRESOURCE_DATA ImageSubresourceData = {};
-
-	ImageSubresourceData.pSysMem = imageData;
-	ImageSubresourceData.SysMemPitch = ImagePitch;
-
-	HRESULT result = m_Device->CreateTexture2D(&ImageTextureDesc,
-		&ImageSubresourceData,
-		&m_ImageTexture
-	);
-
-	assert(SUCCEEDED(result));
-}
-void TextureShader::SetupShaderResourceView()
-{
-	HRESULT result = m_Device->CreateShaderResourceView(m_ImageTexture.Get(),
-		nullptr,
-		&m_ImageShaderResourceView
-	);
-	assert(SUCCEEDED(result));
+	m_DeviceContext->PSSetShaderResources(0, 1, &texture);
+	m_DeviceContext->PSSetSamplers(0, 1, m_SamplerState.GetAddressOf());
 }

@@ -2,16 +2,20 @@
 #include "Rev_CoreSystems.h"
 #include "CompTransform.h"
 #include "CompCamera.h"
+#include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Texture.h"
 #include "glm/vec3.hpp"
 #include <iostream>
+#include "DirectXMath.h"
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, Texture* texture, float widthTexture, float heightTexture) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, TextureShader* shader, Texture* texture, float widthTexture, float heightTexture) :
 	BaseComponent(gameObj),
 	m_TransformComp{ transform },
 	m_CameraComp{ camera },
+	m_Shader{ shader },
+	m_Texture{ texture },
 	m_MeshId{}
 {
 	float depthZ = m_TransformComp->GetPosition().z;
@@ -33,10 +37,13 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 		2 ,1, 3,
 	};
 
-	m_MeshId = Rev_CoreSystems::pRevRender->AddMesh(m_Vertices, m_Indices, texture);
+	m_MeshId = Rev_CoreSystems::pRevRender->AddMesh(m_Vertices, m_Indices);
 }
 
 const void CompRender::render()
 {
-	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId, m_TransformComp->GetModelMatrix(), m_CameraComp->GetCamera()->GetViewMatrix());
+	DirectX::XMMATRIX modelMatrix = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(&m_TransformComp->GetModelMatrix()));
+	m_Shader->SetShader(modelMatrix, m_CameraComp->GetCamera()->GetViewMatrix(), Rev::Rev_CoreSystems::pRevRender->getProjectionMatrix(),
+		m_Texture->GetShaderResourceView());
+	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId);
 }

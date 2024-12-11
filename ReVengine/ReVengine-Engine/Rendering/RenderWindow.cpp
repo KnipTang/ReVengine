@@ -7,7 +7,7 @@
 #include "Utils/Vertex.h"
 #include <algorithm>
 #include "Texture.h"
-#include "Rendering/Direct3D11/Mesh.h"
+#include "Rendering/Direct3D11/Meshes/Mesh.h"
 #include "Rendering/Shaders/TextureShader.h"
 #include <Rev_CoreSystems.h>
 
@@ -69,11 +69,9 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, fl
     }
 }
 
-uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
+uint32_t RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
 {
-    Rev::TextureShader* textureShader = new Rev::TextureShader{ m_CreatorGod->GetDevice(), m_CreatorGod->GetDeviceContext(), texture };
-
-    m_Meshes.emplace_back(std::make_unique<Mesh>(m_CreatorGod->GetDevice(), textureShader));
+    m_Meshes.emplace_back(std::make_unique<Mesh>(m_CreatorGod->GetDevice()));
 
     m_Meshes.back()->setupVertexBuffer(vertices);
     m_Meshes.back()->setupIndexBuffer(indices);
@@ -81,35 +79,14 @@ uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const
     return m_Meshes.back()->GetID();
 }
 
-void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const glm::mat4 modelMatrix, const DirectX::XMMATRIX viewMatrix)
+void RenderWindow::DrawMesh(uint32_t meshId)
 {
-    DirectX::XMMATRIX modelMatrixDirectX = DirectX::XMLoadFloat4x4(reinterpret_cast<const DirectX::XMFLOAT4X4*>(&modelMatrix));
-    DirectX::XMMATRIX transWorld = DirectX::XMMatrixTranspose(modelMatrixDirectX);
-    DirectX::XMMATRIX transView = DirectX::XMMatrixTranspose(viewMatrix);
-    DirectX::XMMATRIX transProj = DirectX::XMMatrixTranspose(m_ProjectionMatrix);
-
     ID3D11DeviceContext* pDeviceContext = m_CreatorGod->GetDeviceContext();
 
-    //Vertex buffer is a buffer that holds the vertex data
     auto&& mesh = m_Meshes.at(meshId);
-    auto&& textureShader = mesh->GetShader();
-    wrl::ComPtr<ID3D11Buffer> matrixBuffer = textureShader->GetMatrixBuffer();
 
     pDeviceContext->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &m_VertexStride, &m_VertexOffset);
     pDeviceContext->IASetIndexBuffer(mesh->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
-
-    D3D11_MAPPED_SUBRESOURCE msr;
-    pDeviceContext->Map(matrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-    Rev::MatrixBufferType* data = (Rev::MatrixBufferType*)msr.pData;
-    data->world = transWorld;
-    data->view = transView;
-    data->projection = transProj;
-   // memcpy(msr.pData, data, sizeof(DirectX::XMMATRIX));
-    pDeviceContext->Unmap(matrixBuffer.Get(), 0);
-
-    pDeviceContext->VSSetConstantBuffers(0, 1, matrixBuffer.GetAddressOf());
-
-    textureShader->SetShader();
 
     pDeviceContext->DrawIndexed(mesh->GetIndiceCount(), 0, 0);
 }
@@ -145,11 +122,25 @@ bool RenderWindow::UpdateWindow()
     return false;
 }
 
-void RevDev::RenderWindow::RipWindow()
+void RenderWindow::RipWindow()
 {
     //Destroy window
     SDL_DestroyWindow(m_Window.get());
 
     //Quit SDL subsystems
     SDL_Quit();
+}
+
+const DirectX::XMMATRIX RenderWindow::getProjectionMatrix()
+{
+    return m_ProjectionMatrix;
+}
+
+ID3D11Device* RenderWindow::GetDevice()
+{
+    return m_CreatorGod->GetDevice();
+}
+ID3D11DeviceContext* RenderWindow::GetDeviceContext()
+{
+    return m_CreatorGod->GetDeviceContext();
 }

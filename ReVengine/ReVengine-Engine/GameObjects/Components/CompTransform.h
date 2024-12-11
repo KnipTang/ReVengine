@@ -23,7 +23,7 @@ namespace Rev
 		void SetRotationDegree(glm::vec3 dir);
 		glm::vec3 GetRotation();
 
-		glm::mat4 GetModelMatrix();
+		glm::mat4& GetModelMatrix();
 
 		glm::vec3 GetForwardVector();
 		glm::vec3 GetRightVector();

@@ -5,10 +5,11 @@
 #include <DirectXMath.h>
 #include "Camera/Camera.h"
 #include "glm/matrix.hpp"
+#include "d3d11.h"
 
 namespace Rev
 {
-	class Texture;
+	class TextureShader;
 }
 
 namespace RevDev
@@ -30,8 +31,8 @@ namespace RevDev
 
 		bool InitWindow(int windowWidth, int windowHeight, float nearZ, float farZ);
 
-		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture);
-		void DrawMesh(uint32_t meshId, const glm::mat4 modelMatrix, const DirectX::XMMATRIX viewMatrix);
+		uint32_t AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices);
+		void DrawMesh(uint32_t meshId);
 
 		bool UpdateWindow();
 
@@ -39,8 +40,10 @@ namespace RevDev
 
 		void LoadTexture();
 
-		DirectX::XMMATRIX getProjectionMatrix();
-		DirectX::XMMATRIX getWorldMatrix();
+		const DirectX::XMMATRIX getProjectionMatrix();
+
+		ID3D11Device* GetDevice();
+		ID3D11DeviceContext* GetDeviceContext();
 	private:
 
 		std::unique_ptr<WindowHandler_D3D11> m_CreatorGod;
