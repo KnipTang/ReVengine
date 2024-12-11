@@ -46,10 +46,9 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	//Gun
-	Rev::GameObject* gun = new Rev::GameObject{};
+	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
 	gun->transform->SetPosition(0, 0, 1);
-	gun->addComponent<Rev::CompRender>(gun, gun->transform, cameraComp, weaponTexture, 0.3f, 0.3f);
-	player->AddChild(gun);
+	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, weaponTexture, 0.3f, 0.3f);
 
 	//Input Config
 	{
@@ -102,7 +101,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 		scene->addGameObject(std::move(player));
 		scene->addGameObject(std::move(enemy1));
 		scene->addGameObject(std::move(enemy2));
-		//scene->addGameObject(std::move(bullet));
+		scene->addGameObject(std::move(gun));
 		scene->addGameObject(std::move(grandParent));
 		scene->DisplaySceneHierarchy();
 		return std::move(scene);

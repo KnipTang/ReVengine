@@ -8,7 +8,7 @@
 #include <algorithm>
 #include "Texture.h"
 #include "Rendering/Direct3D11/Mesh.h"
-#include "Rendering/Direct3D11/TextureShader.h"
+#include "Rendering/Shaders/TextureShader.h"
 #include <Rev_CoreSystems.h>
 
 #undef min
@@ -71,7 +71,7 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, fl
 
 uint32_t RevDev::RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices, Rev::Texture* texture)
 {
-    TextureShader* textureShader = new TextureShader{ m_CreatorGod->GetDevice(), m_CreatorGod->GetDeviceContext(), texture };
+    Rev::TextureShader* textureShader = new Rev::TextureShader{ m_CreatorGod->GetDevice(), m_CreatorGod->GetDeviceContext(), texture };
 
     m_Meshes.emplace_back(std::make_unique<Mesh>(m_CreatorGod->GetDevice(), textureShader));
 
@@ -92,7 +92,7 @@ void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const glm::mat4 modelMatrix
 
     //Vertex buffer is a buffer that holds the vertex data
     auto&& mesh = m_Meshes.at(meshId);
-    auto&& textureShader = mesh->GetTextureShader();
+    auto&& textureShader = mesh->GetShader();
     wrl::ComPtr<ID3D11Buffer> matrixBuffer = textureShader->GetMatrixBuffer();
 
     pDeviceContext->IASetVertexBuffers(0, 1, mesh->GetVertexBuffer().GetAddressOf(), &m_VertexStride, &m_VertexOffset);
@@ -100,7 +100,7 @@ void RevDev::RenderWindow::DrawMesh(uint32_t meshId, const glm::mat4 modelMatrix
 
     D3D11_MAPPED_SUBRESOURCE msr;
     pDeviceContext->Map(matrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-    MatrixBufferType* data = (MatrixBufferType*)msr.pData;
+    Rev::MatrixBufferType* data = (Rev::MatrixBufferType*)msr.pData;
     data->world = transWorld;
     data->view = transView;
     data->projection = transProj;

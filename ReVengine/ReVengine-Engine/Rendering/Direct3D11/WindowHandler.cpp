@@ -10,7 +10,8 @@
 #include "Rendering/Direct3D11/Mesh.h"
 #include "Rendering/Texture.h"
 #include <d3dcompiler.h>
-#include "TextureShader.h"
+#include "Rendering/Shaders/TextureShader.h"
+
 
 using namespace RevDev;
 
@@ -48,7 +49,7 @@ void WindowHandler_D3D11::updateWindow()
 void WindowHandler_D3D11::clearBuffer(float backgroundColour[4])
 {
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), backgroundColour);
-	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH,1,0);
+	pDeviceContext->ClearDepthStencilView(pDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,1,0);
 }
 
 void WindowHandler_D3D11::setupPipeline()
@@ -61,7 +62,7 @@ void WindowHandler_D3D11::setupPipeline()
 	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
@@ -151,7 +152,7 @@ void WindowHandler_D3D11::SetupRenderTargetAndStencelBuffer()
 	//Z buffer
 	D3D11_DEPTH_STENCIL_DESC dsDesc{};
 	dsDesc.DepthEnable = TRUE;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	wrl::ComPtr<ID3D11DepthStencilState> pDSState;
 	pDevice->CreateDepthStencilState(&dsDesc, &pDSState);

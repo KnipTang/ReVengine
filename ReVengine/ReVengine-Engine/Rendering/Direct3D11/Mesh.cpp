@@ -3,16 +3,16 @@
 #include "Rendering/Direct3D11/WindowHandler.h"
 #include "Utils/Vertex.h"
 #include "Rendering/Texture.h"
-#include "TextureShader.h"
+#include "Rendering/Shaders/BaseShader.h"
 
 using namespace RevDev;
 
 uint32_t Mesh::meshIDCounter = 0;
 
-Mesh::Mesh(ID3D11Device* pDevice, TextureShader* textureShader) :
+Mesh::Mesh(ID3D11Device* pDevice, Rev::TextureShader* shader) :
 	m_Device{pDevice},
 	m_IndiceCount{},
-	m_TextureShader{ textureShader },
+	m_Shader{ shader },
 	meshID{meshIDCounter++}
 {
 }

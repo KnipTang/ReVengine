@@ -4,7 +4,9 @@
     "Rendering/RenderWindow.cpp"
     "Rendering/Texture.cpp"
     "Rendering/Direct3D11/Mesh.cpp"
-    "Rendering/Direct3D11/TextureShader.cpp" 
+    "Rendering/Shaders/BaseShader.cpp"
+    "Rendering/Shaders/TextureShader.cpp"
+    "Rendering/Shaders/TextureShader2D.cpp" 
     "Rendering/Direct3D11/WindowHandler.cpp" 
     "Rendering/Camera/Camera.cpp"
     "Sound/Rev_Sound.cpp"
@@ -47,7 +49,7 @@ endif()
 
 
 set(RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
-set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Rendering/shaders")
+set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Rendering/HLSLshaders")
 
 add_custom_target(copy_engine_resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -66,8 +68,8 @@ add_dependencies(ReVengine-Engine copy_engine_resources)
 
 set(DIRECTX11_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Rendering")
 
-set(SHADERS_DIR "${DIRECTX11_DIR}/shaders")
-set(SHADERS_OUT_DIR "${CMAKE_BINARY_DIR}/Rendering/shaders")
+set(SHADERS_DIR "${DIRECTX11_DIR}/HLSLshaders")
+set(SHADERS_OUT_DIR "${CMAKE_BINARY_DIR}/Rendering/HLSLshaders")
 
 # make shader output dir
 file(MAKE_DIRECTORY "${SHADERS_OUT_DIR}")
