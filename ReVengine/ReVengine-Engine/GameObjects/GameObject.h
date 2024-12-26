@@ -3,8 +3,9 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
-#include "BaseComponent.h"
 #include <cassert>
+#include "BaseComponent.h"
+#include <iterator>
 
 namespace Rev
 {
@@ -21,6 +22,11 @@ namespace Rev
 	public:
 		GameObject();
 		~GameObject();
+
+		GameObject(const GameObject& other);
+		GameObject& operator=(const GameObject& other) = default;
+		GameObject(GameObject&& other) = default;
+		GameObject& operator=(GameObject&& other) = default;
 
 		void update(float deltaTime);
 		void lateUpdate(float deltaTime);
@@ -126,13 +132,14 @@ namespace Rev
 		int GetID() const { return objID; }
 		const GameObject* GetParent() { return m_Parent; }
 
+		void SetActive(bool active);
+		bool IsActive() { return m_Active; }
 	private:
 		void SetParent(GameObject* parent)
 		{
 			m_Parent = parent;
 		}
 	public:
-		bool m_Enabled;
 
 		Rev::CompTransform* transform;
 	private:
@@ -141,6 +148,8 @@ namespace Rev
 		std::vector<std::unique_ptr<GameObject>> m_Children;
 		int m_ChildrenCount;
 		GameObject* m_Parent;
+
+		bool m_Active;
 
 		static int objIDCounter;
 		int objID;

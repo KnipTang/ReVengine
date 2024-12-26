@@ -6,7 +6,7 @@ using namespace Rev;
 MemoryPool::MemoryPool(GameObject* gameObj, int fixedSize) :
 	m_PoolSize{ fixedSize }
 {
-	gameObj->m_Enabled = false;
+	gameObj->SetActive(false);
 
 	for (int i = 0; i < m_PoolSize; i++)
 	{
@@ -22,9 +22,9 @@ GameObject* MemoryPool::Activate()
 {
 	for (int i = 0; i < m_PoolSize; i++)
 	{
-		if (!m_Objects.at(i)->m_Enabled)
+		if (!m_Objects.at(i)->IsActive())
 		{
-			m_Objects.at(i)->m_Enabled = true;
+			m_Objects.at(i)->SetActive(true);
 			return m_Objects.at(i);
 		}
 	}

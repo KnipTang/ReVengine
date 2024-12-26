@@ -18,6 +18,7 @@
     "GameObjects/Components/CompRender.cpp"
     "GameObjects/Components/CompInput.cpp" 
     "GameObjects/Components/CompCamera.cpp" 
+    "GameObjects/Components/CompCollision.cpp"
     "Scenes/Scene.cpp"
     "Scenes/SceneManager.cpp"
     "Input/InputManager.cpp"

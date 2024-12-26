@@ -1,9 +1,13 @@
 #include "BulletComp.h"
 #include "GameObjects/Components/CompTransform.h"
+#include "GameObjects/GameObject.h"
+#include <iostream>
 
-BulletComp::BulletComp(Rev::GameObject* gameObj, Rev::CompTransform* transform) :
+BulletComp::BulletComp(Rev::GameObject* gameObj, float speed) :
 	Rev::BaseComponent(gameObj),
-	m_Transform{transform}
+	m_Transform(gameObj->transform),
+	m_StartDirection(gameObj->transform->GetRotation()),
+	m_Speed(speed)
 {
 
 }
@@ -12,13 +16,8 @@ BulletComp::~BulletComp()
 {
 }
 
-void BulletComp::Init(glm::vec3 pos, glm::vec3 rotation)
-{
-	m_Transform->SetPosition(pos);
-	m_Transform->SetRotationDegree(rotation);
-}
-
 void BulletComp::fixedUpdate([[maybe_unused]] float fixedDeltaTime)
 {
-	m_Transform->MoveForward(1, 0.1f);
+	std::cout << m_Transform->GetPosition().x << "\n";
+	m_Transform->MoveForward(1, m_Speed);
 }

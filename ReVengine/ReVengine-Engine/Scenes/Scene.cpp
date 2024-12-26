@@ -17,44 +17,48 @@ Scene::~Scene()
 
 void Scene::update(float deltaTime)
 {
-	for (auto&& obj : m_GameObjects)
+	for (auto&& obj : m_AllGameObjects)
 	{
-		if(obj->m_Enabled) obj->update(deltaTime);
+		if(obj->IsActive()) obj->update(deltaTime);
 	}
 }
 
 void Scene::lateUpdate(float deltaTime)
 {
-	for (auto&& obj : m_GameObjects)
+	for (auto&& obj : m_AllGameObjects)
 	{
-		if (obj->m_Enabled) obj->lateUpdate(deltaTime);
+		if (obj->IsActive()) obj->lateUpdate(deltaTime);
 	}
 }
 
 void Scene::fixedUpdate(float fixedDeltaTime)
 {
-	for (auto&& obj : m_GameObjects)
+	for (auto&& obj : m_AllGameObjects)
 	{
-		if (obj->m_Enabled) obj->fixedUpdate(fixedDeltaTime);
+		if (obj->IsActive()) obj->fixedUpdate(fixedDeltaTime);
 	}
 }
 
 const void Scene::render()
 {
-	for (auto&& obj : m_GameObjects)
+	for (auto&& obj : m_AllGameObjects)
 	{
-		if (obj->m_Enabled) obj->render();
+		if (obj->IsActive()) obj->render();
 	}
 }
 
 const GameObject* Scene::addGameObject(std::unique_ptr<GameObject> gameObj)
 {
-	//if (hasGameObject<T>())  // NoNeed to check gameobejct can be duplicates
-	//	return nullptr;
+	m_AllGameObjects.emplace_back(std::move(gameObj));
 
-	m_GameObjects.emplace_back(std::move(gameObj));
+	return m_AllGameObjects.back().get();
+}
 
-	return m_GameObjects.back().get();
+const GameObject* Scene::addGameObject(GameObject* gameObj)
+{
+	m_AllGameObjects.emplace_back(std::unique_ptr<GameObject>(gameObj));
+
+	return m_AllGameObjects.back().get();
 }
 
 void Scene::SetActive(bool active)

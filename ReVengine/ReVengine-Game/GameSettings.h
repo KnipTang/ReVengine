@@ -7,3 +7,4 @@ namespace GameSettings
 
 	constexpr int fps = 120;
 }
+

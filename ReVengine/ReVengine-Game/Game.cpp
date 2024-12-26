@@ -15,6 +15,7 @@
 #include <SDL_scancode.h>
 #include <iostream>
 #include "Objects/Weapons/BulletComp.h"
+#include "Objects/Weapons/GunComp.h"
 #include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Shaders/TextureShader2D.h"
 
@@ -56,6 +57,10 @@ std::unique_ptr<Rev::Scene> Scene1()
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
 	gun->transform->SetPosition(0, -0.5f, 0);
 	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, weaponTexture, 0.3f, 0.3f);
+	Rev::GameObject* bullet = new Rev::GameObject{};
+	bullet->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, bulletTexture, 0.3f, 0.3f);
+	bullet->addComponent<BulletComp>(gun.get(), 5);
+	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), bullet);
 
 	//Input Config
 	{
@@ -68,6 +73,8 @@ std::unique_ptr<Rev::Scene> Scene1()
 	inputComp->BindAction(SDL_SCANCODE_S, [playerTransform]() { playerTransform->MoveForward(-1); });
 	inputComp->BindAction(SDL_SCANCODE_D, [playerTransform]() { playerTransform->MoveRight(1); });
 	inputComp->BindAction(SDL_SCANCODE_A, [playerTransform]() { playerTransform->MoveRight(-1); });
+
+	inputComp->BindAction(SDL_SCANCODE_G, [gunComp]() { gunComp->Fire(); });
 	}
 
 	//Enemies
@@ -77,11 +84,6 @@ std::unique_ptr<Rev::Scene> Scene1()
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
 	enemy2->transform->SetPosition(1, 0, 5);
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture);
-
-	//Bullet
-	std::unique_ptr<Rev::GameObject> bullet = std::make_unique<Rev::GameObject>();
-	bullet->addComponent<Rev::CompRender>(bullet.get(), bullet->transform, cameraComp, textureShader, bulletTexture);
-	bullet->addComponent<BulletComp>(bullet.get(), bullet->transform);
 
 	std::unique_ptr<Rev::GameObject> grandParent = std::make_unique<Rev::GameObject>();
 	grandParent->transform->SetPosition(3, 0, 0);

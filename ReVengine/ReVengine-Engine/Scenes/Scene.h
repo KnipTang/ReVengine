@@ -5,6 +5,11 @@
 #include <algorithm>
 #include "GameObjects/GameObject.h"
 
+namespace Rev 
+{
+	class GameObject;
+}
+
 namespace Rev
 {
 	template <class T>
@@ -22,11 +27,12 @@ namespace Rev
 		const void render();
 
 		const GameObject* addGameObject(std::unique_ptr<GameObject> gameObj);
+		const GameObject* addGameObject(GameObject* gameObj);
 
 		template <gameObjectConcept T>
 		const bool hasGameObject()
 		{
-			for (const auto& obj : m_GameObjects)
+			for (const auto& obj : m_AllGameObjects)
 			{
 				if (dynamic_cast<T*>(obj.get()))
 					return true;
@@ -38,7 +44,7 @@ namespace Rev
 		template <gameObjectConcept T>
 		T* getGameObject()
 		{
-			for (auto& obj : m_GameObjects)
+			for (auto& obj : m_AllGameObjects)
 			{
 				if (auto derivedComp = dynamic_cast<T*>(obj.get()))
 					return derivedComp;
@@ -47,21 +53,22 @@ namespace Rev
 			return nullptr;
 		}
 
-		template <gameObjectConcept T>
-		void removeGameObject()
+		void removeGameObject(GameObject* obj)
 		{
-			m_GameObjects.erase(
-				std::remove_if(m_GameObjects.begin(), m_GameObjects.end(),
-					[](const std::unique_ptr<GameObject>& obj) {
-						return dynamic_cast<T*>(obj.get()) != nullptr;
+			m_AllGameObjects.erase(
+				std::remove_if(
+					m_AllGameObjects.begin(),
+					m_AllGameObjects.end(),
+					[obj](const std::unique_ptr<GameObject>& gameObject) {
+						return gameObject.get() == obj;
 					}),
-				m_GameObjects.end());
+				m_AllGameObjects.end());
 		}
 
 		void DisplaySceneHierarchy()
 		{
 			std::printf("Scene Hierachy: %s\tSceneID: %i\n", typeid(*this).name(), sceneID);
-			std::ranges::for_each(m_GameObjects,
+			std::ranges::for_each(m_AllGameObjects,
 				[](std::unique_ptr<GameObject>& obj) -> void
 				{
 					obj->DisplayHierarchy();
@@ -71,10 +78,33 @@ namespace Rev
 
 		const int GetID() { return sceneID; }
 		
-		void SetActive(bool active);
+		void SetActive(bool active);;
 		bool IsActive() { return m_Active; }
+
+		void AddActiveGameObject(GameObject* object)
+		{
+			if (!IsGameObjectActive(object))
+				m_ActiveGameObjects.emplace_back(object);
+		}
+		void RemoveActiveGameObject(GameObject* object)
+		{
+			if (IsGameObjectActive(object))
+				m_ActiveGameObjects.erase(std::find(m_ActiveGameObjects.begin(), m_ActiveGameObjects.end(), object));
+		}
+		std::vector<Scene*> GetActiveScenes();
 	private:
-		std::vector<std::unique_ptr<GameObject>> m_GameObjects;
+		bool IsGameObjectActive(GameObject* object)
+		{
+			for (const auto& actObject : m_ActiveGameObjects)
+			{
+				if (actObject == object)
+					return true;
+			}
+			return false;
+		}
+	private:
+		std::vector<std::unique_ptr<GameObject>> m_AllGameObjects;
+		std::vector<GameObject*> m_ActiveGameObjects;
 
 		bool m_Active;
 
