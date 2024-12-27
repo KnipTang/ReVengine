@@ -23,5 +23,4 @@ void GunComp::Fire()
 	Rev::GameObject* bullet = m_BulletFunc();
 	bullet->transform->SetPosition(m_PlayerTransform->GetPosition());
 	Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->addGameObject(bullet);
-	Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->DisplaySceneHierarchy();
 }

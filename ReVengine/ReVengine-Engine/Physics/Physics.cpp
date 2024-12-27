@@ -22,3 +22,13 @@ void Physics::Simulate(float fixedDeltaTime)
 {
     m_PhysicsImpl->Simulate(fixedDeltaTime);
 }
+
+void Physics::CreateStatic(glm::vec3 pos, glm::vec3 size)
+{
+    m_PhysicsImpl->CreateStatic(pos, size);
+}
+
+void Physics::CreateDynamic(glm::vec3 pos, glm::vec3 size, bool gravity)
+{
+    m_PhysicsImpl->CreateDynamic(pos, size, gravity);
+}
