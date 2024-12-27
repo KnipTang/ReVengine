@@ -47,6 +47,11 @@ const void Scene::render()
 	}
 }
 
+void Scene::Physics()
+{
+
+}
+
 const GameObject* Scene::addGameObject(std::unique_ptr<GameObject> gameObj)
 {
 	m_AllGameObjects.emplace_back(std::move(gameObj));

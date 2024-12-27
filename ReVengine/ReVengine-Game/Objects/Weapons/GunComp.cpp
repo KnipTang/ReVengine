@@ -3,22 +3,25 @@
 #include "Scenes/Scene.h"
 #include "Rev_CoreSystems.h"
 #include "GameObjects/Components/CompTransform.h"
+#include "GameObjects/Components/CompTransform.h"
 
-GunComp::GunComp(Rev::GameObject* gameObj, Rev::GameObject* bullet) :
+GunComp::GunComp(Rev::GameObject* gameObj, Rev::CompTransform* playerTransform, std::function<Rev::GameObject* ()> bulletFunc) :
 	Rev::BaseComponent(gameObj),
-	m_Bullet{ bullet }
+	m_PlayerTransform{ playerTransform },
+	m_BulletFunc{ bulletFunc }
 {
 
 }
 
 GunComp::~GunComp()
 {
+
 }
 
 void GunComp::Fire()
 {
-	Rev::GameObject* bullet = new Rev::GameObject{ *m_Bullet };
-	bullet->transform->SetPosition(m_GameObject->transform->GetPosition());
+	Rev::GameObject* bullet = m_BulletFunc();
+	bullet->transform->SetPosition(m_PlayerTransform->GetPosition());
 	Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->addGameObject(bullet);
 	Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->DisplaySceneHierarchy();
 }

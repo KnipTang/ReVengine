@@ -24,6 +24,9 @@
     "Input/InputManager.cpp"
     "ResourceManagement/MemoryPool.cpp"
     "ResourceManagement/ResourceManager.cpp"
+    "Physics/PhysX/Physics_PhysX.cpp"
+    "Physics/Physics.cpp"
+    "Physics/PhysicsImpl.cpp"
 ) #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/GameSettings) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol

@@ -24,6 +24,7 @@ namespace Rev
 		void update(float deltaTime);
 		void lateUpdate(float deltaTime);
 		void fixedUpdate(float fixedDeltaTime);
+		void Physics();
 		const void render();
 
 		const GameObject* addGameObject(std::unique_ptr<GameObject> gameObj);

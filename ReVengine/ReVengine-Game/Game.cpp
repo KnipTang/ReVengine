@@ -18,6 +18,7 @@
 #include "Objects/Weapons/GunComp.h"
 #include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Shaders/TextureShader2D.h"
+#include "Physics/Physics.h"
 
 const std::string resourceFolder = "../game_resources";
 const std::string doomSprites = "/doomSprites";
@@ -55,12 +56,15 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	//Gun
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
-	gun->transform->SetPosition(0, -0.5f, 0);
+	gun->transform->SetPosition(0, -0.85f, 0);
 	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, weaponTexture, 0.3f, 0.3f);
-	Rev::GameObject* bullet = new Rev::GameObject{};
-	bullet->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, bulletTexture, 0.3f, 0.3f);
-	bullet->addComponent<BulletComp>(gun.get(), 5);
-	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), bullet);
+	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), player->transform,
+		[cameraComp, textureShader, bulletTexture]() {
+			Rev::GameObject* bullet = new Rev::GameObject{};
+			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.3f, 0.3f);
+			bullet->addComponent<BulletComp>(bullet, 50.f);
+			return bullet;
+		});
 
 	//Input Config
 	{

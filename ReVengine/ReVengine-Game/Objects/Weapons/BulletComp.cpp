@@ -18,6 +18,5 @@ BulletComp::~BulletComp()
 
 void BulletComp::fixedUpdate([[maybe_unused]] float fixedDeltaTime)
 {
-	std::cout << m_Transform->GetPosition().x << "\n";
-	m_Transform->MoveForward(1, m_Speed);
+	m_Transform->MoveForward(1, m_Speed * fixedDeltaTime);
 }
