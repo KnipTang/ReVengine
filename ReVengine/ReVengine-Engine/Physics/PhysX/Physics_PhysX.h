@@ -8,9 +8,10 @@ namespace RevDev
 	{
 	public:
 		Physics_PhysX();
-		~Physics_PhysX() = default;
+		~Physics_PhysX();
 
 		void Init();
+		void Simulate(float fixedDeltaTime);
 
 	public:
 		physx::PxScene* gScene = nullptr;

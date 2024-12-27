@@ -22,6 +22,7 @@ namespace Rev
 		void update(float deltaTime);
 		void lateUpdate(float deltaTime);
 		void fixedUpdate(float fixedDeltaTime);
+		void Physics(float fixedDeltaTime);
 		const void render();
 
 		const Scene* addScene(std::unique_ptr<Scene> scene);

@@ -12,6 +12,11 @@ namespace Rev
 
 namespace Rev
 {
+	class Physics;
+}
+
+namespace Rev
+{
 	template <class T>
 	concept gameObjectConcept = std::derived_from<T, GameObject>;
 
@@ -24,7 +29,7 @@ namespace Rev
 		void update(float deltaTime);
 		void lateUpdate(float deltaTime);
 		void fixedUpdate(float fixedDeltaTime);
-		void Physics();
+		void Physics(float fixedDeltaTime);
 		const void render();
 
 		const GameObject* addGameObject(std::unique_ptr<GameObject> gameObj);
@@ -77,6 +82,8 @@ namespace Rev
 			);
 		}
 
+		Rev::Physics* getPhysicsHandle() { return m_Physics.get(); }
+
 		const int GetID() { return sceneID; }
 		
 		void SetActive(bool active);;
@@ -111,5 +118,7 @@ namespace Rev
 
 		static int sceneIDCounter;
 		int sceneID;
+
+		std::unique_ptr<Rev::Physics> m_Physics;
 	};
 }

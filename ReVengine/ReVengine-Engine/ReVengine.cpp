@@ -44,6 +44,9 @@ void ReVengine::Run(const std::function<SceneManager*()>& GameRun)
 		while (lag >= fixedTimeStep)
 		{
 			sceneMan->fixedUpdate(fixedTimeStep);
+
+			sceneMan->Physics(fixedTimeStep);
+
 			lag -= fixedTimeStep;
 		}
 

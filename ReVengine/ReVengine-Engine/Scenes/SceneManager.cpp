@@ -38,6 +38,14 @@ void SceneManager::fixedUpdate(float fixedDeltaTime)
 	}
 }
 
+void SceneManager::Physics(float fixedDeltaTime)
+{
+	for (auto&& scene : m_ActiveScenes)
+	{
+		scene->Physics(fixedDeltaTime);
+	}
+}
+
 const void SceneManager::render()
 {
 	for (auto&& scene : m_ActiveScenes)

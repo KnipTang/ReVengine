@@ -1,14 +1,17 @@
 #include "Scene.h"
 #include "GameObjects/GameObject.h"
 #include "Rev_CoreSystems.h"
+#include "Physics/Physics.h"
 
 using namespace Rev;
 
 int Scene::sceneIDCounter = 0;
 
 Scene::Scene() :
-	sceneID{ sceneIDCounter++ }
+	sceneID{ sceneIDCounter++ },
+	m_Physics{ std::make_unique<Rev::Physics>() }
 {
+	m_Physics->Init();
 }
 
 Scene::~Scene()
@@ -39,17 +42,17 @@ void Scene::fixedUpdate(float fixedDeltaTime)
 	}
 }
 
+void Scene::Physics(float fixedDeltaTime)
+{
+	m_Physics->Simulate(fixedDeltaTime);
+}
+
 const void Scene::render()
 {
 	for (auto&& obj : m_AllGameObjects)
 	{
 		if (obj->IsActive()) obj->render();
 	}
-}
-
-void Scene::Physics()
-{
-
 }
 
 const GameObject* Scene::addGameObject(std::unique_ptr<GameObject> gameObj)

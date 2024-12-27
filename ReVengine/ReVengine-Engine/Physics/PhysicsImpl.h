@@ -16,6 +16,7 @@ namespace RevDev
 		~PhysicsImpl();
 
 		void Init();
+		void Simulate(float fixedDeltaTime);
 
 	private:
 		std::unique_ptr<RevDev::Physics_PhysX> m_PhysicsPhysX;
