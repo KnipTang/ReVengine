@@ -11,11 +11,12 @@ using namespace Rev;
 
 CompTransform::CompTransform(GameObject* gameObj, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) :
 	BaseComponent(gameObj),
-	m_Position{position},
-	m_Rotation{rotation},
+	m_Position{ position },
+	m_Rotation{ rotation },
 	m_Scale{scale}
 {
-
+	SetPosition(position);
+	SetRotationRad(rotation);
 }
 
 void CompTransform::update([[maybe_unused]] float deltaTime)
@@ -25,7 +26,7 @@ void CompTransform::update([[maybe_unused]] float deltaTime)
 
 void CompTransform::Move(glm::vec3 dir, float speed)
 {
-	SetPosition(m_Position + dir * speed);
+	SetPosition(m_LocalPosition + dir * speed);
 }
 
 void CompTransform::MoveForward(int input, float speed)
@@ -48,12 +49,12 @@ void CompTransform::Turn(float x, float y)
 
 void CompTransform::AddPitchInput(float input)
 {
-	SetRotationRad(m_Rotation.x + input, m_Rotation.y, m_Rotation.z);
+	SetRotationRad(m_LocalRotation.x + input, m_LocalRotation.y, m_LocalRotation.z);
 }
 
 void CompTransform::AddYawInput(float input)
 {
-	SetRotationRad(m_Rotation.x, m_Rotation.y + input, m_Rotation.z);
+	SetRotationRad(m_LocalRotation.x, m_LocalRotation.y + input, m_LocalRotation.z);
 }
 
 glm::vec3 CompTransform::GetForwardVector()
@@ -78,12 +79,7 @@ void CompTransform::SetPosition(float x, float y, float z)
 
 void CompTransform::SetPosition(glm::vec3 pos)
 {	
-	m_Position = pos;
-
-	if (m_GameObject->GetParent() == nullptr)
-	{
-		m_LocalPosition = m_Position;
-	}
+	m_LocalPosition = pos;
 
 	SetDirtyPosition();
 }
@@ -103,13 +99,8 @@ void CompTransform::SetRotationRad(float x, float y, float z)
 
 void CompTransform::SetRotationRad(glm::vec3 dir)
 {
-	m_Rotation = dir;
-	m_Rotation = glm::mod(m_Rotation, glm::two_pi<float>());
-
-	if (m_GameObject->GetParent() == nullptr)
-	{
-		m_LocalRotation = m_Rotation;
-	}
+	m_LocalRotation = dir;
+	m_LocalRotation = glm::mod(m_LocalRotation, glm::two_pi<float>());
 
 	SetDirtyRotation();
 }
@@ -165,12 +156,20 @@ void CompTransform::SetDirtyRotation()
 void CompTransform::UpdatePosition()
 {
 	m_DirtyPosition = false;
+	if (m_GameObject->GetParent() == nullptr)
+	{
+		m_Position = m_LocalPosition;
+	}
+	else
+	{
+		m_Position = m_GameObject->GetParent()->transform->m_Position + m_LocalPosition;
+	}
 	if (m_GameObject->GetChildCount() > 0)
 	{
 		std::ranges::for_each(m_GameObject->GetChildren(),
 			[this](std::unique_ptr<GameObject>& child) -> void
 			{
-				child->transform->SetPosition(child->transform->m_LocalPosition + m_Position);
+				child->transform->m_Position = child->transform->m_LocalPosition + m_Position;
 				child->transform->UpdatePosition();
 			});
 	}
@@ -179,6 +178,14 @@ void CompTransform::UpdatePosition()
 void CompTransform::UpdateRotation()
 {
 	m_DirtyRotation = false;
+	if (m_GameObject->GetParent() == nullptr)
+	{
+		m_Rotation = m_LocalRotation;
+	}
+	else
+	{
+		m_Rotation = m_GameObject->GetParent()->transform->m_Rotation + m_LocalRotation;
+	}
 	if (m_GameObject->GetChildCount() > 0)
 	{
 		std::ranges::for_each(m_GameObject->GetChildren(),
@@ -192,9 +199,10 @@ void CompTransform::UpdateRotation()
 				glm::vec4 localChildPos = glm::vec4(child->transform->m_LocalPosition, 1.0f);
 				glm::vec3 rotatedChildPos = glm::vec3(parentRotationMat * localChildPos);
 
-				child->transform->SetPosition(parentWorldPos + rotatedChildPos);
+				child->transform->m_Position = parentWorldPos + rotatedChildPos;
+				//child->transform->SetPosition(parentWorldPos + rotatedChildPos);
 
-				child->transform->SetRotationRad(child->transform->m_LocalRotation + m_Rotation);
+				child->transform->m_Rotation = child->transform->m_LocalRotation + m_Rotation;
 				child->transform->UpdateRotation();
 			});
 	}

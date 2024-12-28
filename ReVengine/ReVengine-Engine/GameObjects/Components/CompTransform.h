@@ -35,13 +35,13 @@ namespace Rev
 		void Turn(float x, float y);
 		void AddYawInput(float input);
 		void AddPitchInput(float input);
-		void UpdatePosition();
-		void UpdateRotation();
 
 	private:
 		void SetDirtyPosition();
 		void SetDirtyRotation();
 
+		void UpdatePosition();
+		void UpdateRotation();
 	public:
 		glm::vec3 m_LocalPosition;
 		glm::vec3 m_LocalRotation;
