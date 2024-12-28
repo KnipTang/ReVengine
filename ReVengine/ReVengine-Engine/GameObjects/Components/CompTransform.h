@@ -35,6 +35,13 @@ namespace Rev
 		void Turn(float x, float y);
 		void AddYawInput(float input);
 		void AddPitchInput(float input);
+		void UpdatePosition();
+		void UpdateRotation();
+
+	private:
+		void SetDirtyPosition();
+		void SetDirtyRotation();
+
 	public:
 		glm::vec3 m_LocalPosition;
 		glm::vec3 m_LocalRotation;
@@ -43,7 +50,9 @@ namespace Rev
 		glm::vec3 m_Rotation;
 		glm::vec3 m_Scale; //TODO
 
-
 		glm::mat4 m_ModelMatrix;
+
+		bool m_DirtyPosition;
+		bool m_DirtyRotation;
 	};
 }

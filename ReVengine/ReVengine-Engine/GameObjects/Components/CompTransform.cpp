@@ -80,18 +80,19 @@ void CompTransform::SetPosition(glm::vec3 pos)
 {	
 	m_Position = pos;
 
-	if (m_GameObject->GetChildCount() > 0)
+	if (m_GameObject->GetParent() == nullptr)
 	{
-		std::ranges::for_each(m_GameObject->GetChildren(),
-			[pos](std::unique_ptr<GameObject>& child) -> void
-			{
-				child->transform->SetPosition(child->transform->m_LocalPosition + pos);
-			});
+		m_LocalPosition = m_Position;
 	}
+
+	SetDirtyPosition();
 }
 
 glm::vec3 CompTransform::GetPosition()
 {
+	if (m_DirtyPosition)
+		UpdatePosition();
+
 	return m_Position;
 }
 
@@ -105,6 +106,79 @@ void CompTransform::SetRotationRad(glm::vec3 dir)
 	m_Rotation = dir;
 	m_Rotation = glm::mod(m_Rotation, glm::two_pi<float>());
 
+	if (m_GameObject->GetParent() == nullptr)
+	{
+		m_LocalRotation = m_Rotation;
+	}
+
+	SetDirtyRotation();
+}
+
+void CompTransform::SetRotationDegree(float x, float y, float z)
+{
+	SetRotationDegree(glm::vec3(x, y, z));
+}
+
+void CompTransform::SetRotationDegree(glm::vec3 dir)
+{
+	SetRotationRad(glm::radians(dir));
+}
+
+glm::vec3 CompTransform::GetRotation()
+{
+	if (m_DirtyRotation)
+		UpdateRotation();
+
+	return m_Rotation;
+}
+
+glm::mat4& CompTransform::GetModelMatrix()
+{
+	GetPosition();
+	GetRotation();
+
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), m_Scale);
+	glm::mat4 rotationMat = glm::yawPitchRoll(m_Rotation.y, m_Rotation.x, m_Rotation.z);
+	glm::mat4 positionMat = glm::translate(glm::mat4(1.0f), m_Position);
+	m_ModelMatrix = positionMat * rotationMat * scaleMat;
+	return m_ModelMatrix;
+}
+
+void CompTransform::SetDirtyPosition()
+{
+	m_DirtyPosition = true;
+	for (auto&& child : m_GameObject->GetChildren())
+	{
+		child->transform->SetDirtyPosition();
+	}
+}
+
+void CompTransform::SetDirtyRotation()
+{
+	m_DirtyRotation = true;
+	for (auto&& child : m_GameObject->GetChildren())
+	{
+		child->transform->SetDirtyRotation();
+	}
+}
+
+void CompTransform::UpdatePosition()
+{
+	m_DirtyPosition = false;
+	if (m_GameObject->GetChildCount() > 0)
+	{
+		std::ranges::for_each(m_GameObject->GetChildren(),
+			[this](std::unique_ptr<GameObject>& child) -> void
+			{
+				child->transform->SetPosition(child->transform->m_LocalPosition + m_Position);
+				child->transform->UpdatePosition();
+			});
+	}
+}
+
+void CompTransform::UpdateRotation()
+{
+	m_DirtyRotation = false;
 	if (m_GameObject->GetChildCount() > 0)
 	{
 		std::ranges::for_each(m_GameObject->GetChildren(),
@@ -121,30 +195,7 @@ void CompTransform::SetRotationRad(glm::vec3 dir)
 				child->transform->SetPosition(parentWorldPos + rotatedChildPos);
 
 				child->transform->SetRotationRad(child->transform->m_LocalRotation + m_Rotation);
+				child->transform->UpdateRotation();
 			});
 	}
-}
-
-void CompTransform::SetRotationDegree(float x, float y, float z)
-{
-	SetRotationDegree(glm::vec3(x, y, z));
-}
-
-void CompTransform::SetRotationDegree(glm::vec3 dir)
-{
-	SetRotationRad(glm::radians(dir));
-}
-
-glm::vec3 CompTransform::GetRotation()
-{
-	return m_Rotation;
-}
-
-glm::mat4& CompTransform::GetModelMatrix()
-{
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), m_Scale);
-	glm::mat4 rotationMat = glm::yawPitchRoll(m_Rotation.y, m_Rotation.x, m_Rotation.z);
-	glm::mat4 positionMat = glm::translate(glm::mat4(1.0f), m_Position);
-	m_ModelMatrix = positionMat * rotationMat * scaleMat;
-	return m_ModelMatrix;
 }
