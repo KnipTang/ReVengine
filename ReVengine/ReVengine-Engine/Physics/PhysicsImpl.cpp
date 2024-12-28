@@ -23,12 +23,17 @@ void PhysicsImpl::Simulate(float fixedDeltaTime)
     m_PhysicsPhysX->Simulate(fixedDeltaTime);
 }
 
-void PhysicsImpl::CreateStatic(glm::vec3 pos, glm::vec3 size)
+void PhysicsImpl::CreateStatic(int id, glm::vec3 pos, glm::vec3 size)
 {
-    m_PhysicsPhysX->CreateStatic(pos, size);
+    m_PhysicsPhysX->CreateStatic(id, pos, size);
 }
 
-void PhysicsImpl::CreateDynamic(glm::vec3 pos, glm::vec3 size, bool gravity)
+void PhysicsImpl::CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity)
 {
-    m_PhysicsPhysX->CreateDynamic(pos, size, gravity);
+    m_PhysicsPhysX->CreateDynamic(id, pos, size, gravity);
+}
+
+void PhysicsImpl::UpdateActorTransform(int id)
+{
+    m_PhysicsPhysX->UpdateActorTransform(id);
 }

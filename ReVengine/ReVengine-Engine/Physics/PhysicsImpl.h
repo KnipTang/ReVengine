@@ -19,9 +19,10 @@ namespace RevDev
 		void Init();
 		void Simulate(float fixedDeltaTime);
 
-		void CreateStatic(glm::vec3 pos, glm::vec3 size);
-		void CreateDynamic(glm::vec3 pos, glm::vec3 size, bool gravity);
+		void CreateStatic(int id, glm::vec3 pos, glm::vec3 size);
+		void CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity);
 
+		void UpdateActorTransform(int id);
 	private:
 		std::unique_ptr<RevDev::Physics_PhysX> m_PhysicsPhysX;
 	};

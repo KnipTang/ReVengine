@@ -3,6 +3,8 @@
 #include <PxPhysicsAPI.h>
 #include <glm/vec3.hpp>
 #include <memory>
+#include <vector>
+#include <unordered_map>
 
 namespace RevDev
 {
@@ -20,8 +22,11 @@ namespace RevDev
 		void Init();
 		void Simulate(float fixedDeltaTime);
 
-		void CreateStatic(glm::vec3 pos, glm::vec3 size);
-		void CreateDynamic(glm::vec3 pos, glm::vec3 size, bool gravity);
+		void CreateStatic(int id, glm::vec3 pos, glm::vec3 size);
+		void CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity);
+		void CreateCollider(glm::vec3 pos, glm::vec3 size);
+
+		void UpdateActorTransform(int id, glm::vec3 pos, glm::vec3 rot);
 	public:
 		physx::PxScene* gScene = nullptr;
 
@@ -35,5 +40,8 @@ namespace RevDev
 
 		physx::PxPvd* gPvd = nullptr;
 
+		RevDev::CollisionCallback* collisionCallback;
+
+		std::unordered_map<int, physx::PxRigidBody*> m_Actors;
 	};
 }

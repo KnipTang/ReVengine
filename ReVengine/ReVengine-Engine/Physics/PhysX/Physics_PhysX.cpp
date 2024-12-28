@@ -6,6 +6,7 @@ using namespace RevDev;
 
 Physics_PhysX::Physics_PhysX()
 {
+
 }
 
 Physics_PhysX::~Physics_PhysX()
@@ -32,20 +33,33 @@ void Physics_PhysX::Init()
 
     gDispatcher = physx::PxDefaultCpuDispatcherCreate(2);
 
+    collisionCallback = new RevDev::CollisionCallback{};
+
     physx::PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
     sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
     sceneDesc.cpuDispatcher = gDispatcher;
-    sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-    gScene = gPhysics->createScene(sceneDesc);
+    sceneDesc.filterShader = [](physx::PxFilterObjectAttributes /*attributes0*/,
+        physx::PxFilterData /*filterData0*/,
+        physx::PxFilterObjectAttributes /*attributes1*/,
+        physx::PxFilterData /*filterData1*/,
+        physx::PxPairFlags& pairFlags,
+        const void* /*constantBlock*/,
+        physx::PxU32 /*constantBlockSize*/) -> physx::PxFilterFlags {
+            pairFlags = physx::PxPairFlag::eCONTACT_DEFAULT;
 
+            pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_FOUND;
+            pairFlags |= physx::PxPairFlag::eNOTIFY_TOUCH_LOST;
+
+            return physx::PxFilterFlag::eDEFAULT;
+        };
+    sceneDesc.simulationEventCallback = collisionCallback;
     sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+
+    gScene = gPhysics->createScene(sceneDesc);
 
     gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
     if (!gMaterial)
         throw std::runtime_error("gMaterial error!");
-    
-    RevDev::CollisionCallback collisionCallback;
-    gScene->setSimulationEventCallback(&collisionCallback);
 }
 
 void Physics_PhysX::Simulate(float fixedDeltaTime)
@@ -54,7 +68,7 @@ void Physics_PhysX::Simulate(float fixedDeltaTime)
     gScene->fetchResults(true);
 }
 
-void Physics_PhysX::CreateStatic(glm::vec3 pos, glm::vec3 size)
+void Physics_PhysX::CreateStatic(int id, glm::vec3 pos, glm::vec3 size)
 {
     physx::PxTransform PxPos(physx::PxVec3(pos.x, pos.y, pos.z));
     physx::PxRigidStatic* PxStatic = gPhysics->createRigidStatic(PxPos);
@@ -64,16 +78,17 @@ void Physics_PhysX::CreateStatic(glm::vec3 pos, glm::vec3 size)
         throw std::runtime_error("CreateExclusiveShape failed!");
 
     gScene->addActor(*PxStatic);
+    m_Actors.emplace(id, PxStatic);
 }
 
-void Physics_PhysX::CreateDynamic(glm::vec3 pos, glm::vec3 size, bool gravity)
+void Physics_PhysX::CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity)
 {
     physx::PxTransform PxPos(physx::PxVec3(pos.x, pos.y, pos.z));
     physx::PxRigidDynamic* PxDynamic = gPhysics->createRigidDynamic(PxPos);
 
     physx::PxShape* PxShape = physx::PxRigidActorExt::createExclusiveShape(*PxDynamic, physx::PxBoxGeometry(size.x, size.y, size.z), *gMaterial);
     if (!PxShape)
-        throw std::runtime_error("CreateExclusiveShape failed!");
+        throw std::runtime_error("Create shape error");
 
     if(!gravity)
         PxDynamic->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
@@ -81,4 +96,26 @@ void Physics_PhysX::CreateDynamic(glm::vec3 pos, glm::vec3 size, bool gravity)
     physx::PxRigidBodyExt::updateMassAndInertia(*PxDynamic, 1.0f);
 
     gScene->addActor(*PxDynamic);
+    m_Actors.emplace(id, PxDynamic);
+}
+
+void Physics_PhysX::UpdateActorTransform(int id, glm::vec3 pos, glm::vec3 rot)
+{
+    physx::PxVec3 pxPosition(pos.x, pos.y, pos.z);
+
+    physx::PxQuat pxRotation = physx::PxQuat(physx::PxIdentity);
+
+    if (rot != glm::vec3(0.0f))
+    {
+        physx::PxQuat yaw(rot.x, physx::PxVec3(0, 1, 0));
+        physx::PxQuat pitch(rot.y, physx::PxVec3(1, 0, 0));
+        physx::PxQuat roll(rot.z, physx::PxVec3(0, 0, 1));
+
+        pxRotation = yaw * pitch * roll;
+    }
+
+
+    physx::PxTransform transform(pxPosition, pxRotation);
+    
+    m_Actors.at(id)->setGlobalPose(transform, true);
 }

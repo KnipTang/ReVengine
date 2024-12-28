@@ -86,7 +86,6 @@ std::unique_ptr<Rev::Scene> Scene1()
 
 	inputComp->BindAction(SDL_SCANCODE_R, [playerTransform]() { playerTransform->SetRotationRad(0,0,0); });
 
-
 	inputComp->BindAction(SDL_SCANCODE_G, [gunComp]() { gunComp->Fire(); });
 	}
 
@@ -94,11 +93,11 @@ std::unique_ptr<Rev::Scene> Scene1()
 	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
 	enemy1->transform->SetPosition(0, 0, 5);
 	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture);
-	enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, true);
+	enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false);
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
 	enemy2->transform->SetPosition(5, 0, 5);
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture);
-	enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false);
+	enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, true);
 
 	//Scene add gameobects & return
 	{

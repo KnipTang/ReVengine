@@ -24,5 +24,7 @@ namespace Rev
 		glm::vec3 m_Position;
 		glm::vec3 m_Size;
 
+		int m_ColliderID;
+		static int colliderCounter;
 	};
 }

@@ -16,7 +16,13 @@ namespace RevDev
             }
         }
     
-        void onTrigger(physx::PxTriggerPair* /*pairs*/, physx::PxU32 /*count*/) override {}
+        void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) override {
+            for (physx::PxU32 i = 0; i < count; i++) {
+                if (pairs[i].status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
+                    std::cout << "Trigger detected between objects!\n";
+                }
+            }
+        }
         void onConstraintBreak(physx::PxConstraintInfo* /*constraints*/, physx::PxU32 /*count*/) override {}
         void onWake(physx::PxActor** /*actors*/, physx::PxU32 /*count*/) override {}
         void onSleep(physx::PxActor** /*actors*/, physx::PxU32 /*count*/) override {}
