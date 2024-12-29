@@ -2,6 +2,7 @@
 #include "GameObjects/GameObject.h"
 #include "Rev_CoreSystems.h"
 #include "Physics/Physics.h"
+#include "GameObjects/Components/CompCollision.h"
 
 using namespace Rev;
 
@@ -88,4 +89,25 @@ void Scene::RemoveObjects()
 		if(obj->IsActive() && obj->ToBeDestroyed()) 
 			removeGameObject(obj.get());
 	}
+}
+
+void Scene::removeGameObject(GameObject* obj)
+{
+	for (auto&& child : obj->GetChildren())
+	{
+		obj->RemoveChild(child.get());
+	}
+
+	auto&& collider = obj->getComponent<Rev::CompCollision>();
+	if (collider != nullptr)
+		m_Physics->DestroyCollider(collider->GetID());
+
+	m_AllGameObjects.erase(
+		std::remove_if(
+			m_AllGameObjects.begin(),
+			m_AllGameObjects.end(),
+			[obj](const std::unique_ptr<GameObject>& gameObject) {
+				return gameObject.get() == obj;
+			}),
+		m_AllGameObjects.end());
 }

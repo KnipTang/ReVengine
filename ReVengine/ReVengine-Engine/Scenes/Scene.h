@@ -59,22 +59,7 @@ namespace Rev
 			return nullptr;
 		}
 
-		void removeGameObject(GameObject* obj)
-		{
-			for (auto&& child : obj->GetChildren())
-			{
-				obj->RemoveChild(child.get());
-			}
-
-			m_AllGameObjects.erase(
-				std::remove_if(
-					m_AllGameObjects.begin(),
-					m_AllGameObjects.end(),
-					[obj](const std::unique_ptr<GameObject>& gameObject) {
-						return gameObject.get() == obj;
-					}),
-				m_AllGameObjects.end());
-		}
+		void removeGameObject(GameObject* obj);
 
 		void DisplaySceneHierarchy()
 		{

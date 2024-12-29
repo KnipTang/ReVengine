@@ -21,7 +21,7 @@ namespace Rev
 
 		void update([[maybe_unused]] float deltaTime) override;
 
-		void test() { std::cout << "test"; }
+		int GetID() { return m_ColliderID; }
 	public:
 		std::function<void(Rev::CompCollision* other)> m_CollisionFnc;
 	private:

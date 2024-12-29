@@ -68,13 +68,14 @@ std::unique_ptr<Rev::Scene> Scene1()
 		[cameraComp, textureShader, bulletTexture, physicsHandle]() {
 			Rev::GameObject* bullet = new Rev::GameObject{"Bullet"};
 			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.3f, 0.3f);
-			bullet->addComponent<BulletComp>(bullet, 50.f);
+			BulletComp& bulletComp = *bullet->addComponent<BulletComp>(bullet, 50.f);
 			bullet->addComponent<Rev::CompCollision>(bullet, physicsHandle,
 				[](Rev::CompCollision* other) {
 					Rev::GameObject& obj = *other->GetGameObject();
 					if(obj.m_Tag != "Bullet") obj.Destroy();
 				},
 				false);
+			bulletComp.SetMaxTravelDistance(100);
 			return bullet;
 		});
 

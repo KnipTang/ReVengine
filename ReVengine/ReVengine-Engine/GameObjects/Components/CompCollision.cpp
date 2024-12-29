@@ -24,7 +24,7 @@ CompCollision::CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHand
 
 CompCollision::~CompCollision()
 {
-    m_PhysicsHandle->DestroyCollider(m_ColliderID);
+    
 }
 
 void CompCollision::update([[maybe_unused]] float deltaTime)

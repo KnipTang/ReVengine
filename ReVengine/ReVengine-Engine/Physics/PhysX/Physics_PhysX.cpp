@@ -11,6 +11,11 @@ Physics_PhysX::Physics_PhysX()
 
 Physics_PhysX::~Physics_PhysX()
 {
+    for (int i = 0; i < m_Actors.size(); i++)
+    {
+        DestroyCollider(i);
+    }
+
     gScene->release();
     gDispatcher->release();
     gPhysics->release();
@@ -123,7 +128,7 @@ void Physics_PhysX::DestroyCollider(int id)
     auto it = m_Actors.find(id);
     if (it != m_Actors.end()) 
     {
-        physx::PxActor* actor = it->second;
+        auto&& actor = it->second;
         gScene->removeActor(*actor);
         actor->release();
         m_Actors.erase(it);
