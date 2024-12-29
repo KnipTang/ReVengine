@@ -61,6 +61,11 @@ namespace Rev
 
 		void removeGameObject(GameObject* obj)
 		{
+			for (auto&& child : obj->GetChildren())
+			{
+				obj->RemoveChild(child.get());
+			}
+
 			m_AllGameObjects.erase(
 				std::remove_if(
 					m_AllGameObjects.begin(),
@@ -110,6 +115,8 @@ namespace Rev
 			}
 			return false;
 		}
+
+		void RemoveObjects();
 	private:
 		std::vector<std::unique_ptr<GameObject>> m_AllGameObjects;
 		std::vector<GameObject*> m_ActiveGameObjects;

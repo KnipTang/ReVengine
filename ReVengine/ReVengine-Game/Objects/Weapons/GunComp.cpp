@@ -5,10 +5,11 @@
 #include "GameObjects/Components/CompTransform.h"
 #include "GameObjects/Components/CompTransform.h"
 
-GunComp::GunComp(Rev::GameObject* gameObj, Rev::CompTransform* playerTransform, std::function<Rev::GameObject* ()> bulletFunc) :
+GunComp::GunComp(Rev::GameObject* gameObj, Rev::CompTransform* playerTransform, float fireRate, std::function<Rev::GameObject* ()> bulletFunc) :
 	Rev::BaseComponent(gameObj),
 	m_PlayerTransform{ playerTransform },
-	m_BulletFunc{ bulletFunc }
+	m_BulletFunc{ bulletFunc },
+	m_FireRate{ fireRate }
 {
 
 }
@@ -18,9 +19,23 @@ GunComp::~GunComp()
 
 }
 
+void GunComp::update([[maybe_unused]] float deltaTime)
+{
+	if(!m_ReadyToShoot) 
+		m_TimeLastShot += deltaTime;
+	if (m_TimeLastShot >= m_FireRate)
+		m_ReadyToShoot = true;
+}
+
 void GunComp::Fire()
 {
-	Rev::GameObject* bullet = m_BulletFunc();
-	bullet->transform->SetPosition(m_PlayerTransform->GetPosition());
-	Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->addGameObject(bullet);
+	if (m_ReadyToShoot)
+	{
+		m_TimeLastShot = 0;
+
+		Rev::GameObject* bullet = m_BulletFunc();
+		bullet->transform->SetPosition(m_PlayerTransform->GetWorldPosition());
+		bullet->transform->SetRotationRad(m_PlayerTransform->GetWorldRotation());
+		Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->addGameObject(bullet);
+	}
 }

@@ -6,7 +6,7 @@
 BulletComp::BulletComp(Rev::GameObject* gameObj, float speed) :
 	Rev::BaseComponent(gameObj),
 	m_Transform(gameObj->transform),
-	m_StartDirection(gameObj->transform->GetRotation()),
+	m_StartDirection(gameObj->transform->GetWorldRotation()),
 	m_Speed(speed)
 {
 

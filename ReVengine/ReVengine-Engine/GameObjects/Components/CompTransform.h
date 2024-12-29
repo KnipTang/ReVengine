@@ -16,12 +16,15 @@ namespace Rev
 
 		void SetPosition(float x, float y, float z);
 		void SetPosition(glm::vec3 pos);
-		glm::vec3 GetPosition();
+		glm::vec3 GetWorldPosition();
+		glm::vec3 GetLocalPosition();
+
 		void SetRotationRad(float x, float y, float z);
 		void SetRotationRad(glm::vec3 dir);
 		void SetRotationDegree(float x, float y, float z);
 		void SetRotationDegree(glm::vec3 dir);
-		glm::vec3 GetRotation();
+		glm::vec3 GetWorldRotation();
+		glm::vec3 GetLocalRotation();
 
 		glm::mat4& GetModelMatrix();
 
@@ -36,19 +39,21 @@ namespace Rev
 		void AddYawInput(float input);
 		void AddPitchInput(float input);
 
+		bool IsPositionDirty() { return m_DirtyPosition; }
+		bool IsRotationDirty() { return m_DirtyRotation; }
 	private:
 		void SetDirtyPosition();
 		void SetDirtyRotation();
 
 		void UpdatePosition();
 		void UpdateRotation();
-	public:
-		glm::vec3 m_LocalPosition;
-		glm::vec3 m_LocalRotation;
 	private:
 		glm::vec3 m_Position;
 		glm::vec3 m_Rotation;
 		glm::vec3 m_Scale; //TODO
+
+		glm::vec3 m_LocalPosition;
+		glm::vec3 m_LocalRotation;
 
 		glm::mat4 m_ModelMatrix;
 

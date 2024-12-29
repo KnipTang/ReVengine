@@ -17,7 +17,7 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 	m_Texture{ texture },
 	m_MeshId{}
 {
-	float depthZ = m_TransformComp->GetPosition().z;
+	float depthZ = m_TransformComp->GetWorldPosition().z;
 	m_Vertices =
 	{
 		//Bottom Left

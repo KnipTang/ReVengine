@@ -32,6 +32,8 @@ void Scene::lateUpdate(float deltaTime)
 	{
 		if (obj->IsActive()) obj->lateUpdate(deltaTime);
 	}
+
+	RemoveObjects();
 }
 
 void Scene::fixedUpdate(float fixedDeltaTime)
@@ -76,4 +78,14 @@ void Scene::SetActive(bool active)
 		Rev::Rev_CoreSystems::pSceneManager->AddActiveScene(this);
 	else
 		Rev::Rev_CoreSystems::pSceneManager->RemoveActiveScene(this);
+}
+
+void Scene::RemoveObjects()
+{
+	for (auto&& obj : m_AllGameObjects)
+	{
+		if (obj == nullptr) continue;
+		if(obj->IsActive() && obj->ToBeDestroyed()) 
+			removeGameObject(obj.get());
+	}
 }

@@ -6,6 +6,7 @@
 #include <cassert>
 #include "BaseComponent.h"
 #include <iterator>
+#include <string>
 
 namespace Rev
 {
@@ -20,7 +21,7 @@ namespace Rev
 	class GameObject
 	{
 	public:
-		GameObject();
+		GameObject(std::string tag = "NONE");
 		~GameObject();
 
 		GameObject(const GameObject& other);
@@ -32,6 +33,9 @@ namespace Rev
 		void lateUpdate(float deltaTime);
 		void fixedUpdate(float fixedDeltaTime);
 		const void render();
+
+		void Destroy() { m_ToDestroy = true; }
+		bool ToBeDestroyed() { return m_ToDestroy; }
 
 		template <baseCompConcept T, typename... TArguments>
 		T* addComponent(GameObject* gameObj, TArguments&&... args)
@@ -140,8 +144,8 @@ namespace Rev
 			m_Parent = parent;
 		}
 	public:
-
 		Rev::CompTransform* transform;
+		std::string m_Tag;
 	private:
 		std::vector<std::unique_ptr<BaseComponent>> m_Components;
 
@@ -150,6 +154,8 @@ namespace Rev
 		GameObject* m_Parent;
 
 		bool m_Active;
+
+		bool m_ToDestroy;
 
 		static int objIDCounter;
 		int objID;

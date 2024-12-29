@@ -8,11 +8,13 @@ using namespace Rev;
 
 int GameObject::objIDCounter = 0;
 
-GameObject::GameObject() :
+GameObject::GameObject(std::string tag) :
+	m_Tag{ tag },
 	m_Components{},
 	m_ChildrenCount{0},
 	m_Parent{nullptr},
 	m_Active{true},
+	m_ToDestroy{false},
 	objID{objIDCounter++}
 {
 	transform = addComponent<Rev::CompTransform>(this);
@@ -93,8 +95,8 @@ GameObject* GameObject::AddChild(GameObject* childObj)
 {
 	childObj->SetParent(this);
 
-	childObj->transform->m_LocalPosition = childObj->transform->GetPosition() - transform->GetPosition();
-	childObj->transform->m_LocalRotation = childObj->transform->GetRotation() - transform->GetRotation();
+	childObj->transform->SetPosition(childObj->transform->GetWorldPosition() - transform->GetWorldPosition());
+	childObj->transform->SetRotationRad(childObj->transform->GetWorldRotation() - transform->GetWorldRotation());
 
 	m_Children.emplace_back(childObj);
 
@@ -110,5 +112,5 @@ void GameObject::SetActive(bool active)
 	if (active)
 		Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->AddActiveGameObject(this);
 	else
-		Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->removeGameObject(this);
+		Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->RemoveActiveGameObject(this);
 }

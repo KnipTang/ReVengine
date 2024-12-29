@@ -84,12 +84,20 @@ void CompTransform::SetPosition(glm::vec3 pos)
 	SetDirtyPosition();
 }
 
-glm::vec3 CompTransform::GetPosition()
+glm::vec3 CompTransform::GetWorldPosition()
 {
 	if (m_DirtyPosition)
 		UpdatePosition();
 
 	return m_Position;
+}
+
+glm::vec3 CompTransform::GetLocalPosition()
+{
+	if (m_DirtyPosition)
+		UpdatePosition();
+
+	return m_LocalPosition;
 }
 
 void CompTransform::SetRotationRad(float x, float y, float z)
@@ -115,7 +123,7 @@ void CompTransform::SetRotationDegree(glm::vec3 dir)
 	SetRotationRad(glm::radians(dir));
 }
 
-glm::vec3 CompTransform::GetRotation()
+glm::vec3 CompTransform::GetWorldRotation()
 {
 	if (m_DirtyRotation)
 		UpdateRotation();
@@ -123,10 +131,18 @@ glm::vec3 CompTransform::GetRotation()
 	return m_Rotation;
 }
 
+glm::vec3 CompTransform::GetLocalRotation()
+{
+	if (m_DirtyRotation)
+		UpdateRotation();
+
+	return m_LocalRotation;
+}
+
 glm::mat4& CompTransform::GetModelMatrix()
 {
-	GetPosition();
-	GetRotation();
+	GetWorldPosition();
+	GetWorldRotation();
 
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), m_Scale);
 	glm::mat4 rotationMat = glm::yawPitchRoll(m_Rotation.y, m_Rotation.x, m_Rotation.z);

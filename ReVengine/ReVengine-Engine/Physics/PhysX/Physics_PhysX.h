@@ -23,8 +23,9 @@ namespace RevDev
 		void Simulate(float fixedDeltaTime);
 
 		void CreateStatic(int id, glm::vec3 pos, glm::vec3 size);
-		void CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity);
-		void CreateCollider(glm::vec3 pos, glm::vec3 size);
+		void CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity, void* userData);
+
+		void DestroyCollider(int id);
 
 		void UpdateActorTransform(int id, glm::vec3 pos, glm::vec3 rot);
 	public:
@@ -42,6 +43,6 @@ namespace RevDev
 
 		RevDev::CollisionCallback* collisionCallback;
 
-		std::unordered_map<int, physx::PxRigidBody*> m_Actors;
+		std::unordered_map<int, physx::PxRigidActor*> m_Actors;
 	};
 }

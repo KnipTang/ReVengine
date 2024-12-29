@@ -2,16 +2,27 @@
 
 #include <PxPhysicsAPI.h>
 #include <iostream>
+#include "GameObjects/Components/CompCollision.h"
 
 namespace RevDev
 {
     class CollisionCallback : public physx::PxSimulationEventCallback {
     public:
 
-        void onContact(const physx::PxContactPairHeader& /*pairHeader*/, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override {
+        void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override {
             for (physx::PxU32 i = 0; i < nbPairs; i++) {
                 if (pairs[i].events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-                    std::cout << "Collision detected between objects!\n";
+                    std::cout << "Collision detected between objects! "
+                    << pairHeader.actors[0] << " and " << pairHeader.actors[1] << std::endl;
+
+                    void* userDataA = pairHeader.actors[0]->userData;
+                    void* userDataB = pairHeader.actors[1]->userData;
+
+                    auto* compA = static_cast<Rev::CompCollision*>(userDataA);
+                    auto* compB = static_cast<Rev::CompCollision*>(userDataB);
+
+                    if (compA) compA->m_CollisionFnc(compB);
+                    if (compB) compB->m_CollisionFnc(compA);
                 }
             }
         }
@@ -19,7 +30,9 @@ namespace RevDev
         void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) override {
             for (physx::PxU32 i = 0; i < count; i++) {
                 if (pairs[i].status & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-                    std::cout << "Trigger detected between objects!\n";
+                    std::cout << "Trigger detected between objects! " 
+                        << pairs[i].triggerActor << " by " << pairs[i].otherActor << std::endl;
+
                 }
             }
         }

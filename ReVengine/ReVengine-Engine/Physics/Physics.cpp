@@ -28,12 +28,17 @@ void Physics::CreateStatic(int id, glm::vec3 pos, glm::vec3 size)
     m_PhysicsImpl->CreateStatic(id, pos, size);
 }
 
-void Physics::CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity)
+void Physics::CreateDynamic(int id, glm::vec3 pos, glm::vec3 size, bool gravity, void* userData)
 {
-    m_PhysicsImpl->CreateDynamic(id, pos, size, gravity);
+    m_PhysicsImpl->CreateDynamic(id, pos, size, gravity, userData);
 }
 
-void Physics::UpdateActorTransform(int id)
+void Physics::DestroyCollider(int id)
 {
-    m_PhysicsImpl->UpdateActorTransform(id);
+    m_PhysicsImpl->DestroyCollider(id);
+}
+
+void Physics::UpdateActorTransform(int id, glm::vec3 pos, glm::vec3 rot)
+{
+    m_PhysicsImpl->UpdateActorTransform(id, pos, rot);
 }

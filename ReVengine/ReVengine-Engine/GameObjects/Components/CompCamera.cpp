@@ -18,7 +18,7 @@ CompCamera::CompCamera(GameObject* gameObj, Rev::CompTransform* transform, bool 
 
 void Rev::CompCamera::lateUpdate([[maybe_unused]] float deltaTime)
 {
-	m_Camera->Update(m_Transform->GetPosition(), m_Transform->GetRotation());
+	m_Camera->Update(m_Transform->GetWorldPosition(), m_Transform->GetWorldRotation());
 
 	MouseRelativeMotion delta = Rev::Rev_CoreSystems::pInputManager->GetMouseRelativeMotion();
 

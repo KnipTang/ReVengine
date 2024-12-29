@@ -2,10 +2,13 @@
 
 #include "GameObjects/BaseComponent.h"
 #include <glm/vec3.hpp>
+#include <iostream>
+#include <functional>
 
 namespace Rev
 {
 	class Physics;
+	class CompTransform;
 }
 
 namespace Rev
@@ -13,13 +16,18 @@ namespace Rev
 	class CompCollision : public Rev::BaseComponent
 	{
 	public:
-		CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHandle, bool staticObject, bool gravity = false, glm::vec3 size = { 1,1,1 }, glm::vec3 pos = { 0,0,0 });
-		~CompCollision() = default;
+		CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHandle, std::function<void(Rev::CompCollision* other)> collisionFnc, bool staticObject, bool gravity = false, glm::vec3 size = { 1,1,1 }, glm::vec3 pos = { 0,0,0 });
+		~CompCollision();
 
-	private:
+		void update([[maybe_unused]] float deltaTime) override;
 
+		void test() { std::cout << "test"; }
+	public:
+		std::function<void(Rev::CompCollision* other)> m_CollisionFnc;
 	private:
 		Rev::Physics* m_PhysicsHandle;
+
+		Rev::CompTransform* m_TransformHandle;
 
 		glm::vec3 m_Position;
 		glm::vec3 m_Size;

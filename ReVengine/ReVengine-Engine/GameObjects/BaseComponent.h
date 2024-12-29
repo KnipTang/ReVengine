@@ -19,6 +19,9 @@ namespace Rev
 		virtual void lateUpdate([[maybe_unused]] float deltaTime) {};
 		virtual void fixedUpdate([[maybe_unused]] float fixedDeltaTime) {};
 		virtual const void render() {};
+
+		GameObject* GetGameObject() const { return m_GameObject; }
+
 	protected:
 		GameObject* m_GameObject;
 	};
