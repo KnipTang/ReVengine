@@ -59,6 +59,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	player->addComponent<Rev::CompCollision>(player.get(), physicsHandle, false, false, glm::vec3{0.1f, 1, 0.1f});
+	cameraComp->LockAxes(RotationAxes::x, true);
 
 	//Gun
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();

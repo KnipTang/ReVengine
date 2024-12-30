@@ -11,12 +11,14 @@ CompCamera::CompCamera(GameObject* gameObj, Rev::CompTransform* transform, bool 
 	m_Camera{ std::make_unique<RevDev::Camera>() },
 	m_Transform{ transform },
 	m_LookSensitivity{5},
-	m_ControllsFlipped{flipControlls}
+	m_ControllsFlipped{flipControlls},
+	m_LockedX{false},
+	m_LockedY{false}
 {
 
 }
 
-void Rev::CompCamera::lateUpdate([[maybe_unused]] float deltaTime)
+void CompCamera::lateUpdate([[maybe_unused]] float deltaTime)
 {
 	m_Camera->Update(m_Transform->GetWorldPosition(), m_Transform->GetWorldRotation());
 
@@ -30,7 +32,17 @@ void Rev::CompCamera::lateUpdate([[maybe_unused]] float deltaTime)
 		Turn(turnValue.second, turnValue.first);
 }
 
-void Rev::CompCamera::Turn(float x, float y)
+void CompCamera::Turn(float x, float y)
 {
+	if (m_LockedX) x = 0;
+	if (m_LockedY) y = 0;
 	m_Transform->Turn(x, y);
+}
+
+void CompCamera::LockAxes(RotationAxes axe, bool lock)
+{
+	if (axe == RotationAxes::x)
+		m_LockedX = lock;
+	else
+		m_LockedY = lock;
 }

@@ -13,6 +13,12 @@ namespace Rev
 	class CompTransform;
 }
 
+enum class RotationAxes
+{
+	x,
+	y
+};
+
 namespace Rev
 {
 	class CompCamera : public BaseComponent
@@ -25,6 +31,8 @@ namespace Rev
 
 		void Turn(float x, float y);
 
+		void LockAxes(RotationAxes axe, bool lock = true);
+
 		RevDev::Camera* GetCamera() const { return m_Camera.get(); }
 	private:
 		std::unique_ptr<RevDev::Camera> m_Camera;
@@ -34,5 +42,8 @@ namespace Rev
 		float m_LookSensitivity;
 
 		bool m_ControllsFlipped;
+
+		bool m_LockedX;
+		bool m_LockedY;
 	};
 }
