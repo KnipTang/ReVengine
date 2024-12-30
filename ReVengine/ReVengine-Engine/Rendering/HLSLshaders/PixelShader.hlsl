@@ -17,7 +17,7 @@ ps_output ps_main(ps_input input)
 {
     ps_output output;
    
-    output.color = float4(0, 0, 0, 1); //Texture.Sample(Sampler, input.uv);
+    output.color = Texture.Sample(Sampler, input.uv);
 
     return output;
 }

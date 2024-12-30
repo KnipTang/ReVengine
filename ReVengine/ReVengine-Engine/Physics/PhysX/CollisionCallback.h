@@ -12,9 +12,6 @@ namespace RevDev
         void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) override {
             for (physx::PxU32 i = 0; i < nbPairs; i++) {
                 if (pairs[i].events & physx::PxPairFlag::eNOTIFY_TOUCH_FOUND) {
-                    std::cout << "Collision detected between objects! "
-                    << pairHeader.actors[0] << " and " << pairHeader.actors[1] << std::endl;
-
                     void* userDataA = pairHeader.actors[0]->userData;
                     void* userDataB = pairHeader.actors[1]->userData;
 

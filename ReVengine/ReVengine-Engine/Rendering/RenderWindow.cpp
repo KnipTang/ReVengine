@@ -102,8 +102,11 @@ bool RenderWindow::UpdateWindow()
         switch (e.type)
         {
         case SDL_KEYDOWN:
-            Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(e.key.keysym.scancode);
-            std::cout << e.key.keysym.scancode;
+            m_LastPressedKey = e.key.keysym.scancode;
+           // Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(e.key.keysym.scancode);
+            break;
+        case SDL_KEYUP:
+            m_LastPressedKey = SDL_SCANCODE_UNKNOWN;
             break;
 
         case SDL_MOUSEMOTION:
@@ -114,6 +117,8 @@ bool RenderWindow::UpdateWindow()
             break;
         }
     }    
+
+    if(m_LastPressedKey != SDL_SCANCODE_UNKNOWN) Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(m_LastPressedKey);
 
     int xRel, yRel;
     SDL_GetRelativeMouseState(&xRel, &yRel);

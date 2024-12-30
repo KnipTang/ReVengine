@@ -32,6 +32,7 @@ void GunComp::Fire()
 	if (m_ReadyToShoot)
 	{
 		m_TimeLastShot = 0;
+		m_ReadyToShoot = false;
 
 		Rev::GameObject* bullet = m_BulletFunc();
 		bullet->transform->SetPosition(m_PlayerTransform->GetWorldPosition());

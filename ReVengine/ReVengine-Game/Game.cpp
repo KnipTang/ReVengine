@@ -64,7 +64,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
 	gun->transform->SetPosition(0, -0.85f, 0);
 	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, weaponTexture, 0.3f, 0.3f);
-	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), player->transform, 5,
+	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), player->transform, 0.25f,
 		[cameraComp, textureShader, bulletTexture, physicsHandle]() {
 			Rev::GameObject* bullet = new Rev::GameObject{"Bullet"};
 			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.3f, 0.3f);

@@ -6,6 +6,7 @@
 #include "Camera/Camera.h"
 #include "glm/matrix.hpp"
 #include "d3d11.h"
+#include "SDL_scancode.h"
 
 namespace Rev
 {
@@ -63,6 +64,6 @@ namespace RevDev
 
 		DirectX::XMMATRIX m_ProjectionMatrix;
 
-		//SDL_Scancode m_LastPressedKey;
+		SDL_Scancode m_LastPressedKey;
 	};
 }
