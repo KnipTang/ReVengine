@@ -17,6 +17,7 @@
 #include <iostream>
 #include "Objects/Weapons/BulletComp.h"
 #include "Objects/Weapons/GunComp.h"
+#include "Objects/Enemies/LookAtPlayerComp.h"
 #include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Shaders/TextureShader2D.h"
 #include "Physics/Physics.h"
@@ -80,17 +81,19 @@ std::unique_ptr<Rev::Scene> Scene1()
 			return bullet;
 		});
 	gunComp->SetFireSoundEffect("pew");
+
+	Rev::CompTransform* playerTransform = player->transform;
+	float walkingSpeed = 0.1f;
 	//Input Config
 	{
-	Rev::CompTransform* playerTransform = player->transform;
 	inputComp->BindAction(SDL_SCANCODE_I, [playerTransform]() { playerTransform->AddPitchInput(10); });
 	inputComp->BindAction(SDL_SCANCODE_K, [playerTransform]() { playerTransform->AddPitchInput(-10); });
 	inputComp->BindAction(SDL_SCANCODE_L, [playerTransform]() { playerTransform->AddYawInput(10); });
 	inputComp->BindAction(SDL_SCANCODE_J, [playerTransform]() { playerTransform->AddYawInput(-10); });
-	inputComp->BindAction(SDL_SCANCODE_W, [playerTransform]() { playerTransform->MoveForward(1); });
-	inputComp->BindAction(SDL_SCANCODE_S, [playerTransform]() { playerTransform->MoveForward(-1); });
-	inputComp->BindAction(SDL_SCANCODE_D, [playerTransform]() { playerTransform->MoveRight(1); });
-	inputComp->BindAction(SDL_SCANCODE_A, [playerTransform]() { playerTransform->MoveRight(-1); });
+	inputComp->BindAction(SDL_SCANCODE_W, [playerTransform, walkingSpeed]() { playerTransform->MoveForward(1, walkingSpeed); });
+	inputComp->BindAction(SDL_SCANCODE_S, [playerTransform, walkingSpeed]() { playerTransform->MoveForward(-1, walkingSpeed); });
+	inputComp->BindAction(SDL_SCANCODE_D, [playerTransform, walkingSpeed]() { playerTransform->MoveRight(1, walkingSpeed); });
+	inputComp->BindAction(SDL_SCANCODE_A, [playerTransform, walkingSpeed]() { playerTransform->MoveRight(-1, walkingSpeed); });
 
 	inputComp->BindAction(SDL_SCANCODE_R, [playerTransform]() { playerTransform->SetRotationRad(0,0,0); });
 
@@ -105,12 +108,14 @@ std::unique_ptr<Rev::Scene> Scene1()
 
 	//Enemies
 	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
+	enemy1->addComponent<LookAtPlayerComp>(enemy1.get(), playerTransform);
 	enemy1->transform->SetPosition(0, 0, 5);
 	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture);
 	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.3f, 1, 0.1f});
 	enemy1Coll.SetOnContactFunction(lambdaCollEnemy);
 
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
+	enemy2->addComponent<LookAtPlayerComp>(enemy2.get(), playerTransform);
 	enemy2->transform->SetPosition(5, 0, 5);
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture);
 	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.3f, 1, 0.1f });

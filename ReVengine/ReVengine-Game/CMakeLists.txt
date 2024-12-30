@@ -2,6 +2,7 @@ add_executable(ReVengine-Game
 "Game.cpp" 
 "Objects/Weapons/BulletComp.cpp"
 "Objects/Weapons/GunComp.cpp"
+"Objects/Enemies/LookAtPlayerComp.cpp"
 ) #No need to add header files
 
 target_link_libraries(ReVengine-Game ReVengine-Engine) #links Game to Engine lib(dll)

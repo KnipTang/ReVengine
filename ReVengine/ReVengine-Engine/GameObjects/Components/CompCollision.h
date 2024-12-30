@@ -19,7 +19,7 @@ namespace Rev
 		CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHandle, bool staticObject = false, bool gravity = false, glm::vec3 size = { 1,1,1 }, glm::vec3 pos = { 0,0,0 });
 		~CompCollision();
 
-		void update([[maybe_unused]] float deltaTime) override;
+		void lateUpdate([[maybe_unused]] float deltaTime) override;
 
 		void SetOnContactFunction(std::function<void(Rev::CompCollision* other)> onContactFnc) { m_OnContactFunction = onContactFnc; }
 		void OnContact(Rev::CompCollision* other);

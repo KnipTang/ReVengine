@@ -26,7 +26,7 @@ CompCollision::~CompCollision()
     
 }
 
-void CompCollision::update([[maybe_unused]] float deltaTime)
+void CompCollision::lateUpdate([[maybe_unused]] float deltaTime)
 {
     //if (m_TransformHandle->IsPositionDirty() || m_TransformHandle->IsRotationDirty())
         m_PhysicsHandle->UpdateActorTransform(m_ColliderID, m_TransformHandle->GetWorldPosition(), m_TransformHandle->GetWorldRotation());
