@@ -17,6 +17,8 @@ public:
 	void update([[maybe_unused]] float deltaTime) override;
 
 	void Fire();
+	
+	void SetFireSoundEffect(const std::string name) { m_SoundEffectName = name; }
 
 private:
 	Rev::CompTransform* m_PlayerTransform;
@@ -25,4 +27,6 @@ private:
 	float m_FireRate;
 	float m_TimeLastShot;
 	bool m_ReadyToShoot;
+
+	std::string m_SoundEffectName;
 };

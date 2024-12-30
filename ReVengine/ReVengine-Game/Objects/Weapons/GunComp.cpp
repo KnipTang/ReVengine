@@ -3,7 +3,7 @@
 #include "Scenes/Scene.h"
 #include "Rev_CoreSystems.h"
 #include "GameObjects/Components/CompTransform.h"
-#include "GameObjects/Components/CompTransform.h"
+#include "Rev_CoreSystems.h"
 
 GunComp::GunComp(Rev::GameObject* gameObj, Rev::CompTransform* playerTransform, float fireRate, std::function<Rev::GameObject* ()> bulletFunc) :
 	Rev::BaseComponent(gameObj),
@@ -38,5 +38,7 @@ void GunComp::Fire()
 		bullet->transform->SetPosition(m_PlayerTransform->GetWorldPosition());
 		bullet->transform->SetRotationRad(m_PlayerTransform->GetWorldRotation());
 		Rev::Rev_CoreSystems::pSceneManager->GetActiveScenes().at(0)->addGameObject(bullet);
+
+		if(!m_SoundEffectName.empty()) Rev::Rev_CoreSystems::pRevSound->PlayRevSound(m_SoundEffectName);
 	}
 }

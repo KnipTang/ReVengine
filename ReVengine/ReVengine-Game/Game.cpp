@@ -68,7 +68,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), player->transform, 0.25f,
 		[cameraComp, textureShader, bulletTexture, physicsHandle]() {
 			Rev::GameObject* bullet = new Rev::GameObject{"Bullet"};
-			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.3f, 0.3f);
+			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.1f, 0.1f);
 			BulletComp& bulletComp = *bullet->addComponent<BulletComp>(bullet, 50.f);
 			bulletComp.SetMaxTravelDistance(100);
 			Rev::CompCollision& bulletColl = *bullet->addComponent<Rev::CompCollision>(bullet, physicsHandle, false, false, glm::vec3{ 0.1f, 0.1f, 0.1f });
@@ -79,7 +79,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 				});
 			return bullet;
 		});
-
+	gunComp->SetFireSoundEffect("pew");
 	//Input Config
 	{
 	Rev::CompTransform* playerTransform = player->transform;
@@ -107,13 +107,13 @@ std::unique_ptr<Rev::Scene> Scene1()
 	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
 	enemy1->transform->SetPosition(0, 0, 5);
 	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture);
-	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.1f, 1, 0.1f});
+	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.3f, 1, 0.1f});
 	enemy1Coll.SetOnContactFunction(lambdaCollEnemy);
 
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
 	enemy2->transform->SetPosition(5, 0, 5);
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture);
-	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.1f, 1, 0.1f });
+	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.3f, 1, 0.1f });
 	enemy2Coll.SetOnContactFunction(lambdaCollEnemy);
 
 	std::unique_ptr<Rev::GameObject> grandParent = std::make_unique<Rev::GameObject>();
