@@ -8,9 +8,8 @@ using namespace Rev;
 
 int CompCollision::colliderCounter = 0;
 
-CompCollision::CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHandle, std::function<void(Rev::CompCollision* other)> collisionFnc, bool staticObject, bool gravity, glm::vec3 size, glm::vec3 pos) :
+CompCollision::CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHandle, bool staticObject, bool gravity, glm::vec3 size, glm::vec3 pos) :
     BaseComponent(gameObj),
-    m_CollisionFnc{ collisionFnc },
     m_PhysicsHandle{ physicsHandle },
     m_TransformHandle{ m_GameObject->transform },
     m_Size{size},
@@ -31,4 +30,9 @@ void CompCollision::update([[maybe_unused]] float deltaTime)
 {
     //if (m_TransformHandle->IsPositionDirty() || m_TransformHandle->IsRotationDirty())
         m_PhysicsHandle->UpdateActorTransform(m_ColliderID, m_TransformHandle->GetWorldPosition(), m_TransformHandle->GetWorldRotation());
+}
+
+void CompCollision::OnContact(Rev::CompCollision* other)
+{
+    if(m_OnContactFunction != nullptr) m_OnContactFunction(other);
 }

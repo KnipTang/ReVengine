@@ -143,8 +143,8 @@ void Physics_PhysX::UpdateActorTransform(int id, glm::vec3 pos, glm::vec3 rot)
 
     if (rot != glm::vec3(0.0f))
     {
-        physx::PxQuat yaw(rot.x, physx::PxVec3(0, 1, 0));
-        physx::PxQuat pitch(rot.y, physx::PxVec3(1, 0, 0));
+        physx::PxQuat yaw(rot.y, physx::PxVec3(0, 1, 0));
+        physx::PxQuat pitch(rot.x, physx::PxVec3(1, 0, 0));
         physx::PxQuat roll(rot.z, physx::PxVec3(0, 0, 1));
 
         pxRotation = yaw * pitch * roll;

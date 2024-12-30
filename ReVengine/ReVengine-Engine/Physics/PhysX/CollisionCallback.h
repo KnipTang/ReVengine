@@ -21,8 +21,8 @@ namespace RevDev
                     auto* compA = static_cast<Rev::CompCollision*>(userDataA);
                     auto* compB = static_cast<Rev::CompCollision*>(userDataB);
 
-                    if (compA) compA->m_CollisionFnc(compB);
-                    if (compB) compB->m_CollisionFnc(compA);
+                    if (compA) compA->OnContact(compB);
+                    if (compB) compB->OnContact(compA);
                 }
             }
         }

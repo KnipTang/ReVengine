@@ -55,10 +55,10 @@ std::unique_ptr<Rev::Scene> Scene1()
 	Rev::TextureShader2D* textureShader2D = new Rev::TextureShader2D{ renderer->GetDevice(), renderer->GetDeviceContext() };
 
 	//Player
-	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>();
+	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>("Player");
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
-	//player->addComponent<Rev::CompCollision>(player.get(), physicsHandle, false);
+	player->addComponent<Rev::CompCollision>(player.get(), physicsHandle, false, false, glm::vec3{0.1f, 1, 0.1f});
 
 	//Gun
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
@@ -69,13 +69,13 @@ std::unique_ptr<Rev::Scene> Scene1()
 			Rev::GameObject* bullet = new Rev::GameObject{"Bullet"};
 			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.3f, 0.3f);
 			BulletComp& bulletComp = *bullet->addComponent<BulletComp>(bullet, 50.f);
-			bullet->addComponent<Rev::CompCollision>(bullet, physicsHandle,
-				[](Rev::CompCollision* other) {
-					Rev::GameObject& obj = *other->GetGameObject();
-					if(obj.m_Tag != "Bullet") obj.Destroy();
-				},
-				false);
 			bulletComp.SetMaxTravelDistance(100);
+			Rev::CompCollision& bulletColl = *bullet->addComponent<Rev::CompCollision>(bullet, physicsHandle, false, false, glm::vec3{ 0.1f, 0.1f, 0.1f });
+			bulletColl.SetOnContactFunction(
+				[](Rev::CompCollision* other) {
+				Rev::GameObject& obj = *other->GetGameObject();
+				if (obj.m_Tag != "Bullet" && obj.m_Tag != "Player") obj.Destroy();
+				});
 			return bullet;
 		});
 
@@ -96,18 +96,24 @@ std::unique_ptr<Rev::Scene> Scene1()
 	inputComp->BindAction(SDL_SCANCODE_G, [gunComp]() { gunComp->Fire(); });
 	}
 
+	auto lambdaCollEnemy = 
+		[](Rev::CompCollision* other) {
+		Rev::GameObject& obj = *other->GetGameObject();
+		if(obj.m_Tag == "Bullet") obj.Destroy();
+		};
+
 	//Enemies
 	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
 	enemy1->transform->SetPosition(0, 0, 5);
 	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture);
-	enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle,
-		[](Rev::CompCollision* other) {
-			other->GetGameObject()->Destroy();
-		}, false);
+	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.1f, 1, 0.1f});
+	enemy1Coll.SetOnContactFunction(lambdaCollEnemy);
+
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
 	enemy2->transform->SetPosition(5, 0, 5);
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture);
-	//enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, true);
+	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.1f, 1, 0.1f });
+	enemy2Coll.SetOnContactFunction(lambdaCollEnemy);
 
 	std::unique_ptr<Rev::GameObject> grandParent = std::make_unique<Rev::GameObject>();
 	grandParent->transform->SetPosition(6, 0, 0);

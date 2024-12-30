@@ -16,16 +16,18 @@ namespace Rev
 	class CompCollision : public Rev::BaseComponent
 	{
 	public:
-		CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHandle, std::function<void(Rev::CompCollision* other)> collisionFnc, bool staticObject, bool gravity = false, glm::vec3 size = { 1,1,1 }, glm::vec3 pos = { 0,0,0 });
+		CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHandle, bool staticObject = false, bool gravity = false, glm::vec3 size = { 1,1,1 }, glm::vec3 pos = { 0,0,0 });
 		~CompCollision();
 
 		void update([[maybe_unused]] float deltaTime) override;
 
+		void SetOnContactFunction(std::function<void(Rev::CompCollision* other)> onContactFnc) { m_OnContactFunction = onContactFnc; }
+		void OnContact(Rev::CompCollision* other);
+
 		int GetID() { return m_ColliderID; }
-	public:
-		std::function<void(Rev::CompCollision* other)> m_CollisionFnc;
 	private:
 		Rev::Physics* m_PhysicsHandle;
+		std::function<void(Rev::CompCollision* other)> m_OnContactFunction;
 
 		Rev::CompTransform* m_TransformHandle;
 

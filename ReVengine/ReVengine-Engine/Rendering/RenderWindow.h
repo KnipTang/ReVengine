@@ -62,5 +62,7 @@ namespace RevDev
 		int m_WindowHeight;
 
 		DirectX::XMMATRIX m_ProjectionMatrix;
+
+		//SDL_Scancode m_LastPressedKey;
 	};
 }

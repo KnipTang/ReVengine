@@ -10,6 +10,7 @@
 #include "Rendering/Direct3D11/Meshes/Mesh.h"
 #include "Rendering/Shaders/TextureShader.h"
 #include <Rev_CoreSystems.h>
+#include <iostream>
 
 #undef min
 #undef max
@@ -102,6 +103,7 @@ bool RenderWindow::UpdateWindow()
         {
         case SDL_KEYDOWN:
             Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(e.key.keysym.scancode);
+            std::cout << e.key.keysym.scancode;
             break;
 
         case SDL_MOUSEMOTION:

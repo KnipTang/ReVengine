@@ -17,17 +17,17 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 	m_Texture{ texture },
 	m_MeshId{}
 {
-	float depthZ = m_TransformComp->GetWorldPosition().z;
+	//float depthZ = m_TransformComp->GetWorldPosition().z;
 	m_Vertices =
 	{
 		//Bottom Left
-		{ { 0 - widthTexture / 2,  0 - heightTexture / 2, depthZ }, { 0.f, 1.f } },
+		{ { 0 - widthTexture / 2,  0 - heightTexture / 2, 0 }, { 0.f, 1.f } },
 		//Bottom Right
-		{ { 0 + widthTexture / 2,  0 - heightTexture / 2, depthZ }, { 1.f, 1.f } },
+		{ { 0 + widthTexture / 2,  0 - heightTexture / 2, 0 }, { 1.f, 1.f } },
 		//Top Left
-		{ { 0 - widthTexture / 2,  0 + heightTexture / 2, depthZ }, { 0.f, 0.f } },
+		{ { 0 - widthTexture / 2,  0 + heightTexture / 2, 0 }, { 0.f, 0.f } },
 		//Top Right
-		{ { 0 + widthTexture / 2,  0 + heightTexture / 2, depthZ }, { 1.f, 0.f } },
+		{ { 0 + widthTexture / 2,  0 + heightTexture / 2, 0 }, { 1.f, 0.f } },
 	};
 
 	m_Indices =
