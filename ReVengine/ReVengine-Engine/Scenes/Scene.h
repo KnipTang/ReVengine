@@ -102,6 +102,8 @@ namespace Rev
 		}
 
 		void RemoveObjects();
+
+		void SortRenderObjects();
 	private:
 		std::vector<std::unique_ptr<GameObject>> m_AllGameObjects;
 		std::vector<GameObject*> m_ActiveGameObjects;

@@ -14,6 +14,7 @@ namespace Rev
 {
 	class Texture;
 	class TextureShader;
+	class CompTransform;
 }
 
 namespace RevDev
@@ -31,7 +32,6 @@ namespace RevDev
 		wrl::ComPtr<ID3D11Buffer> GetVertexBuffer() { return m_VertexBuffer; }
 		wrl::ComPtr<ID3D11Buffer> GetIndexBuffer() { return m_IndexBuffer; }
 		const UINT GetIndiceCount() { return m_IndiceCount; }
-	private:
 
 	private:
 		ID3D11Device* m_Device;

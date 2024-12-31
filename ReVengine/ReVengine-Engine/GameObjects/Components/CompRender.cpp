@@ -6,26 +6,28 @@
 #include "Rendering/Texture.h"
 #include "glm/vec3.hpp"
 #include "DirectXMath.h"
+#include "GameObjects/GameObject.h"
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, BaseShader* shader, Texture* texture, float widthTexture, float heightTexture) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, BaseShader* shader, Texture* texture, float widthTexture, float heightTexture, bool transparent) :
 	BaseComponent(gameObj),
 	m_TransformComp{ transform },
 	m_CameraComp{ camera },
 	m_Shader{ shader },
 	m_Texture{ texture },
-	m_MeshId{}
+	m_MeshId{},
+	m_Transparent{transparent}
 {
 	//float depthZ = m_TransformComp->GetWorldPosition().z;
 	m_Vertices =
 	{
 		//Bottom Left
-		{ { 0 - widthTexture / 2,  0 - heightTexture / 2, 0 }, { 0.f, 1.f } },
+		{ { 0 /*- widthTexture / 2*/,  0 /*- heightTexture / 2*/, 0 }, { 0.f, 1.f } },
 		//Bottom Right
-		{ { 0 + widthTexture / 2,  0 - heightTexture / 2, 0 }, { 1.f, 1.f } },
+		{ { 0 + widthTexture / 2,  0 /*- heightTexture / 2*/, 0 }, { 1.f, 1.f } },
 		//Top Left
-		{ { 0 - widthTexture / 2,  0 + heightTexture / 2, 0 }, { 0.f, 0.f } },
+		{ { 0 /*- widthTexture / 2*/,  0 + heightTexture / 2, 0 }, { 0.f, 0.f } },
 		//Top Right
 		{ { 0 + widthTexture / 2,  0 + heightTexture / 2, 0 }, { 1.f, 0.f } },
 	};
@@ -46,4 +48,10 @@ const void CompRender::render()
 		m_Texture->GetShaderResourceView());
 	m_Shader->SetShaderStages();
 	Rev_CoreSystems::pRevRender->DrawMesh(m_MeshId);
+}
+
+float CompRender::GetDistanceToCamera()
+{
+	float distance = glm::distance(m_CameraComp->GetGameObject()->transform->GetWorldPosition(), m_TransformComp->GetWorldPosition());
+	return distance;
 }

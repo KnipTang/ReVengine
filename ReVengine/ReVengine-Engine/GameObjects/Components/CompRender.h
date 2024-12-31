@@ -19,10 +19,19 @@ namespace Rev
 	class CompRender : public BaseComponent
 	{
 	public:
-		CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, BaseShader* shader, Texture* texture, float widthTexture = 1, float heightTexture = 1);
+		CompRender(GameObject* gameObj, 
+			CompTransform* transform, CompCamera* camera, 
+			BaseShader* shader, Texture* texture, 
+			float widthTexture = 1, float heightTexture = 1, bool transparent = false);
 		~CompRender() {};
 
 		const void render() override;
+
+		float GetDistanceToCamera();
+	public:
+		bool m_Transparent;
+
+		bool m_Is2D;
 	private:
 		CompTransform* m_TransformComp;
 		CompCamera* m_CameraComp;

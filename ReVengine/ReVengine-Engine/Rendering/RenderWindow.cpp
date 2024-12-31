@@ -72,12 +72,12 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, fl
 
 uint32_t RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::vector<unsigned short> indices)
 {
-    m_Meshes.emplace_back(std::make_unique<Mesh>(m_CreatorGod->GetDevice()));
+    RevDev::Mesh& mesh = *m_Meshes.emplace_back(std::make_unique<Mesh>(m_CreatorGod->GetDevice())).get();
 
-    m_Meshes.back()->setupVertexBuffer(vertices);
-    m_Meshes.back()->setupIndexBuffer(indices);
+    mesh.setupVertexBuffer(vertices);
+    mesh.setupIndexBuffer(indices);
 
-    return m_Meshes.back()->GetID();
+    return mesh.GetID();
 }
 
 void RenderWindow::DrawMesh(uint32_t meshId)

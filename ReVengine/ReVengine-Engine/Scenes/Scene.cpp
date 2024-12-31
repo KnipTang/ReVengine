@@ -3,6 +3,7 @@
 #include "Rev_CoreSystems.h"
 #include "Physics/Physics.h"
 #include "GameObjects/Components/CompCollision.h"
+#include "GameObjects/Components/CompRender.h"
 
 using namespace Rev;
 
@@ -52,6 +53,7 @@ void Scene::Physics(float fixedDeltaTime)
 
 const void Scene::render()
 {
+	SortRenderObjects();
 	for (auto&& obj : m_AllGameObjects)
 	{
 		if (obj->IsActive()) obj->render();
@@ -110,4 +112,31 @@ void Scene::removeGameObject(GameObject* obj)
 				return gameObject.get() == obj;
 			}),
 		m_AllGameObjects.end());
+}
+
+void Scene::SortRenderObjects()
+{
+	for (auto&& object : m_AllGameObjects)
+	{
+		std::cout << object->m_Tag << "\n";
+	}
+	std::cout << "\n";
+
+	std::sort(m_AllGameObjects.begin(), m_AllGameObjects.end(), [](const std::unique_ptr<Rev::GameObject>& a, const std::unique_ptr<Rev::GameObject>& b) {
+		auto&& renderCompA = a->getComponent<Rev::CompRender>();
+		auto&& renderCompB = b->getComponent<Rev::CompRender>();
+
+		if (!renderCompA || !renderCompB) {
+			return renderCompA != nullptr;
+		}
+		if (renderCompA->m_Is2D != renderCompB->m_Is2D) {
+			return !renderCompA->m_Is2D;
+		}
+
+		if (renderCompA->m_Transparent != renderCompB->m_Transparent)
+		{
+			return renderCompA->m_Transparent < renderCompB->m_Transparent;
+		}
+		return renderCompA->GetDistanceToCamera() > renderCompB->GetDistanceToCamera();
+		});
 }

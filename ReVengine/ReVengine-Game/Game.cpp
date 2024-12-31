@@ -27,6 +27,8 @@ const std::string doomSprites = "/doomSprites";
 const std::string doomEnemies = "/Enemies";
 const std::string doomBullets = "/Bullets";
 const std::string doomWeapons = "/Weapons";
+const std::string doomMap = "/Map";
+
 
 std::unique_ptr<Rev::Scene> Scene1()
 {
@@ -47,25 +49,46 @@ std::unique_ptr<Rev::Scene> Scene1()
 	const std::string secondBulletPath = resourceFolder + doomSprites + doomBullets + "/misla1.png";
 	const std::string weaponBulletPath = resourceFolder + doomSprites + doomWeapons + "/pisga0.png";
 	const std::string testDoomFile = resourceFolder + doomSprites + doomEnemies + "/bossb1.png";
+	const std::string doomFloor = resourceFolder + doomSprites + doomMap + "/floor0_5.png";
 	Rev::Texture* testTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(),  "TestTexture", testDoomFile);
 	Rev::Texture* bulletTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(), "bulletTexture", mainBulletPath);
 	Rev::Texture* bullet2Texture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(), "bullet2Texture", secondBulletPath);
 	Rev::Texture* weaponTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(), "weaponTexture", weaponBulletPath);
+	Rev::Texture* floorTexture = Rev::Rev_CoreSystems::pResourceManager->LoadResource(renderer->GetDevice(), "floor", doomFloor);
 
 	Rev::TextureShader* textureShader = new Rev::TextureShader{ renderer->GetDevice(), renderer->GetDeviceContext()};
 	Rev::TextureShader2D* textureShader2D = new Rev::TextureShader2D{ renderer->GetDevice(), renderer->GetDeviceContext() };
 
 	//Player
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>("Player");
+	player->transform->SetPosition(0, 0.5f, 0);
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	player->addComponent<Rev::CompCollision>(player.get(), physicsHandle, false, false, glm::vec3{0.1f, 1, 0.1f});
 	cameraComp->LockAxes(RotationAxes::x, true);
 
+	//Map
+	std::vector<std::unique_ptr<Rev::GameObject>> floors;
+	for (float i = 0; i < 10; i+=0.5f)
+	{
+		for (float j = 0; j < 10; j += 0.5f)
+		{
+			floors.emplace_back(std::make_unique<Rev::GameObject>("Floor"));
+			auto&& currentFloor = floors.back();
+
+			currentFloor->transform->SetRotationDegree(90, 0, 0);
+			currentFloor->transform->SetPosition(i, 0, j);
+			currentFloor->addComponent<Rev::CompRender>(currentFloor.get(), currentFloor->transform, cameraComp, textureShader, floorTexture, 1.f, 1.f);
+
+		}
+	}
+
+
 	//Gun
-	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>();
-	gun->transform->SetPosition(0, -0.85f, 0);
-	gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, weaponTexture, 0.3f, 0.3f);
+	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>("Gun");
+	gun->transform->SetPosition(0, -1.f, 0);
+	Rev::CompRender* gunRender = gun->addComponent<Rev::CompRender>(gun.get(), gun->transform, cameraComp, textureShader2D, weaponTexture, 0.7f, 0.7f, true);
+	gunRender->m_Is2D = true;
 	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), player->transform, 0.25f,
 		[cameraComp, textureShader, bulletTexture, physicsHandle]() {
 			Rev::GameObject* bullet = new Rev::GameObject{"Bullet"};
@@ -83,7 +106,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	gunComp->SetFireSoundEffect("pew");
 
 	Rev::CompTransform* playerTransform = player->transform;
-	float walkingSpeed = 0.1f;
+	float walkingSpeed = 0.05f;
 	//Input Config
 	{
 	inputComp->BindAction(SDL_SCANCODE_I, [playerTransform]() { playerTransform->AddPitchInput(10); });
@@ -107,48 +130,31 @@ std::unique_ptr<Rev::Scene> Scene1()
 		};
 
 	//Enemies
-	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>();
+	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>("Enemy1");
 	enemy1->addComponent<LookAtPlayerComp>(enemy1.get(), playerTransform);
 	enemy1->transform->SetPosition(0, 0, 5);
-	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture);
+	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture, 1.5f,1.5f, true);
 	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.3f, 1, 0.1f});
 	enemy1Coll.SetOnContactFunction(lambdaCollEnemy);
 
-	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>();
+	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>("Enemy2");
 	enemy2->addComponent<LookAtPlayerComp>(enemy2.get(), playerTransform);
 	enemy2->transform->SetPosition(5, 0, 5);
-	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture);
+	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture, 1.5f, 1.5f, true);
 	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.3f, 1, 0.1f });
 	enemy2Coll.SetOnContactFunction(lambdaCollEnemy);
 
-	std::unique_ptr<Rev::GameObject> grandParent = std::make_unique<Rev::GameObject>();
-	grandParent->transform->SetPosition(6, 0, 0);
-	grandParent->addComponent<Rev::CompRender>(grandParent.get(), grandParent->transform, cameraComp, textureShader, bullet2Texture);
-	Rev::GameObject* parent = new Rev::GameObject;
-	parent->transform->SetPosition(7, 0, 0);
-	parent->addComponent<Rev::CompRender>(parent, parent->transform, cameraComp, textureShader, bulletTexture);
-	Rev::GameObject* son = new Rev::GameObject;
-	son->transform->SetPosition(9, 0, 0);
-	son->addComponent<Rev::CompRender>(son, son->transform, cameraComp, textureShader, bulletTexture);
-	grandParent->AddChild(parent);
-	parent->AddChild(son);
-
-	Rev::CompTransform* grandTransform = grandParent->transform;
-	inputComp->BindAction(SDL_SCANCODE_T, [grandTransform]() { grandTransform->MoveRight(1); });
-	Rev::CompTransform* parentTransform = parent->transform;
-	inputComp->BindAction(SDL_SCANCODE_U, [parentTransform]() { parentTransform->MoveRight(1); });
-	inputComp->BindAction(SDL_SCANCODE_G, [parentTransform]() { parentTransform->AddYawInput(0.1); });
-	Rev::CompTransform* childTransform = son->transform;
-	inputComp->BindAction(SDL_SCANCODE_B, [childTransform]() { childTransform->AddYawInput(0.1); });
-
 	//Scene add gameobects & return
 	{
-		scene->addGameObject(std::move(player));
-		scene->addGameObject(std::move(enemy1));
 		scene->addGameObject(std::move(enemy2));
+		scene->addGameObject(std::move(enemy1));
 		scene->addGameObject(std::move(gun));
-		scene->addGameObject(std::move(grandParent));
-		scene->DisplaySceneHierarchy();
+		scene->addGameObject(std::move(player));
+		//for (auto&& floor : floors)
+		//{
+		//	scene->addGameObject(std::move(floor));
+		//}
+		//scene->DisplaySceneHierarchy();
 		return std::move(scene);
 	}
 }

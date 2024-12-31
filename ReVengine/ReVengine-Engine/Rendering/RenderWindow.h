@@ -45,6 +45,7 @@ namespace RevDev
 
 		ID3D11Device* GetDevice();
 		ID3D11DeviceContext* GetDeviceContext();
+	
 	private:
 
 		std::unique_ptr<WindowHandler_D3D11> m_CreatorGod;

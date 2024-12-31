@@ -18,7 +18,7 @@ namespace Rev
 	class ReVengine
 	{
 	public:
-		ReVengine(int windowWidth, int windowHeight, float nearZ = 1.f, float farZ = 1000);
+		ReVengine(int windowWidth, int windowHeight, float nearZ = 0.5f, float farZ = 1000);
 		~ReVengine();
 
 		void Run(const std::function<SceneManager* ()>& GameRun);
