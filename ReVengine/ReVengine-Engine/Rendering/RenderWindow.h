@@ -19,6 +19,7 @@ namespace RevDev
 {
 	class WindowHandler_D3D11;
 	class Mesh;
+	class ImGuiSetup;
 }
 
 struct SDL_Window;
@@ -51,6 +52,7 @@ namespace RevDev
 	private:
 
 		std::unique_ptr<WindowHandler_D3D11> m_CreatorGod;
+		std::unique_ptr<ImGuiSetup> m_ImGui;
 
 		//The window we'll be rendering to
 		std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>> m_Window;

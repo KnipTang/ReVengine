@@ -9,10 +9,14 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(unofficial-omniverse-physx-sdk CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 FetchContent_Declare(
   soLoud
   GIT_REPOSITORY https://git.allpurposem.at/mat/SoLoud-CMake.git
+  GIT_TAG 3b7eec82fcdbb0fb436862c402c37770b0604cd0
+  GIT_PROGRESS TRUE
+  OVERRIDE_FIND_PACKAGE TRUE
 )
 FetchContent_MakeAvailable(soLoud)
 

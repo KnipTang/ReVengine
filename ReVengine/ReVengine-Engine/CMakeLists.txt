@@ -28,7 +28,7 @@
     "Physics/Physics.cpp"
     "Physics/PhysicsImpl.cpp"
     "Physics/PhysX/CollisionCallback.cpp"
-) #No need to add header files
+ "Rendering/ImGui/ImGuiSetup.cpp") #No need to add header files
 
 target_include_directories(ReVengine-Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/GameSettings) #adds current dir of this file to include path of engine dir, Public so everyone that links with this can access there files lol
 
@@ -39,6 +39,7 @@ target_link_libraries(ReVengine-Engine PUBLIC
     SDL2::SDL2 SDL2::SDL2main
     glm::glm
     unofficial::omniverse-physx-sdk::sdk
+    imgui::imgui
 ) #link libs to engine, name "soload" is the "target_name"
 
 target_include_directories(ReVengine-Engine PUBLIC 

@@ -11,6 +11,7 @@
 #include "Rendering/Shaders/TextureShader.h"
 #include <Rev_CoreSystems.h>
 #include <iostream>
+#include "ImGui/ImGuiSetup.h"
 
 #undef min
 #undef max
@@ -65,6 +66,13 @@ bool RenderWindow::InitWindow(int windowWidth, int windowHeight, float nearZ, fl
             m_CreatorGod = std::make_unique<WindowHandler_D3D11>(m_Window.get(), m_WindowWidth, m_WindowHeight);
             m_CreatorGod->Setup();
         }
+        {
+            //Imgui
+            m_ImGui = std::make_unique<RevDev::ImGuiSetup>();
+            m_ImGui->InitWindow(m_WindowWidth, m_WindowHeight);
+            m_ImGui->InitForSDL2(*m_Window.get());
+            m_ImGui->InitFor3D11(*m_CreatorGod->GetDevice(), *m_CreatorGod->GetDeviceContext());
+        }
 
         return true;
     }
@@ -94,6 +102,7 @@ void RenderWindow::DrawMesh(uint32_t meshId)
 
 bool RenderWindow::UpdateWindow()
 {
+    m_ImGui->Update();
     //To get window to stay up
     SDL_Event e;
 
