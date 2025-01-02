@@ -18,6 +18,7 @@
 #include "Objects/Weapons/BulletComp.h"
 #include "Objects/Weapons/GunComp.h"
 #include "Objects/Enemies/LookAtPlayerComp.h"
+#include "Objects/Enemies/EnemyComp.h"
 #include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Shaders/TextureShader2D.h"
 #include "Physics/Physics.h"
@@ -39,8 +40,10 @@ std::unique_ptr<Rev::Scene> Scene1()
 	//Sound
 	{
 		const std::string SoundPew = "/sound/pew_pew.wav";
+		const std::string SoundEnemyGrawling = "/sound/EnemyGrawling.mp3";
 
 		Rev::Rev_CoreSystems::pRevSound->LoadSound("pew", resourceFolder + SoundPew);
+		Rev::Rev_CoreSystems::pRevSound->LoadSound("EnemyGrawl", resourceFolder + SoundEnemyGrawling);
 		Rev::Rev_CoreSystems::pRevSound->PlayRevSound("pew");
 	}
 
@@ -133,6 +136,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	//Enemies
 	std::unique_ptr<Rev::GameObject> enemy1 = std::make_unique<Rev::GameObject>("Enemy1");
 	enemy1->addComponent<LookAtPlayerComp>(enemy1.get(), playerTransform);
+	enemy1->addComponent<EnemyComp>(enemy1.get());
 	enemy1->transform->SetPosition(0, 0, 5);
 	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture, 1.5f,1.5f, true);
 	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.3f, 1, 0.1f});
@@ -140,6 +144,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>("Enemy2");
 	enemy2->addComponent<LookAtPlayerComp>(enemy2.get(), playerTransform);
+	enemy2->addComponent<EnemyComp>(enemy2.get());
 	enemy2->transform->SetPosition(5, 0, 5);
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture, 1.5f, 1.5f, true);
 	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.3f, 1, 0.1f });
