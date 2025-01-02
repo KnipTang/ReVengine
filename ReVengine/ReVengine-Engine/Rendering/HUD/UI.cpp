@@ -15,7 +15,7 @@ UI::~UI()
 
 }
 
-void UI::SubscribeElement(std::string text, float* value)
+void UI::SubscribeElement(std::string text, const float* value)
 {
 	if(m_ImGui != nullptr)
 		m_ImGui->SubscribeElement(text, value);

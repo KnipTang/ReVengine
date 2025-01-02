@@ -16,7 +16,7 @@ namespace RevDev
 		UI();
 		~UI();
 
-		void SubscribeElement(std::string text, float* value);
+		void SubscribeElement(std::string text, const float* value);
 	private:
 		RevDev::ImGuiSetup* m_ImGui;
 	};

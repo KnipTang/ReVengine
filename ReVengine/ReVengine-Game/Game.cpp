@@ -21,6 +21,7 @@
 #include "Objects/Enemies/EnemyComp.h"
 #include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Shaders/TextureShader2D.h"
+#include "Objects/HealthComp.h"
 #include "Physics/Physics.h"
 #include "Rendering/HUD/UI.h"
 
@@ -66,6 +67,8 @@ std::unique_ptr<Rev::Scene> Scene1()
 	//Player
 	std::unique_ptr<Rev::GameObject> player = std::make_unique<Rev::GameObject>("Player");
 	player->transform->SetPosition(0, 0.5f, 0);
+	HealthComp* healthPlayerComp = player->addComponent<HealthComp>(player.get());
+	Rev::Rev_CoreSystems::pUI->SubscribeElement("Health: ", &healthPlayerComp->GetHealth());
 	Rev::CompCamera* cameraComp = player->addComponent<Rev::CompCamera>(player.get(), player->transform);
 	Rev::CompInput* inputComp = player->addComponent<Rev::CompInput>(player.get());
 	player->addComponent<Rev::CompCollision>(player.get(), physicsHandle, false, false, glm::vec3{0.1f, 1, 0.1f});
@@ -131,8 +134,19 @@ std::unique_ptr<Rev::Scene> Scene1()
 
 	auto lambdaCollEnemy = 
 		[](Rev::CompCollision* other) {
-		Rev::GameObject& obj = *other->GetGameObject();
-		if(obj.m_Tag == "Bullet") obj.Destroy();
+			Rev::GameObject& obj = *other->GetGameObject();
+			if(obj.m_Tag == "Bullet") obj.Destroy();
+			else if (obj.m_Tag == "Player")
+			{
+				HealthComp* healthComp = obj.getComponent<HealthComp>();
+				if (healthComp != nullptr)
+				{
+					healthComp->AddHealth(-5);
+
+					obj.transform->MoveForward(-1, 2);
+				}
+
+			}
 		};
 
 	//Enemies
@@ -141,7 +155,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	enemy1->addComponent<EnemyComp>(enemy1.get());
 	enemy1->transform->SetPosition(0, 0, 5);
 	enemy1->addComponent<Rev::CompRender>(enemy1.get(), enemy1->transform, cameraComp, textureShader, testTexture, 1.5f,1.5f, true);
-	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.3f, 1, 0.1f});
+	Rev::CompCollision& enemy1Coll = *enemy1->addComponent<Rev::CompCollision>(enemy1.get(), physicsHandle, false, false, glm::vec3{0.3f, 1, 0.5f});
 	enemy1Coll.SetOnContactFunction(lambdaCollEnemy);
 
 	std::unique_ptr<Rev::GameObject> enemy2 = std::make_unique<Rev::GameObject>("Enemy2");
@@ -149,7 +163,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	enemy2->addComponent<EnemyComp>(enemy2.get());
 	enemy2->transform->SetPosition(5, 0, 5);
 	enemy2->addComponent<Rev::CompRender>(enemy2.get(), enemy2->transform, cameraComp, textureShader, testTexture, 1.5f, 1.5f, true);
-	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.3f, 1, 0.1f });
+	Rev::CompCollision& enemy2Coll = *enemy2->addComponent<Rev::CompCollision>(enemy2.get(), physicsHandle, false, false, glm::vec3{ 0.3f, 1, 0.5f });
 	enemy2Coll.SetOnContactFunction(lambdaCollEnemy);
 
 	//Scene add gameobects & return

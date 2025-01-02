@@ -21,13 +21,13 @@ namespace RevDev
 
 		void Update();
 
-		void SubscribeElement(std::string text, float* value);
+		void SubscribeElement(std::string text, const float* value);
 	private:
 		float m_ImguiWindowWidth;
 		float m_ImguiWindowHeight;
 
 		float m_WindowHeight;
 
-		std::unordered_map<std::string, float*> m_SubscriptedElements;
+		std::unordered_map<std::string, const float*> m_SubscriptedElements;
 	};
 }

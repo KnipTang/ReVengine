@@ -71,7 +71,7 @@ void ImGuiSetup::Update()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiSetup::SubscribeElement(std::string text, float* value)
+void ImGuiSetup::SubscribeElement(std::string text, const float* value)
 {
 	m_SubscriptedElements.emplace(std::move(text), value);
 }
