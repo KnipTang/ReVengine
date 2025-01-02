@@ -12,10 +12,10 @@ CompCollision::CompCollision(Rev::GameObject* gameObj, Rev::Physics* physicsHand
     BaseComponent(gameObj),
     m_PhysicsHandle{ physicsHandle },
     m_TransformHandle{ m_GameObject->transform },
-    m_Size{size},
+    m_Size{ size },
     m_ColliderID{ colliderCounter++ }
 {
-    m_Position = m_TransformHandle->GetWorldPosition() + pos;
+    m_Position = m_TransformHandle->GetWorldPosition() + pos + (size * 0.5f);
     staticObject ? 
         m_PhysicsHandle->CreateStatic(m_ColliderID, m_Position, size) :
         m_PhysicsHandle->CreateDynamic(m_ColliderID, m_Position, size, gravity, this);

@@ -24,12 +24,7 @@ vs_output vs_main(vs_input input)
     output.position = mul(input.position, worldMatrix);
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
-   // output.position.y = -output.position.y;
-    //output.position.z -= 10;
-    //output.position = mul(output.position, transform);
-    //output.position = mul(float4(input.position.x, input.position.y, -input.position.z, 1.0f), transform);
     output.uv = input.uv;
-    //output.color = input.color;
     
     return output;
 }

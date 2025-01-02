@@ -10,14 +10,26 @@ CompInput::CompInput(GameObject* gameObj) :
 	Rev::Rev_CoreSystems::pInputManager->SubscribeInputComp(this);
 }
 
-void CompInput::BindAction(SDL_Scancode key, std::function<void()> action)
+void CompInput::BindKeyAction(SDL_Scancode key, std::function<void()> action)
 {
-	m_Actions.emplace(key, action);
+	m_KeyActions.emplace(key, action);
 }
 
-void CompInput::Execute(SDL_Scancode key)
+void CompInput::ExecuteKey(SDL_Scancode key)
 {
-	std::pair actionRange = m_Actions.equal_range(key);
+	std::pair actionRange = m_KeyActions.equal_range(key);
+	for (auto iterator = actionRange.first; iterator != actionRange.second; iterator++) {
+		iterator->second();
+	}
+}
+
+void CompInput::BindMouseAction(Uint8 mouse, std::function<void()> action)
+{
+	m_MouseActions.emplace(mouse, action);
+}
+void CompInput::ExecuteMouse(Uint8 mouse)
+{
+	std::pair actionRange = m_MouseActions.equal_range(mouse);
 	for (auto iterator = actionRange.first; iterator != actionRange.second; iterator++) {
 		iterator->second();
 	}

@@ -108,18 +108,20 @@ std::unique_ptr<Rev::Scene> Scene1()
 	float walkingSpeed = 0.05f;
 	//Input Config
 	{
-	inputComp->BindAction(SDL_SCANCODE_I, [playerTransform]() { playerTransform->AddPitchInput(10); });
-	inputComp->BindAction(SDL_SCANCODE_K, [playerTransform]() { playerTransform->AddPitchInput(-10); });
-	inputComp->BindAction(SDL_SCANCODE_L, [playerTransform]() { playerTransform->AddYawInput(10); });
-	inputComp->BindAction(SDL_SCANCODE_J, [playerTransform]() { playerTransform->AddYawInput(-10); });
-	inputComp->BindAction(SDL_SCANCODE_W, [playerTransform, walkingSpeed]() { playerTransform->MoveForward(1, walkingSpeed); });
-	inputComp->BindAction(SDL_SCANCODE_S, [playerTransform, walkingSpeed]() { playerTransform->MoveForward(-1, walkingSpeed); });
-	inputComp->BindAction(SDL_SCANCODE_D, [playerTransform, walkingSpeed]() { playerTransform->MoveRight(1, walkingSpeed); });
-	inputComp->BindAction(SDL_SCANCODE_A, [playerTransform, walkingSpeed]() { playerTransform->MoveRight(-1, walkingSpeed); });
+	inputComp->BindKeyAction(SDL_SCANCODE_I, [playerTransform]() { playerTransform->AddPitchInput(10); });
+	inputComp->BindKeyAction(SDL_SCANCODE_K, [playerTransform]() { playerTransform->AddPitchInput(-10); });
+	inputComp->BindKeyAction(SDL_SCANCODE_L, [playerTransform]() { playerTransform->AddYawInput(10); });
+	inputComp->BindKeyAction(SDL_SCANCODE_J, [playerTransform]() { playerTransform->AddYawInput(-10); });
+	inputComp->BindKeyAction(SDL_SCANCODE_W, [playerTransform, walkingSpeed]() { playerTransform->MoveForward(1, walkingSpeed); });
+	inputComp->BindKeyAction(SDL_SCANCODE_S, [playerTransform, walkingSpeed]() { playerTransform->MoveForward(-1, walkingSpeed); });
+	inputComp->BindKeyAction(SDL_SCANCODE_D, [playerTransform, walkingSpeed]() { playerTransform->MoveRight(1, walkingSpeed); });
+	inputComp->BindKeyAction(SDL_SCANCODE_A, [playerTransform, walkingSpeed]() { playerTransform->MoveRight(-1, walkingSpeed); });
 
-	inputComp->BindAction(SDL_SCANCODE_R, [playerTransform]() { playerTransform->SetRotationRad(0,0,0); });
+	inputComp->BindKeyAction(SDL_SCANCODE_R, [playerTransform]() { playerTransform->SetRotationRad(0,0,0); });
 
-	inputComp->BindAction(SDL_SCANCODE_G, [gunComp]() { gunComp->Fire(); });
+	inputComp->BindMouseAction(SDL_BUTTON_LEFT, [gunComp]() { gunComp->Fire(); });
+
+	inputComp->BindKeyAction(SDL_SCANCODE_G, [gunComp]() { gunComp->Fire(); });
 	}
 
 	auto lambdaCollEnemy = 

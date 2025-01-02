@@ -23,7 +23,15 @@ void InputManager::HandleKeyDown(SDL_Scancode key)
 {
 	for (auto&& comp : m_SubscriptedInputComps)
 	{
-		comp->Execute(key);
+		comp->ExecuteKey(key);
+	}
+}
+
+void InputManager::HandleMouseKeyDown(Uint8 mouse)
+{
+	for (auto&& comp : m_SubscriptedInputComps)
+	{
+		comp->ExecuteMouse(mouse);
 	}
 }
 

@@ -107,6 +107,12 @@ bool RenderWindow::UpdateWindow()
         case SDL_KEYUP:
             m_LastPressedKeys.erase(e.key.keysym.scancode);
             break;
+        case SDL_MOUSEBUTTONDOWN:
+            m_LastPressedMouse.insert(e.button.button);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            m_LastPressedMouse.erase(e.button.button);
+            break;
 
         case SDL_MOUSEMOTION:
             break;
@@ -120,6 +126,10 @@ bool RenderWindow::UpdateWindow()
     for (const auto& key : m_LastPressedKeys)
     {
         Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(key);
+    }
+    for (const auto& mouse : m_LastPressedMouse)
+    {
+        Rev::Rev_CoreSystems::pInputManager->HandleMouseKeyDown(mouse);
     }
 
     int xRel, yRel;

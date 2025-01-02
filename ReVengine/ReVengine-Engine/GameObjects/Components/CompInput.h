@@ -13,13 +13,17 @@ namespace Rev
 		CompInput(GameObject* gameObj);
 		~CompInput() = default;
 
-		void BindAction(SDL_Scancode key, std::function<void()> action);
-		void Execute(SDL_Scancode key);
+		void BindKeyAction(SDL_Scancode key, std::function<void()> action);
+		void ExecuteKey(SDL_Scancode key);
 		
-	private:
-		using ActionMap = std::unordered_multimap<SDL_Scancode, std::function<void()>>;
-		ActionMap m_Actions;
+		void BindMouseAction(Uint8 mouse, std::function<void()> action);
+		void ExecuteMouse(Uint8 mouse);
 
+	private:
+		using KeyActionMap = std::unordered_multimap<SDL_Scancode, std::function<void()>>;
+		KeyActionMap m_KeyActions;
+		using MouseActionMap = std::unordered_multimap<Uint8, std::function<void()>>;
+		MouseActionMap m_MouseActions;
 
 	};
 }

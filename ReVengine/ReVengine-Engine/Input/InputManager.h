@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <SDL_scancode.h>
+#include <SDL_events.h>
 #include "Utils/MousePos.h"
 
 namespace Rev
@@ -20,6 +21,7 @@ namespace RevDev
 		void SubscribeInputComp(Rev::CompInput* inputComp);
 
 		void HandleKeyDown(SDL_Scancode key);
+		void HandleMouseKeyDown(Uint8 mouse);
 		void HandleMouseRelativeMotion(int x, int y);
 
 		MouseRelativeMotion GetMouseRelativeMotion() { return *m_MouseRelativeMotion.get(); }
