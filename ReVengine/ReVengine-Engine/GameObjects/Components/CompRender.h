@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "Utils/Vertex.h"
+#include <glm/vec3.hpp>
 
 //struct Vertex;
 namespace Rev
@@ -22,7 +23,8 @@ namespace Rev
 		CompRender(GameObject* gameObj, 
 			CompTransform* transform, CompCamera* camera, 
 			BaseShader* shader, Texture* texture, 
-			float widthTexture = 1, float heightTexture = 1, bool transparent = false);
+			float widthTexture = 1, float heightTexture = 1,
+			glm::vec3 position = {0,0,0}, bool transparent = false);
 		~CompRender() {};
 
 		const void render() override;

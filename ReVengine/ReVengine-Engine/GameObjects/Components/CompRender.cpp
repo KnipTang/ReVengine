@@ -10,7 +10,10 @@
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera* camera, BaseShader* shader, Texture* texture, float widthTexture, float heightTexture, bool transparent) :
+CompRender::CompRender(GameObject* gameObj, CompTransform* transform, 
+	CompCamera* camera, BaseShader* shader, Texture* texture, 
+	float widthTexture, float heightTexture, 
+	glm::vec3 position, bool transparent) :
 	BaseComponent(gameObj),
 	m_TransformComp{ transform },
 	m_CameraComp{ camera },
@@ -24,13 +27,13 @@ CompRender::CompRender(GameObject* gameObj, CompTransform* transform, CompCamera
 	m_Vertices =
 	{
 		//Bottom Left
-		{ { 0 /*- widthTexture / 2*/,  0 /*- heightTexture / 2*/, 0 }, { 0.f, 1.f } },
+		{ { position.x, position.y, position.z }, { 0.f, 1.f } },
 		//Bottom Right
-		{ { widthTexture / 2,  0 /*- heightTexture / 2*/, 0 }, { 1.f, 1.f } },
+		{ { position.x + widthTexture / 2,  position.y, position.z }, { 1.f, 1.f } },
 		//Top Left
-		{ { 0 /*- widthTexture / 2*/, heightTexture / 2, 0 }, { 0.f, 0.f } },
+		{ { position.x, position.y + heightTexture / 2, position.z }, { 0.f, 0.f } },
 		//Top Right
-		{ { widthTexture / 2, heightTexture / 2, 0 }, { 1.f, 0.f } },
+		{ { position.x + widthTexture / 2, position.y + heightTexture / 2, position.z }, { 1.f, 0.f } },
 	};
 
 	m_Indices =

@@ -61,8 +61,6 @@ void ImGuiSetup::Update()
 		ImGui::Text("%s: %.2f", element.first.c_str(), *element.second);
 	}
 
-	ImGui::Text("k");
-
 	ImGui::End();
 
 	ImGui::PopStyleVar(2);
