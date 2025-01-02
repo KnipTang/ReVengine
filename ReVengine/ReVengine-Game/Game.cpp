@@ -83,7 +83,6 @@ std::unique_ptr<Rev::Scene> Scene1()
 		}
 	}
 
-
 	//Gun
 	std::unique_ptr<Rev::GameObject> gun = std::make_unique<Rev::GameObject>("Gun");
 	gun->transform->SetPosition(0, -1.f, 0);
@@ -92,7 +91,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 	GunComp* gunComp = gun->addComponent<GunComp>(gun.get(), player->transform, 0.25f,
 		[cameraComp, textureShader, bulletTexture, physicsHandle]() {
 			Rev::GameObject* bullet = new Rev::GameObject{"Bullet"};
-			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.1f, 0.1f);
+			bullet->addComponent<Rev::CompRender>(bullet, bullet->transform, cameraComp, textureShader, bulletTexture, 0.1f, 0.1f, true);
 			BulletComp& bulletComp = *bullet->addComponent<BulletComp>(bullet, 50.f);
 			bulletComp.SetMaxTravelDistance(100);
 			Rev::CompCollision& bulletColl = *bullet->addComponent<Rev::CompCollision>(bullet, physicsHandle, false, false, glm::vec3{ 0.1f, 0.1f, 0.1f });
@@ -150,11 +149,11 @@ std::unique_ptr<Rev::Scene> Scene1()
 		scene->addGameObject(std::move(enemy1));
 		scene->addGameObject(std::move(gun));
 		scene->addGameObject(std::move(player));
-		//for (auto&& floor : floors)
-		//{
-		//	scene->addGameObject(std::move(floor));
-		//}
-		//scene->DisplaySceneHierarchy();
+		for (auto&& floor : floors)
+		{
+			scene->addGameObject(std::move(floor));
+		}
+		scene->DisplaySceneHierarchy();
 		return std::move(scene);
 	}
 }

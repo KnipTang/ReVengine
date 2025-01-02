@@ -116,12 +116,6 @@ void Scene::removeGameObject(GameObject* obj)
 
 void Scene::SortRenderObjects()
 {
-	for (auto&& object : m_AllGameObjects)
-	{
-		std::cout << object->m_Tag << "\n";
-	}
-	std::cout << "\n";
-
 	std::sort(m_AllGameObjects.begin(), m_AllGameObjects.end(), [](const std::unique_ptr<Rev::GameObject>& a, const std::unique_ptr<Rev::GameObject>& b) {
 		auto&& renderCompA = a->getComponent<Rev::CompRender>();
 		auto&& renderCompB = b->getComponent<Rev::CompRender>();
@@ -129,13 +123,13 @@ void Scene::SortRenderObjects()
 		if (!renderCompA || !renderCompB) {
 			return renderCompA != nullptr;
 		}
-		if (renderCompA->m_Is2D != renderCompB->m_Is2D) {
-			return !renderCompA->m_Is2D;
-		}
 
 		if (renderCompA->m_Transparent != renderCompB->m_Transparent)
 		{
 			return renderCompA->m_Transparent < renderCompB->m_Transparent;
+		}
+		if (renderCompA->m_Is2D != renderCompB->m_Is2D) {
+			return !renderCompA->m_Is2D;
 		}
 		return renderCompA->GetDistanceToCamera() > renderCompB->GetDistanceToCamera();
 		});

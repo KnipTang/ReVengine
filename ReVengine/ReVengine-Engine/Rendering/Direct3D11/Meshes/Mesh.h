@@ -14,7 +14,6 @@ namespace Rev
 {
 	class Texture;
 	class TextureShader;
-	class CompTransform;
 }
 
 namespace RevDev
