@@ -48,11 +48,13 @@ namespace RevDev
 
 		ID3D11Device* GetDevice();
 		ID3D11DeviceContext* GetDeviceContext();
+
+		RevDev::ImGuiSetup* GetImGuiHandle() { return m_ImGui.get(); }
 	
 	private:
 
 		std::unique_ptr<WindowHandler_D3D11> m_CreatorGod;
-		std::unique_ptr<ImGuiSetup> m_ImGui;
+		std::unique_ptr<RevDev::ImGuiSetup> m_ImGui;
 
 		//The window we'll be rendering to
 		std::unique_ptr<SDL_Window, std::function<void(SDL_Window*)>> m_Window;

@@ -22,6 +22,7 @@
 #include "Rendering/Shaders/TextureShader.h"
 #include "Rendering/Shaders/TextureShader2D.h"
 #include "Physics/Physics.h"
+#include "Rendering/HUD/UI.h"
 
 const std::string resourceFolder = "../game_resources";
 const std::string doomSprites = "/doomSprites";
@@ -109,6 +110,7 @@ std::unique_ptr<Rev::Scene> Scene1()
 
 	Rev::CompTransform* playerTransform = player->transform;
 	float walkingSpeed = 0.05f;
+	Rev::Rev_CoreSystems::pUI->SubscribeElement("test: ", &playerTransform->GetWorldPosition().x );
 	//Input Config
 	{
 	inputComp->BindKeyAction(SDL_SCANCODE_I, [playerTransform]() { playerTransform->AddPitchInput(10); });

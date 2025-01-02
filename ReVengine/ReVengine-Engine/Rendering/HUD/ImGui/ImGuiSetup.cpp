@@ -56,8 +56,12 @@ void ImGuiSetup::Update()
 	ImGui::SetNextWindowPos(ImVec2(0, m_WindowHeight - m_ImguiWindowHeight), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(m_ImguiWindowWidth, m_ImguiWindowHeight), ImGuiCond_Always);
 
+	for (const auto& element : m_SubscriptedElements)
+	{
+		ImGui::Text("%s: %.2f", element.first.c_str(), *element.second);
+	}
 
-	ImGui::Text("Hello, ImGui!");
+	ImGui::Text("k");
 
 	ImGui::End();
 
@@ -65,4 +69,9 @@ void ImGuiSetup::Update()
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+}
+
+void ImGuiSetup::SubscribeElement(std::string text, float* value)
+{
+	m_SubscriptedElements.emplace(std::move(text), value);
 }

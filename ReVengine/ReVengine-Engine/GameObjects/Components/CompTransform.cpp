@@ -57,19 +57,16 @@ void CompTransform::AddYawInput(float input)
 	SetRotationRad(m_LocalRotation.x, m_LocalRotation.y + input, m_LocalRotation.z);
 }
 
-glm::vec3 CompTransform::GetForwardVector()
+const glm::vec3 CompTransform::GetForwardVector()
 {
 	GetModelMatrix();
-	const glm::vec3 forward = glm::vec3(m_ModelMatrix[2]);
-	return forward;
+	return glm::vec3(m_ModelMatrix[2]);
 }
 
-glm::vec3 CompTransform::GetRightVector()
+const glm::vec3 CompTransform::GetRightVector()
 {
 	GetModelMatrix();
-	const glm::vec3 right = glm::vec3(m_ModelMatrix[0]);
-
-	return right;
+	return glm::vec3(m_ModelMatrix[0]);
 }
 
 void CompTransform::SetPosition(float x, float y, float z)
@@ -84,7 +81,7 @@ void CompTransform::SetPosition(glm::vec3 pos)
 	SetDirtyPosition();
 }
 
-glm::vec3 CompTransform::GetWorldPosition()
+glm::vec3& CompTransform::GetWorldPosition()
 {
 	if (m_DirtyPosition)
 		UpdatePosition();
@@ -92,7 +89,7 @@ glm::vec3 CompTransform::GetWorldPosition()
 	return m_Position;
 }
 
-glm::vec3 CompTransform::GetLocalPosition()
+glm::vec3& CompTransform::GetLocalPosition()
 {
 	if (m_DirtyPosition)
 		UpdatePosition();
@@ -123,7 +120,7 @@ void CompTransform::SetRotationDegree(glm::vec3 dir)
 	SetRotationRad(glm::radians(dir));
 }
 
-glm::vec3 CompTransform::GetWorldRotation()
+glm::vec3& CompTransform::GetWorldRotation()
 {
 	if (m_DirtyRotation)
 		UpdateRotation();
@@ -131,7 +128,7 @@ glm::vec3 CompTransform::GetWorldRotation()
 	return m_Rotation;
 }
 
-glm::vec3 CompTransform::GetLocalRotation()
+glm::vec3& CompTransform::GetLocalRotation()
 {
 	if (m_DirtyRotation)
 		UpdateRotation();

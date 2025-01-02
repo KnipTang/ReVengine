@@ -6,6 +6,7 @@
 #include "Input/InputManager.h"
 #include "ResourceManagement/ResourceManager.h"
 #include "Scenes/SceneManager.h"
+#include "Rendering/HUD/UI.h"
 
 namespace Rev
 {
@@ -22,6 +23,7 @@ namespace Rev
 		static inline std::unique_ptr<RevDev::RenderWindow> pRevRender = std::make_unique<RevDev::RenderWindow>();
 		static inline std::unique_ptr<RevDev::InputManager> pInputManager = std::make_unique<RevDev::InputManager>();
 		static inline std::unique_ptr<RevDev::ResourceManager> pResourceManager = std::make_unique<RevDev::ResourceManager>();
+		static inline std::unique_ptr<RevDev::UI> pUI = std::make_unique<RevDev::UI>();
 	private:
 	};
 }

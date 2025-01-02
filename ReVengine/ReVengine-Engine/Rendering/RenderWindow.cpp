@@ -11,7 +11,7 @@
 #include "Rendering/Shaders/TextureShader.h"
 #include <Rev_CoreSystems.h>
 #include <iostream>
-#include "ImGui/ImGuiSetup.h"
+#include "HUD/ImGui/ImGuiSetup.h"
 
 #undef min
 #undef max
