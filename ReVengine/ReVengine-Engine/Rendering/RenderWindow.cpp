@@ -102,11 +102,10 @@ bool RenderWindow::UpdateWindow()
         switch (e.type)
         {
         case SDL_KEYDOWN:
-            m_LastPressedKey = e.key.keysym.scancode;
-           // Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(e.key.keysym.scancode);
+            m_LastPressedKeys.insert(e.key.keysym.scancode);
             break;
         case SDL_KEYUP:
-            m_LastPressedKey = SDL_SCANCODE_UNKNOWN;
+            m_LastPressedKeys.erase(e.key.keysym.scancode);
             break;
 
         case SDL_MOUSEMOTION:
@@ -118,7 +117,10 @@ bool RenderWindow::UpdateWindow()
         }
     }    
 
-    if(m_LastPressedKey != SDL_SCANCODE_UNKNOWN) Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(m_LastPressedKey);
+    for (const auto& key : m_LastPressedKeys)
+    {
+        Rev::Rev_CoreSystems::pInputManager->HandleKeyDown(key);
+    }
 
     int xRel, yRel;
     SDL_GetRelativeMouseState(&xRel, &yRel);

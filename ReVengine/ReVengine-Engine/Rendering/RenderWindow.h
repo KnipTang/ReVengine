@@ -7,6 +7,7 @@
 #include "glm/matrix.hpp"
 #include "d3d11.h"
 #include "SDL_scancode.h"
+#include <set>
 
 namespace Rev
 {
@@ -65,6 +66,6 @@ namespace RevDev
 
 		DirectX::XMMATRIX m_ProjectionMatrix;
 
-		SDL_Scancode m_LastPressedKey;
+		std::set<SDL_Scancode> m_LastPressedKeys;
 	};
 }
