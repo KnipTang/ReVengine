@@ -1,15 +1,15 @@
 {
   "dependencies": [
     "glm",
-    "physx",
-    "sdl2",
-    "stb",
     {
       "name": "imgui",
       "features": [
-        "sdl2-binding",
-        "dx11-binding"
+        "dx11-binding",
+        "sdl2-binding"
       ]
-    }
+    },
+    "physx",
+    "sdl2",
+    "stb"
   ]
 }
