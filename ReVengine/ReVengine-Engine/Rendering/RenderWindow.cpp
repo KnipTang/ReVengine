@@ -100,7 +100,7 @@ void RenderWindow::DrawMesh(uint32_t meshId)
     pDeviceContext->DrawIndexed(mesh->GetIndiceCount(), 0, 0);
 }
 
-bool RenderWindow::UpdateWindow()
+bool RenderWindow::HandleInput()
 {
     m_ImGui->Update();
     //To get window to stay up
@@ -145,9 +145,13 @@ bool RenderWindow::UpdateWindow()
     SDL_GetRelativeMouseState(&xRel, &yRel);
     Rev::Rev_CoreSystems::pInputManager->HandleMouseRelativeMotion(xRel, yRel);
 
-    m_CreatorGod->updateWindow();
 
     return false;
+}
+
+void RenderWindow::UpdateWindow()
+{
+    m_CreatorGod->updateWindow();
 }
 
 void RenderWindow::RipWindow()
