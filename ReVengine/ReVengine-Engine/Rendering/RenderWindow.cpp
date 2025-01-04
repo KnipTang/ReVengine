@@ -149,9 +149,9 @@ bool RenderWindow::HandleInput()
     return false;
 }
 
-void RenderWindow::UpdateWindow()
+void RenderWindow::PresentWindow()
 {
-    m_CreatorGod->updateWindow();
+    m_CreatorGod->PresentWindow();
 }
 
 void RenderWindow::RipWindow()

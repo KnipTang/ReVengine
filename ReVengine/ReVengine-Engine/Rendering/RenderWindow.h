@@ -40,7 +40,7 @@ namespace RevDev
 
 		bool HandleInput();
 
-		void UpdateWindow();
+		void PresentWindow();
 
 		void RipWindow();
 

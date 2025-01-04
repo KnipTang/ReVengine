@@ -23,7 +23,7 @@ namespace RevDev
 
 		void Setup();
 
-		void updateWindow();
+		void PresentWindow();
 
 		ID3D11Device* GetDevice() { return pDevice.Get(); }
 		ID3D11DeviceContext* GetDeviceContext() { return pDeviceContext.Get(); }

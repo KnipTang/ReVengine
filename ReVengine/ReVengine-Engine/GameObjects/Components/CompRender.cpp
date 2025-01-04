@@ -10,12 +10,12 @@
 
 using namespace Rev;
 
-CompRender::CompRender(GameObject* gameObj, CompTransform* transform, 
+CompRender::CompRender(GameObject* gameObj, 
 	CompCamera* camera, BaseShader* shader, Texture* texture, 
 	float widthTexture, float heightTexture, 
 	glm::vec3 position, bool transparent) :
 	BaseComponent(gameObj),
-	m_TransformComp{ transform },
+	m_TransformComp{ gameObj->transform },
 	m_CameraComp{ camera },
 	m_Shader{ shader },
 	m_Texture{ texture },

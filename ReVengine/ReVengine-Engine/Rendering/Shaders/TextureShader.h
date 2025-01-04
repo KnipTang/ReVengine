@@ -25,7 +25,7 @@ namespace Rev
 		};
 
 	public:
-		TextureShader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+		TextureShader();
 		~TextureShader();
 
 		void InitShader();

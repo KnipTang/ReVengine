@@ -40,7 +40,7 @@ void RevDev::WindowHandler_D3D11::Setup()
 	setupPipeline();
 }
 
-void WindowHandler_D3D11::updateWindow()
+void WindowHandler_D3D11::PresentWindow()
 {
 	pSwapChain->Present(1, 0);
 	clearBuffer(m_BackgroundColour);

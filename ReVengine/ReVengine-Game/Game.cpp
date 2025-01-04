@@ -3,15 +3,17 @@
 #include "GameObjects/GameObject.h"
 #include "Scenes/Scene.h"
 #include "GameSettings.h"
+#include "GameObjects/Components/CompCamera.h"
 
 std::unique_ptr<Rev::Scene> Scene1()
 {
 	std::unique_ptr<Rev::Scene> scene = std::make_unique<Rev::Scene>();
-	std::unique_ptr<Rev::GameObject> exampleObject = std::make_unique<Rev::GameObject>();
+	Rev::GameObject* exampleObject = new Rev::GameObject{};
+	exampleObject->addComponent<Rev::CompCamera>(exampleObject, exampleObject->transform);
 
 	//Scene add gameobects & return
 	{
-		scene->addGameObject(std::move(exampleObject));
+		scene->addGameObject(exampleObject);
 		scene->DisplaySceneHierarchy();
 		return std::move(scene);
 	}

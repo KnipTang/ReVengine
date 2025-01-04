@@ -67,3 +67,13 @@ std::vector<Scene*> SceneManager::GetActiveScenes()
 {
 	return m_ActiveScenes;
 }
+
+Scene* SceneManager::GetSceneByID(int ID)
+{
+	for (auto&& scene : m_AllScenes)
+	{
+		if (scene->GetID() == ID)
+			return scene.get();
+	}
+	return nullptr;
+}

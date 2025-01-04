@@ -58,7 +58,7 @@ void ImGuiSetup::Update()
 
 	for (const auto& element : m_SubscriptedElements)
 	{
-		ImGui::Text("%s: %.2f", element.first.c_str(), *element.second);
+		ImGui::Text("%s%.2f", element.first.c_str(), *element.second);
 	}
 
 	ImGui::End();

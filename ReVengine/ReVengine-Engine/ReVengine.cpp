@@ -57,7 +57,7 @@ void ReVengine::Run(const std::function<SceneManager*()>& GameRun)
 
 		sceneMan->lateUpdate(deltaTime);
 
-		Rev_CoreSystems::pRevRender->UpdateWindow();
+		Rev_CoreSystems::pRevRender->PresentWindow();
 
 		sceneMan->render();
 

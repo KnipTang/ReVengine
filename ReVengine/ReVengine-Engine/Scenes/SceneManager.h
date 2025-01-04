@@ -61,6 +61,7 @@ namespace Rev
 				m_ActiveScenes.erase(std::find(m_ActiveScenes.begin(), m_ActiveScenes.end(), scene));
 		}
 		std::vector<Scene*> GetActiveScenes();
+		Scene* GetSceneByID(int ID);
 
 		const int GetID() { return sceneManagerID; }
 
