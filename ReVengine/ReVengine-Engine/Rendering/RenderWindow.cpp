@@ -82,8 +82,8 @@ uint32_t RenderWindow::AddMesh(const std::vector<Vertex> vertices, const std::ve
 {
     RevDev::Mesh& mesh = *m_Meshes.emplace_back(std::make_unique<Mesh>(m_CreatorGod->GetDevice())).get();
 
-    mesh.setupVertexBuffer(vertices);
-    mesh.setupIndexBuffer(indices);
+    mesh.SetupVertexBuffer(vertices);
+    mesh.SetupIndexBuffer(indices);
 
     return mesh.GetID();
 }
@@ -163,7 +163,7 @@ void RenderWindow::RipWindow()
     SDL_Quit();
 }
 
-const DirectX::XMMATRIX RenderWindow::getProjectionMatrix()
+const DirectX::XMMATRIX RenderWindow::GetProjectionMatrix()
 {
     return m_ProjectionMatrix;
 }

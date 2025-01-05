@@ -11,7 +11,7 @@ namespace Rev
 
 namespace RevDev
 {
-	class ResourceManager
+	class ResourceManager final
 	{
 	public:
 		ResourceManager();

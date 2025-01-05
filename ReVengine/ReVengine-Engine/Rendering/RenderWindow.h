@@ -27,7 +27,7 @@ struct Vertex;
 
 namespace RevDev
 {
-	class RenderWindow
+	class RenderWindow final
 	{
 	public:
 		RenderWindow();
@@ -46,7 +46,7 @@ namespace RevDev
 
 		void LoadTexture();
 
-		const DirectX::XMMATRIX getProjectionMatrix();
+		const DirectX::XMMATRIX GetProjectionMatrix();
 
 		ID3D11Device* GetDevice();
 		ID3D11DeviceContext* GetDeviceContext();

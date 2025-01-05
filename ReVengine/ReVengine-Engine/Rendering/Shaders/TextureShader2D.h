@@ -14,7 +14,7 @@ namespace Rev {
 
 namespace Rev
 {
-	class TextureShader2D : public Rev::BaseShader
+	class TextureShader2D final : public Rev::BaseShader
 	{
 	private:
 		struct MatrixBufferType

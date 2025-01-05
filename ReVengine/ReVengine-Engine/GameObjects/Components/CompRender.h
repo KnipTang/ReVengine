@@ -17,7 +17,7 @@ namespace Rev
 
 namespace Rev
 {
-	class CompRender : public BaseComponent
+	class CompRender final : public BaseComponent
 	{
 	public:
 		CompRender(GameObject* gameObj, CompCamera* camera, 
@@ -26,7 +26,7 @@ namespace Rev
 			glm::vec3 position = {0,0,0}, bool transparent = false);
 		~CompRender() {};
 
-		const void render() override;
+		const void Render() override;
 
 		float GetDistanceToCamera();
 	public:

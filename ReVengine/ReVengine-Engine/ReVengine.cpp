@@ -46,20 +46,20 @@ void ReVengine::Run(const std::function<SceneManager*()>& GameRun)
 
 		while (lag >= fixedTimeStep)
 		{
-			sceneMan->fixedUpdate(fixedTimeStep);
+			sceneMan->FixedUpdate(fixedTimeStep);
 
 			sceneMan->Physics(fixedTimeStep);
 
 			lag -= fixedTimeStep;
 		}
 
-		sceneMan->update(deltaTime);
+		sceneMan->Update(deltaTime);
 
-		sceneMan->lateUpdate(deltaTime);
+		sceneMan->LateUpdate(deltaTime);
 
 		Rev_CoreSystems::pRevRender->PresentWindow();
 
-		sceneMan->render();
+		sceneMan->Render();
 
 
 		const auto sleepTime = currentTime + targetFrameTime - std::chrono::high_resolution_clock::now();

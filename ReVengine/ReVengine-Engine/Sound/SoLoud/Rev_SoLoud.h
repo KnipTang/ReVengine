@@ -11,7 +11,7 @@ namespace SoLoud {
 
 namespace RevDev
 {
-	class Rev_SoLoud
+	class Rev_SoLoud final
 	{
 	public:
 		Rev_SoLoud();
