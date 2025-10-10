@@ -22,13 +22,13 @@
 1. Open the Cmake project with visual studio by right clicking in the folder and selecting “Open with visual studio”.
 ![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild1.png)
 
-3. In the Visual Studio IDE, Select Tools < Command line < Developer Command Prompt.
+2. In the Visual Studio IDE, Select Tools < Command line < Developer Command Prompt.
 ![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild2.png)
 
-4. In the Developer command windows, execute $vcpkg install.
+3. In the Developer command windows, execute $vcpkg install.
 ![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild3.png)
 
-5. Wait until all the libraries have been downloaded and then close Visual Studio. Open it again with the same method as step 1 and wait until the output window has finished building. Once finished ReVengine-Game.exe will be build and able to execute.
+4. Wait until all the libraries have been downloaded and then close Visual Studio. Open it again with the same method as step 1 and wait until the output window has finished building. Once finished ReVengine-Game.exe will be build and able to execute.
 ![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild4.png)
 
 ## Docmumentation - Getting-Started
