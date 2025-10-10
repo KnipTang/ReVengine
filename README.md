@@ -20,13 +20,16 @@
 ## Manual
 *How-To-Build - Visual Studio*
 1. Open the Cmake project with visual studio by right clicking in the folder and selecting “Open with visual studio”.
+![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild1.png)
 
-2. In the Visual Studio IDE, Select Tools < Command line < Developer Command Prompt.
+3. In the Visual Studio IDE, Select Tools < Command line < Developer Command Prompt.
+![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild2.png)
 
-3. In the Developer command windows, execute $vcpkg install.
-   
-4. Wait until all the libraries have been downloaded and then close Visual Studio. Open it again with the same method as step 1 and wait until the output window has finished building. Once finished ReVengine-Game.exe will be build and able to execute.
+4. In the Developer command windows, execute $vcpkg install.
+![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild3.png)
 
+5. Wait until all the libraries have been downloaded and then close Visual Studio. Open it again with the same method as step 1 and wait until the output window has finished building. Once finished ReVengine-Game.exe will be build and able to execute.
+![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HowToBuild4.png)
 
 ## Docmumentation - Getting-Started
 **Basics**
@@ -99,6 +102,7 @@ To display anything on the HUD, call the function SubscribeElement of the Rev_Co
 ```
 Rev::Rev_CoreSystems::pUI->SubscribeElement("Health: ", &healthPlayerComp->GetHealth());
 ```
+![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/HUDHealth.png)
 
 **Adding game objects to a scene during runtime**
 You can get a handle to the global scene manager in the Rev_CoreSystems. From this handle you can get the current active scene of a scene by its unique ID or its tag. This way you can simply call the AddGameObject function.
@@ -107,6 +111,7 @@ Rev::Rev_CoreSystems::pSceneManager->GetSceneByTag(“GameScene”)->addGameObje
 ```
 
 **Event / Game loop**
+![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/GameLoop.png)
 
 ## Report and Critical Reflection
 **Component based Gameobjects**
