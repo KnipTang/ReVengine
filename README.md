@@ -111,6 +111,7 @@ Rev::Rev_CoreSystems::pSceneManager->GetSceneByTag(“GameScene”)->addGameObje
 ```
 
 **Event / Game loop**
+
 ![App Screenshot](https://github.com/KnipTang/ReVengine/blob/main/DocumentationImages/GameLoop.png)
 
 ## Report and Critical Reflection
