@@ -1,3 +1,6 @@
+## ReVengine: A 1993 Doom engine, inspired C++ Game Engine.
+Example use case(Dooom): https://github.com/KnipTang/RevEngine-Dooom / https://youtu.be/NYs_ixAxnB8
+
 ## Highlighted features
 - Component based system
 - Multi SDL input system, Bind SDL codes to functionality
